@@ -13,8 +13,8 @@ const session = {
       "id": "linearGenomeView",
       "minimized": false,
       "type": "LinearGenomeView",
-      "offsetPx": 45551,
-      "bpPerPx": 0.3230882076593731,
+      "offsetPx": 587,
+      "bpPerPx": 11.392401564776572,
       "displayedRegions": [
         {
           "refName": "NC_045512.2",
@@ -26,22 +26,35 @@ const session = {
       ],
       "tracks": [
         {
-          "id": "4aZAiE-A3",
-          "type": "ReferenceSequenceTrack",
-          "configuration": "GRCh38-ReferenceSequenceTrack",
+          "id": "EdJ6oObfhiLEMLFiceUqD",
+          "type": "FeatureTrack",
+          "configuration": "nextstrain-annotations",
           "minimized": false,
           "displays": [
             {
-              "id": "AD3gqvG0_6",
-              "type": "LinearReferenceSequenceDisplay",
-              "heightPreConfig": 160,
-              "configuration": "GRCh38-ReferenceSequenceTrack-LinearReferenceSequenceDisplay",
-              "showForward": true,
-              "showReverse": true,
-              "showTranslation": true
+              "id": "qhFttmpuBqkM2kwVp9zTS",
+              "type": "LinearBasicDisplay",
+              "configuration": "nextstrain-color-display"
             }
           ]
         }
+        // {
+        //   "id": "4aZAiE-A3",
+        //   "type": "ReferenceSequenceTrack",
+        //   "configuration": "GRCh38-ReferenceSequenceTrack",
+        //   "minimized": false,
+        //   "displays": [
+        //     {
+        //       "id": "AD3gqvG0_6",
+        //       "type": "LinearReferenceSequenceDisplay",
+        //       "heightPreConfig": 160,
+        //       "configuration": "GRCh38-ReferenceSequenceTrack-LinearReferenceSequenceDisplay",
+        //       "showForward": true,
+        //       "showReverse": true,
+        //       "showTranslation": true
+        //     }
+        //   ]
+        // }
       ],
       "hideHeader": false,
       "hideHeaderOverview": false,

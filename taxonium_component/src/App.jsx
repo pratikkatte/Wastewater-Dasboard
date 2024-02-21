@@ -51,7 +51,7 @@ import {
         })
         setViewState(state)
       }, []);
-
+      
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
