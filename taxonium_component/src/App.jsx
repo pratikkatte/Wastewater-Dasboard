@@ -79,7 +79,7 @@ import {
         trackId: trackId,
         name: 'bamfile-name-'+clickedNodeRef.current.nodeDetails.name,
         assemblyNames: ['NC_045512'],
-        category: ['Genes'],
+        category: [],
         adapter: {
         type: "BamAdapter",
         bamLocation: {
@@ -90,13 +90,6 @@ import {
             uri: bami_location
             },
         },
-        // displays: [
-        //   {
-        //     type: "LinearPileupDisplay",
-        //     displayId: "newTrack_alignments"+trackId,
-        //     height: 200
-        //   }
-        // ]
         }
     }
     
