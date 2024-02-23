@@ -33,7 +33,7 @@ const tracks = [
           fill: "#E67030",
         },
         {
-          refName: 'NC_045512',
+          refName: 'NC_045512.2',
           name: "Orf1a",
           uniqueId: 0,
           start: 265,
@@ -117,24 +117,24 @@ const tracks = [
       },
     ],
   },
-    {
-      type: 'AlignmentsTrack',
-      trackId: 'genes',
-      name: 'spike-in_bams_file_0.bam',
-      assemblyNames: ['NC_045512'],
-      category: ['Genes'],
-      adapter: {
-        type: 'BamAdapter',
-        bamLocation: {
-          uri: 'spike-in_bams_file_0.bam',
-        },
-        index: {
-          location: {
-            uri: 'spike-in_bams_file_0.bam.bai',
-          },
-        },
-      }
-  }
+  //   {
+  //     type: 'AlignmentsTrack',
+  //     trackId: 'genes',
+  //     name: 'spike-in_bams_file_0.bam',
+  //     assemblyNames: ['NC_045512'],
+  //     category: ['Genes'],
+  //     adapter: {
+  //       type: 'BamAdapter',
+  //       bamLocation: {
+  //         uri: 'spike-in_bams_file_0.bam',
+  //       },
+  //       index: {
+  //         location: {
+  //           uri: 'spike-in_bams_file_0.bam.bai',
+  //         },
+  //       },
+  //     }
+  // }
   ]
   
   export default tracks
