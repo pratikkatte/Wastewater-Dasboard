@@ -34,6 +34,9 @@ const useSearch = ({
   const [zoomToSearch, setZoomToSearch] = useState(
     query.zoomToSearch ? { index: query.zoomToSearch } : null
   );
+
+  console.log("zoomToSearch", zoomToSearch)
+
   const searchesEnabled = query.enabled
     ? JSON.parse(query.enabled)
     : JSON.parse(default_query.enabled);
@@ -223,10 +226,8 @@ const useSearch = ({
   ]);
 
   const addNewTopLevelSearch = () => {
-    console.log("addNewTopLevelSearch");
     // get a random string key
     const newSearch = getDefaultSearch(config);
-
     setSearchSpec([...searchSpec, newSearch]);
     setTimeout(() => {
       setEnabled(newSearch.key, true);
@@ -251,23 +252,56 @@ const useSearch = ({
   useEffect(() => {
     if (zoomToSearch && deckSize) {
       const { index } = zoomToSearch;
-      const relevant = searchResults[searchSpec[index].key];
-      if (!relevant) {
-        console.log("no search results for index", index);
-        console.log(searchResults);
+      console.log("zoom index", searchResults)
+      const relevant = [];
+      
+      index.forEach(currentIndex => {
+        const key = searchSpec[currentIndex].key;
+        relevant.push(searchResults[key])
+      })
+      // const relevant = searchResults[searchSpec[index].key];
+      console.log("zoom relevant", relevant);
+
+      // if (!relevant) {
+      //   console.log("no search results for index", index);
+      //   console.log(searchResults);
+      //   return;
+      // }
+
+      if (relevant.some(element => element === undefined)) {
         return;
       }
-      const { overview } = relevant;
-      if (!overview || overview.length === 0) {
-        console.log("no overview for index", index);
-        return;
-      }
-      const min_y = reduceMaxOrMin(overview, (d) => d.y, "min");
-      const max_y = reduceMaxOrMin(overview, (d) => d.y, "max");
-      // eslint-disable-next-line no-unused-vars
-      const min_x = reduceMaxOrMin(overview, (d) => d[xType], "min");
-      // eslint-disable-next-line no-unused-vars
-      const max_x = reduceMaxOrMin(overview, (d) => d[xType], "max");
+
+      // const { overview } = relevant;
+      const overview = []
+      const xs = []
+      const ys = []
+
+      relevant.forEach(currelevant => {
+        console.log("zoom", currelevant)
+        ys.push(currelevant['overview'][0].y)
+        xs.push(currelevant['overview'][0].x_dist)
+      })
+
+      // // Add the custom overview check.
+      // if (!overview || overview.length === 0) {
+      //   console.log("no overview for index", index);
+      //   return;
+      // }
+      
+      console.log("doing zoom ", xs, ys);
+      const min_y = Math.min(...ys);
+      const max_y = Math.max(...ys);
+
+      const min_x = Math.min(...xs);
+      const max_x = Math.max(...xs);
+
+      // const min_y = reduceMaxOrMin(overview, (d) => d.y, "min");
+      // const max_y = reduceMaxOrMin(overview, (d) => d.y, "max");
+      // // eslint-disable-next-line no-unused-vars
+      // const min_x = reduceMaxOrMin(overview, (d) => d[xType], "min");
+      // // eslint-disable-next-line no-unused-vars
+      // const max_x = reduceMaxOrMin(overview, (d) => d[xType], "max");
 
       console.log("Doing zoom", min_y, max_y, min_x, max_x);
 
