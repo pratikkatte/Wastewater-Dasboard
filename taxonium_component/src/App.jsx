@@ -139,16 +139,21 @@ useEffect(() => {
         
         const default_search = createDefaultSearch(mark_nodes_s);
   
+        const zoom_to_indexes = []
+        for (let i = 0; i < fileNames.length; i++) {
+          zoom_to_indexes.push(i.toString());
+        }
+        console.log("zoom_to_indexes", zoom_to_indexes);
+
         queryRef.current = {
           srch: JSON.stringify(default_search),
           enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
           backend: "",
           xType: "x_dist",
+          zoomToSearch: zoom_to_indexes,
           mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
           treenomeEnabled: false,
-        };
-        console.log("print", queryRef.current)
-        
+        };        
         setSelectedFile(nodeFileDictionary);
       }
   

@@ -163,6 +163,8 @@ function Taxonium({
     settings,
   });
 
+  console.log("print", search);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
