@@ -42,11 +42,12 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
             data,
             config,
           );
-
+          
+          console.log("response", response)
           if (response.status === 200) {
             
             const selected_nodes = response.data.selected_nodes
-            console.log("response", selected_nodes)
+            
             handleFileProcessing(selected_nodes)
             console.log("file uploaded")
           }

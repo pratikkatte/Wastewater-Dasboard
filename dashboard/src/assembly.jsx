@@ -7,10 +7,10 @@ const assembly = {
       adapter: {
         type: 'IndexedFastaAdapter',
         fastaLocation: {
-          uri: '/konstantinos/refsequences.fasta',
+          uri: 'http://localhost:5000/uploads/refsequences.fasta',
         },
         faiLocation: {
-          uri: '/konstantinos/refsequences.fasta.fai',
+          uri: 'http://localhost:5000/uploads/refsequences.fasta.fai',
         },
       },
     }

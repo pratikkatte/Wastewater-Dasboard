@@ -3,8 +3,11 @@ import os
 from flask import jsonify, request
 import pysam
 from werkzeug.utils import secure_filename
+from flask import send_from_directory
+
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__))+ '/data'
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 ALLOWED_EXTENSIONS = set(['bam', 'bai'])
 
@@ -48,6 +51,10 @@ def selectNodes(uploaded_filenames):
 def allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@app.route('/uploads/<name>')
+def download_file(name):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
 @app.route('/api/upload', methods=['POST', 'GET'])
 def fileUpload():
