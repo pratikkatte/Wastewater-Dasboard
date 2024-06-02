@@ -1,6 +1,6 @@
 import { getDefaultSearch } from "./searchUtil";
 
-const first_search = getDefaultSearch(null, "A");
+const first_search = getDefaultSearch(null, "aa1");
 if (window.location.hostname.includes("visualtreeoflife.taxonium.org")) {
   first_search["type"] = "meta_name";
 }
