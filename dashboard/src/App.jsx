@@ -10,7 +10,8 @@ import defaultSession from './defaultSession.jsx'
 import addTrack  from './utils/TrackUtils.jsx'
 import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
-import axios from 'axios'
+import DashboardPlugin from './plugins'
+
 
 import {
   createViewState,
@@ -58,6 +59,9 @@ function App() {
       assembly,
       tracks: tracks,
       defaultSession,
+      plugins:[
+        DashboardPlugin
+        ],
       onChange: patch => {
         setPatches(previous => previous + JSON.stringify(patch) + '\n')
       },
