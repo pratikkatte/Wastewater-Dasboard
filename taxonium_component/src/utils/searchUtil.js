@@ -1,9 +1,8 @@
-export function getDefaultSearch(config, text ) {
-  const key = Math.random().toString(36).substring(2, 15);
-  // if (!key) {
-  //   key = Math.random().toString(36).substring(2, 15);
-  //   console.log("generated key", key);
-  // }
+export function getDefaultSearch(config, key) {
+  if (!key) {
+    key = Math.random().toString(36).substring(2, 15);
+    console.log("generated key", key);
+  }
   if (config && config.defaultSearch) {
     return config.defaultSearch;
   }
@@ -11,7 +10,7 @@ export function getDefaultSearch(config, text ) {
     key,
     type: "name",
     method: "text_match",
-    text,
+    text: "",
     gene: "S",
     position: 484,
     new_residue: "any",

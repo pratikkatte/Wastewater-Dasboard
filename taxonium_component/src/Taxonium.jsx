@@ -45,15 +45,11 @@ function Taxonium({
   const backupUpdateQuery = useCallback((newQuery) => {
     setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
   }, []);
+  
 
   query = backupQuery; // query
   updateQuery = backupUpdateQuery;
-  // if query and updateQuery are not provided, use the backupQuery
-  // if (!query && !updateQuery) {
-  //   query = backupQuery; // query
-  //   updateQuery = backupUpdateQuery; // 
-  // }
-
+  
   // if no setTitle, set it to a noop
   if (!setTitle) {
     setTitle = () => {};
@@ -97,12 +93,14 @@ function Taxonium({
   }
   const selectedDetails = useNodeDetails("selected", backend);
 
+
   useEffect(() => {
     if(selectedDetails.nodeDetails != null){
       onClickNode(selectedDetails)
     }
  }, [selectedDetails])
- 
+
+
   const config = useConfig(
     backend,
     view,
@@ -163,16 +161,6 @@ function Taxonium({
     settings,
   });
 
-  console.log("print", search);
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-    setTimeout(() => {
-      window.dispatchEvent(new Event("resize"));
-    }, 100);
-  };
-
   const treenomeState = useTreenomeState(data, deckRef, view, settings);
 
   return (
@@ -188,11 +176,7 @@ function Taxonium({
       />
       <div className="flex-grow overflow-hidden flex flex-col md:flex-row">
         <div
-          className={
-            sidebarOpen
-              ? "h-1/2 md:h-full w-full 2xl:w-3/4 md:flex-grow" +
-                (settings.treenomeEnabled ? " md:w-3/4" : " md:w-2/3")
-              : "md:col-span-12 h-5/6 md:h-full w-full"
+          className={ "md:col-span-12 h-5/6 md:h-full w-full"
           }
         >
           <Deck
@@ -218,47 +202,6 @@ function Taxonium({
             jbrowseRef={jbrowseRef}
             setAdditionalColorMapping={setAdditionalColorMapping}
           />
-        </div>
-
-        <div
-          className={
-            sidebarOpen
-              ? "flex-grow min-h-0 h-1/2 md:h-full 2xl:w-1/4 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
-                (settings.treenomeEnabled ? " md:w-1/4" : " md:w-1/3")
-              : "bg-white shadow-xl"
-          }
-        >
-          {/* {!sidebarOpen && (
-            <button onClick={toggleSidebar}>
-              <br />
-              {window.innerWidth > 768 ? (
-                <MdArrowBack className="mx-auto w-5 h-5 sidebar-toggle" />
-              ) : (
-                <MdArrowUpward className="mx-auto w-5 h-5 sidebar-toggle" />
-              )}
-            </button>
-          )}
-
-          {sidebarOpen && (
-            <SearchPanel
-              className="flex-grow min-h-0 h-full bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden"
-              backend={backend}
-              search={search}
-              colorBy={colorBy}
-              colorHook={colorHook}
-              config={config}
-              selectedDetails={selectedDetails}
-              xType={xType}
-              setxType={setxType}
-              settings={settings}
-              treenomeState={treenomeState}
-              view={view}
-              overlayContent={overlayContent}
-              setAboutEnabled={setAboutEnabled}
-              perNodeFunctions={perNodeFunctions}
-              toggleSidebar={toggleSidebar}
-            />
-          )} */}
         </div>
       </div>
     </div>
