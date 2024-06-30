@@ -242,6 +242,7 @@ const useLayers = ({
         }
       : null;
 
+
     const fillin_scatter_layer = {
       layerType: "ScatterplotLayer",
       ...scatter_layer_common_props,
@@ -488,9 +489,10 @@ const useLayers = ({
       id: "main-search-scatter-" + spec.key,
       getPosition: (d) => [d[xType], d.y],
       getLineColor: settings.displaySearchesAsPoints ? [0, 0, 0] : lineColor,
-      getRadius: settings.displaySearchesAsPoints
-        ? settings.searchPointSize
-        : 5 + 2 * i,
+      // getRadius: settings.displaySearchesAsPoints
+      //   ? settings.searchPointSize
+      //   : 5 + 2 * i,
+      getRadius: 5,
       radiusUnits: "pixels",
       lineWidthUnits: "pixels",
       stroked: true,
