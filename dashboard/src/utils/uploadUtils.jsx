@@ -6,6 +6,8 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [isUploading, setisUploading] = useState(false);
+
   const [uploadProgress, setuploadProgress] = useState(0);
 
   let uploadInput = React.createRef();
@@ -20,6 +22,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
     
     const handleFileUpload = async (ev) => {
       ev.preventDefault();
+      setisUploading(true)
 
       if (!uploadedFile) {
           alert('Please select a file first');
@@ -46,6 +49,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
           console.log("response", response)
           if (response.status === 200) {
             
+            setisUploading(false)
             const selected_nodes = response.data.selected_nodes
             
             handleFileProcessing(selected_nodes)
@@ -56,6 +60,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
             alert(response.status)
           }
         }catch (error){
+          setisUploading(false)
           console.log("error", error)
           if (error.response.status == 400){
             alert(error.response.data.status)
@@ -105,8 +110,17 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
                 }} 
                 onChange={handleFileChange} style={{ padding: '10px', margin: '5px', border: '1px solid #ccc', borderRadius: '5px' }} multiple />
                 <button onClick={handleFileUpload} style={{ padding: '10px 20px', margin: '5px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Upload</button>
+                {isUploading && (
+            <>
+            <p>{uploadProgress}%</p>
+            {/* <CircularProgress value={uploadProgress} thickness="12px">
+              <CircularProgressLabel>{uploadProgress}%</CircularProgressLabel>
+            </CircularProgress> */}
+            </>
+        )}
                 <br/>
             </div>
+           
         </div>
 
       );

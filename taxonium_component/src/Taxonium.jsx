@@ -101,6 +101,7 @@ function Taxonium({
  }, [selectedDetails])
 
 
+
   const config = useConfig(
     backend,
     view,

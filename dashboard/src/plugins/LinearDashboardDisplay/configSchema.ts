@@ -34,6 +34,11 @@ export default (pluginManager: PluginManager) => {
       description: 'color scheme to use',
       defaultValue: 'mappingQuality',
     },
+    
+    groupname_tag: {
+      type: 'string',
+      defaultValue: "",
+    }
   },
     { baseConfiguration: baseLinearDisplayConfigSchema, explicitlyTyped: true },
   )

@@ -252,7 +252,6 @@ const useSearch = ({
   useEffect(() => {
     if (zoomToSearch && deckSize) {
       const { index } = zoomToSearch;
-      console.log("zoom index", searchResults)
       const relevant = [];
       
       index.forEach(currentIndex => {
@@ -278,7 +277,6 @@ const useSearch = ({
       const ys = []
 
       relevant.forEach(currelevant => {
-        console.log("zoom", currelevant)
         ys.push(currelevant['overview'][0].y)
         xs.push(currelevant['overview'][0].x_dist)
       })
@@ -289,7 +287,6 @@ const useSearch = ({
       //   return;
       // }
       
-      console.log("doing zoom ", xs, ys);
       const min_y = Math.min(...ys);
       const max_y = Math.max(...ys);
 
@@ -303,7 +300,6 @@ const useSearch = ({
       // // eslint-disable-next-line no-unused-vars
       // const max_x = reduceMaxOrMin(overview, (d) => d[xType], "max");
 
-      console.log("Doing zoom", min_y, max_y, min_x, max_x);
 
       const oldViewState = { ...view.viewState };
       const newZoom =
@@ -321,11 +317,7 @@ const useSearch = ({
         target: new_target,
         zoom: newZoom,
       };
-      console.log(
-        "zoom to search new VS",
-        viewState.target[0],
-        viewState.target[1]
-      );
+
 
       view.onViewStateChange({
         viewState: viewState,
