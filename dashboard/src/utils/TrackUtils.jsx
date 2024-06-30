@@ -15,7 +15,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
         assemblyNames: ['NC_045512'],
         category: [],
         adapter: {
-            type: "BamAdapter",
+            type: "DashboardAdapter",
             bamLocation: {
                 uri: bam_location
             },
