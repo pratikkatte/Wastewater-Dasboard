@@ -56,8 +56,6 @@ function App() {
   const [query, updateQuery] = useQueryAsState(default_query);
   const [refNames, setRefNames] = useState([]);
 
-
-
   useEffect(() => {
     const state = createViewState({
       assembly,

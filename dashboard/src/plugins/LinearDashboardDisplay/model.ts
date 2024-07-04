@@ -27,6 +27,8 @@ import LinearGenomeViewPlugin from '@jbrowse/plugin-linear-genome-view'
 import { observable } from 'mobx'
 import { IAnyStateTreeNode, addDisposer, isAlive, getSnapshot } from 'mobx-state-tree'
 import { lazy } from 'react'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+
 
 const FilterByTagDialog = lazy(() => import('./FilterByTag'))
 import { IAutorunOptions, autorun } from 'mobx'
@@ -77,12 +79,12 @@ function createAutorun(
       }),
     ),
   })
-
   
   // using a map because it preserves order
 const rendererTypes = new Map([
     ['pileup', 'PileupRenderer'],
     ['svg', 'SvgFeatureRenderer'],
+    ['Dashboard', 'DashboardRenderer']
   ])
 
 type LGV = LinearGenomeViewModel
@@ -109,7 +111,8 @@ export default (
             types.model({
               name: types.string,
             })
-          )
+          ),
+          showEPColor: false,
         }),
         
       )
@@ -126,8 +129,6 @@ export default (
           }) {
             self.colorTagMap = observable.map({}) // clear existing mapping
             self.colorBy = cast(colorScheme)
-            console.log("colorscheme", colorScheme.type, colorScheme.tag)
-
             if (colorScheme.tag) {
               self.tagsReady = false
             }
@@ -193,10 +194,21 @@ export default (
           },
         }))
         .actions(self => ({
+        
+          toggleEPDisplay() {
+
+            self.showEPColor = !self.showEPColor
+            if(self.showEPColor)
+            {
+              self.setColorScheme({type: 'tag', tag: 'EP'})
+            }
+            else{
+              self.setColorScheme({type: 'mappingQuality'});
+            }
+          },
 
         afterAttach() {
           const group_name = getConf(self, 'groupname_tag')
-          console.log('group', group_name)
 
             self.setColorScheme({type: 'mappingQuality'});
             
@@ -225,7 +237,6 @@ export default (
               if (colorBy?.tag && !tagsReady) {
                 const vals = await getUniqueTagValues(self, colorBy, staticBlocks)
                 self.updateColorTagMap(vals)
-                console.log("it was in here, inside Tag")
               }
               self.setTagsReady(true)
             },
@@ -271,6 +282,7 @@ export default (
             }),
           )
       }
+
     }
     ))
       .views(self => ({
@@ -306,7 +318,6 @@ export default (
   
           get rendererTypeName() {
               const viewName = getConf(self, 'defaultRendering')
-              console.log(viewName)
               const rendererType = rendererTypes.get(viewName)
               if (!rendererType) {
                 throw new Error(`unknown alignments view name ${viewName}`)
@@ -317,21 +328,23 @@ export default (
           trackMenuItems() {
             return [
               ...superTrackMenuItems(),
-                {
-                  label: 'Filter by',
-                  icon: FilterListIcon,
-                  onClick: () => {
-                    getSession(self).queueDialog(doneCallback => [
-                      FilterByTagDialog,
-                      { model: self, handleClose: doneCallback },
-                    ])
-                  },
-              },
+              //   {
+              //     label: 'Filter by',
+              //     icon: FilterListIcon,
+              //     onClick: () => {
+              //       getSession(self).queueDialog(doneCallback => [
+              //         FilterByTagDialog,
+              //         { model: self, handleClose: doneCallback },
+              //       ])
+              //     },
+              // },
               {
-                label: 'color by XX',
+                label: 'color by EP',
+                icon: VisibilityIcon,
                 type: 'checkbox',
+                checked: self.showEPColor,
                 onClick: () => {
-                  self.setColorScheme({type: 'tag', tag: 'XX'})
+                  self.toggleEPDisplay()
                 }
               }
             ]
@@ -366,7 +379,7 @@ export default (
                           featureId: f,
                           sessionId,
                           layoutId: getContainingView(self).id,
-                          rendererType: 'PileupRenderer',
+                          rendererType: 'DashboardRenderer',
                         },
                       )) as { feature: SimpleFeatureSerialized | undefined }
     
