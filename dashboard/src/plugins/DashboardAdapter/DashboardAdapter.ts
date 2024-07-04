@@ -102,7 +102,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
         return { idToName, nameToId }
       },
     )
-    console.log(this.samHeader)
     return this.samHeader
   }
 
@@ -213,7 +212,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
 
           if (tagFilter) {            
             const v = record.get(tagFilter.tag)
-            console.log("tagfilter", v)
 
             if (
               !(tagFilter.value === '*'
@@ -222,16 +220,16 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
                 : `${v}`.split(',').includes(tagFilter.value)
                 // : tagFilter.value.split(',').includes(`${v}`)
             )) {
-              console.log("tagfilter", tagFilter, (tagFilter.value === '*'
-              ? v !== undefined
-              // : `${v}` === tagFilter.value
-              : `${v}`.split(',').includes(tagFilter.value)))
+              // console.log("tagfilter", tagFilter, (tagFilter.value === '*'
+              // ? v !== undefined
+              // // : `${v}` === tagFilter.value
+              // : `${v}`.split(',').includes(tagFilter.value)))
               continue
             }
-            console.log("tagfilter", tagFilter, (tagFilter.value === '*'
-                ? v !== undefined
-                // : `${v}` === tagFilter.value
-                : tagFilter.value.split(',').includes(`${v}`)))
+            // console.log("tagfilter", tagFilter, (tagFilter.value === '*'
+            //     ? v !== undefined
+            //     // : `${v}` === tagFilter.value
+            //     : tagFilter.value.split(',').includes(`${v}`)))
           }
           if (readName && record.get('name') !== readName) {
             continue

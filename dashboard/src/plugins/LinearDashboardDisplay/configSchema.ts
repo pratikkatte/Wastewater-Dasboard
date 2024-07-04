@@ -13,12 +13,12 @@ export default (pluginManager: PluginManager) => {
     {
       defaultRendering: {
         type: 'stringEnum',
-        model: types.enumeration('Rendering', ['pileup']),
-        defaultValue: 'pileup',
+        model: types.enumeration('Rendering', ['pileup', 'Dashboard']),
+        defaultValue: 'Dashboard',
     },
     renderers: ConfigurationSchema('RenderersConfiguration', {
-      PileupRenderer:
-      pluginManager.getRendererType('PileupRenderer').configSchema,
+      DashboardRenderer:
+      pluginManager.getRendererType('DashboardRenderer').configSchema,
     }),
 
     colorScheme: {

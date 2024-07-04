@@ -1,12 +1,17 @@
+import { lazy } from 'react'
 import PluginManager from '@jbrowse/core/PluginManager'
 import Plugin from '@jbrowse/core/Plugin'
 import { ConfigurationSchema } from '@jbrowse/core/configuration'
-import { DisplayType, TrackType, createBaseTrackConfig, createBaseTrackModel  } from '@jbrowse/core/pluggableElementTypes'
+import { DisplayType, TrackType, createBaseTrackConfig, createBaseTrackModel, RendererType } from '@jbrowse/core/pluggableElementTypes'
 
 import LinearDashboardDisplayF from './LinearDashboardDisplay'
 import AdapterType from '@jbrowse/core/pluggableElementTypes/AdapterType'
+// import  DashboardRenderingSchema from './DashboardRenderer/configSchema'
+// import DashboardRenderingComponent from './DashboardRenderer/component/DashboardRendering'
+
 import { AdapterClass, configSchema } from './DashboardAdapter'
 
+import {DashboardRender, configSchema as DashboardRenderingSchema, ReactComponent as DashboardRenderingComponent} from './DashboardRenderer'
 
 export default class DashboardPlugin extends Plugin {
   name = 'DashboardPlugin'
@@ -65,5 +70,16 @@ export default class DashboardPlugin extends Plugin {
         configSchema,
       }),
   )
+
+  pluginManager.addRendererType(() => {
+    return new DashboardRender({
+      name: 'DashboardRenderer', 
+      displayName: 'Dashboard renderer',
+      ReactComponent: DashboardRenderingComponent, 
+      configSchema: DashboardRenderingSchema, 
+      pluginManager
+    })
+  })
+
   }
 }
