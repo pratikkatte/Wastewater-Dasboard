@@ -11,6 +11,7 @@ import addTrack  from './utils/TrackUtils.jsx'
 import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 import {BamFile} from '@gmod/bam'
 
@@ -56,6 +57,10 @@ function App() {
   const [query, updateQuery] = useQueryAsState(default_query);
   const [refNames, setRefNames] = useState([]);
 
+  const toggleJBrowse = () => {
+    setJBrowseOpen(!JBrowseOpen);
+  };
+
   useEffect(() => {
     const state = createViewState({
       assembly,
@@ -93,64 +98,6 @@ useEffect(() => {
     }
     }, [showTrack])
 
-
-    // // or import {BamFile} from '@gmod/bam'
-    
-    // function readBam() {
-
-    //   const path = require('path');
-
-    //   console.log("readBAM")
-
-    //   path.join(__dirname, 'example.bam');
-    //   const bamPath = "../../server/app/data/SRR28230429.bam"
-
-    //   const bam = new BamFile({
-    //     path: bamPath,
-    //     index: { path: `${bamPath}.bai` }
-    // })
-    // // // Open the BAM file
-    // // var  header = await bam.getHeader()
-
-    // // // this would get same records as samtools view ctgA:1-50000
-    // // var records = await t.getRecordsForRange('ctgA', 0, 50000)
-
-    // }
-
-    // readBam().catch(err => console.error(err))
-
-    // useEffect(() => {
-    //   console.log("readBAM")
-    //   const fetchBamData = async () => {
-    //     try {
-    //       const bamUrl = 'http://localhost:5000/uploads/customised_my_vcf_NODE-1.bam';
-    //       const baiUrl = `${bamUrl}.bai`
-          
-    //       const bam = new BamFile({
-    //         bamUrl,
-    //         baiUrl,
-    //         fetch: (url, options) => fetch(url, options).then(r => r.arrayBuffer()),
-    //       });
-         
-    //       await bam.getHeader(); // Ensures the BAM file is loaded
-
-    //       const records = await bam.getRecordsForRange('NC_045512v2', 100, 200);
-    //      // const newReads = [];
-  
-    //       for (const record of records) {
-    //         console.log(record._tags())
-    //       //   newReads.push(`Read Name: ${record.get('name')}, Tag XX: ${record.get('XX')}`);
-    //       }
-  
-    //       // setReads(newReads);
-    //     } catch (err) {
-    //       console.log(`Error reading BAM: ${err.message}`);
-    //     }
-    //   };
-  
-    //   fetchBamData();
-    // }, []);
-  
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
@@ -189,11 +136,25 @@ useEffect(() => {
               />
             </div>        
         </div>
-          <div className='flex' style={{margin: "10px"}}>
+        <div className='flex' style={{ margin: "10px", position: "relative" }}>
+          <button 
+                onClick={toggleJBrowse} 
+                style={{ 
+                  position: 'absolute', 
+                  top: '10px', 
+                  right: '10px', 
+                  zIndex: 10, 
+                  backgroundColor: 'white', 
+                  border: 'none', 
+                  cursor: 'pointer' 
+                }}
+              >
+                {JBrowseOpen ? <FaArrowRight /> : <FaArrowLeft />}
+              </button>
             {JBrowseOpen &&
             <div>
               <JBrowseLinearGenomeView viewState={viewState} />
-              </div>
+            </div>
             }
           </div> 
         </div> 
