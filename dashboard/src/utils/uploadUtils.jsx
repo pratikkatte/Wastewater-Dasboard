@@ -2,82 +2,48 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 
-const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRef}) => {
+const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRef, setuploadProgress}) => {
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isUploading, setisUploading] = useState(false);
 
-  const [uploadProgress, setuploadProgress] = useState(0);
-
+  
+  const [message, setMessage] = useState('')
   let uploadInput = React.createRef();
 
-    const handleFileChange = (event) => {
-      const selectedFileList = []
-      for (let i=0; i< event.target.files.length; i++){
-        selectedFileList.push(event.target.files.item(i));
-      }
-      setUploadedFile(selectedFileList)
-      };
     
-    const handleFileUpload = async (ev) => {
-      ev.preventDefault();
+    const handleFileChange = (event) => {
+      setUploadedFile(Array.from(event.target.files)); 
+    };
+    const handleFileUpload = () => {
+      // ev.preventDefault();
       setisUploading(true)
 
       if (!uploadedFile) {
           alert('Please select a file first');
           return;
         }
-        const data = new FormData()
-
-        for (let i =0; i < uploadInput.files.length; i++){
-          data.append("file", uploadInput.files[i], uploadInput.files[i].name)
-        }
-        try {
-          const config = {
-            onUploadProgress: (progressEvent) => {
-              const { loaded, total } = progressEvent;
-              setuploadProgress(Math.round((loaded / total) * 100));
-            },
-          };
-          const response = await axios.post(
-            "/api/upload",
-            data,
-            config,
-          );
-          
-          console.log("response", response)
-          if (response.status === 200) {
-            
-            setisUploading(false)
-            const selected_nodes = response.data.selected_nodes
-            
+      const worker = new Worker(new URL('./uploadWorker.js', import.meta.url));
+      worker.onmessage = function(event) {
+        if (event.data.progress !== undefined) {
+          setuploadProgress(event.data.progress);
+        } else if (event.data.message) {
+            setMessage(event.data.message);
+            const selected_nodes = event.data.data.selected_nodes
             handleFileProcessing(selected_nodes)
-            console.log("file uploaded")
-          }
-          if (response.status == 400 ){
-            console.log(response)
-            alert(response.status)
-          }
-        }catch (error){
-          setisUploading(false)
-          console.log("error", error)
-          if (error.response.status == 400){
-            alert(error.response.data.status)
-          }
-          else {
-            alert(error.response.statusText)
-          }            
-      }
+        } else if (event.data.error) {
+            setMessage(event.data.error);
+        }
+    };
+
+    worker.postMessage({uploadedFile});
     };
 
       const handleFileProcessing = (filenames_nodes) => {
       
         const nodes = Object.keys(filenames_nodes);
-        console.log("nodes", nodes);
-        
         mark_nodeRef.current = nodes;
-        console.log("mark_nodeRef",mark_nodeRef)
         const default_search = createDefaultSearch(nodes);
     
         const zoom_to_indexes = [];
@@ -85,6 +51,18 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
             zoom_to_indexes.push(i.toString());
         }
     
+        // const query = {
+        //       srch: JSON.stringify(default_search),
+        //       enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
+        //       backend: "",
+        //       xType: "x_dist",
+        //       zoomToSearch: zoom_to_indexes,
+        //       mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
+        //       treenomeEnabled: false,
+        //   };
+        
+        // updateQuery(query)
+        
         queryRef.current = {
             srch: JSON.stringify(default_search),
             enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
@@ -112,7 +90,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
                 <button onClick={handleFileUpload} style={{ padding: '10px 20px', margin: '5px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Upload</button>
                 {isUploading && (
             <>
-            <p>{uploadProgress}%</p>
+            {/* <p>{uploadProgress.toFixed(1)}%</p> */}
             {/* <CircularProgress value={uploadProgress} thickness="12px">
               <CircularProgressLabel>{uploadProgress}%</CircularProgressLabel>
             </CircularProgress> */}

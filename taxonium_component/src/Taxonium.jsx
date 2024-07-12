@@ -86,6 +86,7 @@ function Taxonium({
     url_on_fail,
     sourceData
   );
+
   let hoverDetails = useHoverDetails();
   const gisaidHoverDetails = useNodeDetails("gisaid-hovered", backend);
   if (window.location.toString().includes("epicov.org")) {
@@ -93,14 +94,11 @@ function Taxonium({
   }
   const selectedDetails = useNodeDetails("selected", backend);
 
-
   useEffect(() => {
     if(selectedDetails.nodeDetails != null){
       onClickNode(selectedDetails)
     }
  }, [selectedDetails])
-
-
 
   const config = useConfig(
     backend,
@@ -111,6 +109,7 @@ function Taxonium({
     configDict,
     configUrl
   );
+  
   const colorBy = useColorBy(config, query, updateQuery);
   const [additionalColorMapping, setAdditionalColorMapping] = useState({});
   const colorMapping = useMemo(() => {

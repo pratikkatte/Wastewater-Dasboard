@@ -54,6 +54,7 @@ function App() {
 
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
+  const [uploadProgress, setuploadProgress] = useState(0);
   const [query, updateQuery] = useQueryAsState(default_query);
   const [refNames, setRefNames] = useState([]);
 
@@ -110,6 +111,9 @@ useEffect(() => {
     }
     }, [JBrowseOpen]);
 
+    const onbuttonclick = useCallback(() => {
+      console.log("button clicked")
+    })
 
     if (!viewState) {
       return null
@@ -118,11 +122,14 @@ useEffect(() => {
   return (
     <>
       <div>
+        <div>
+          <button onClick={onbuttonclick}>button clicked</button>
+        </div>
           < Header/>
           <br />
-            {!selectedFile ? 
+            {!selectedFile? 
               <div>
-                <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} queryRef={queryRef} />
+                <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} queryRef={queryRef} setuploadProgress={setuploadProgress} />
               </div>
           :
          <div>
@@ -160,6 +167,7 @@ useEffect(() => {
         </div> 
       </div> 
       }
+      <p>{uploadProgress.toFixed(1)}%</p>
     </div>
   </>
 );

@@ -8,7 +8,6 @@ from flask import send_from_directory
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__))+ '/data'
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 ALLOWED_EXTENSIONS = set(['bam', 'bai'])
 
 
@@ -60,8 +59,9 @@ def download_file(name):
 def fileUpload():
     if request.method == 'POST':
         uploaded_files = []
-
+        print(request.files)
         file = request.files.getlist('file')
+        print(file)
         for f in file:
             filename = secure_filename(f.filename)
             if allowedFile(filename):
@@ -78,4 +78,3 @@ def fileUpload():
         return jsonify({"selected_nodes": file_dict, "status": "success"})
     else:
         return jsonify({"status":"failed"})
-
