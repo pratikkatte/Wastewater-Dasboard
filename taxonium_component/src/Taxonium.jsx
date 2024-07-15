@@ -39,17 +39,16 @@ function Taxonium({
   setAboutEnabled,
   setOverlayContent,
   setTitle,
-  onClickNode
+  onClickNode,
 }) {
   const [backupQuery, setBackupQuery] = useState(query);
   const backupUpdateQuery = useCallback((newQuery) => {
     setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
   }, []);
   
+  // query = backupQuery; // query
+  // updateQuery = backupUpdateQuery;
 
-  query = backupQuery; // query
-  updateQuery = backupUpdateQuery;
-  
   // if no setTitle, set it to a noop
   if (!setTitle) {
     setTitle = () => {};
@@ -161,6 +160,11 @@ function Taxonium({
     settings,
   });
 
+  useEffect(() => {
+    if(query.zoomToSearch!==undefined){
+      search.setZoomToSearch({index: query.zoomToSearch});
+    }
+  }, [query])
   const treenomeState = useTreenomeState(data, deckRef, view, settings);
 
   return (

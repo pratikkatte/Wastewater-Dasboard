@@ -13,9 +13,6 @@ import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
-import {BamFile} from '@gmod/bam'
-
-
 import {
   createViewState,
   JBrowseLinearGenomeView,
@@ -31,14 +28,11 @@ const createDefaultSearch = (mark_nodes) => {
   })
 }
 
-
 function App() {
-
   // Import taxonium-component
   useEffect(() => {
     import("taxonium-component");
   }, []);
-
 
   const [viewState, setViewState] = useState();
   const [all_tracks, setTracks] = useState([])
@@ -55,8 +49,18 @@ function App() {
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
   const [uploadProgress, setuploadProgress] = useState(0);
-  const [query, updateQuery] = useQueryAsState(default_query);
+  // const [query, updateQuery] = useState(default_query);
+
+  const [backupQuery, setBackupQuery] = useState(default_query);
+  const backupUpdateQuery = useCallback((newQuery) => {
+    setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
+  }, []);
+  
+  const query = backupQuery; // query
+  const updateQuery = backupUpdateQuery;
+
   const [refNames, setRefNames] = useState([]);
+
 
   const toggleJBrowse = () => {
     setJBrowseOpen(!JBrowseOpen);
@@ -85,7 +89,7 @@ useEffect(() => {
         setTracks, 
         setShowTrack, 
         viewState, all_tracks);
-  }      
+      }      
   }, [createTract])
 
   useEffect(() => {
@@ -103,7 +107,6 @@ useEffect(() => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
-            
             selectedNode.clearNodeDetails()
             // addTrack();
             setCreateTrack(true);
@@ -111,35 +114,54 @@ useEffect(() => {
     }
     }, [JBrowseOpen]);
 
-    const onbuttonclick = useCallback(() => {
-      console.log("button clicked")
-    })
+    // const onbuttonclick = useCallback(() => {
+    //   console.log("button clicked")
+    //   const prev_nodes = Object.keys(selectedFile);
+    //   const additional_nodes = ["England/PHEC-3V07BV6F/2021"];
+    //   const nodes = [...prev_nodes, ...additional_nodes]
+      
+    //     mark_nodeRef.current = nodes;
+    //     const default_search = createDefaultSearch(nodes);
+    
+    //     const zoom_to_indexes = [];
+    //     for (let i = 0; i < nodes.length; i++) {
+    //         zoom_to_indexes.push(i.toString());
+    //     }
+    //     const query = {
+    //           srch: JSON.stringify(default_search),
+    //           enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
+    //           backend: "",
+    //           xType: "x_dist",
+    //           zoomToSearch: zoom_to_indexes,
+    //           mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
+    //           treenomeEnabled: false,
+    //       };
+    //   updateQuery(query)
+    // })
 
     if (!viewState) {
       return null
   }
-
   return (
     <>
       <div>
         <div>
-          <button onClick={onbuttonclick}>button clicked</button>
         </div>
           < Header/>
           <br />
-            {!selectedFile? 
+            {!(uploadProgress>10)? 
               <div>
-                <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} queryRef={queryRef} setuploadProgress={setuploadProgress} />
+                <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} updateQuery={updateQuery} setuploadProgress={setuploadProgress} />
               </div>
           :
          <div>
-        <div style={{display:"flex", height: "92vh"}} >
+        <div style={{display:"flex", height: "90vh"}} >
           <div className="h-screen w-screen flex flex-col overflow-hidden">
-            <div className="h-[calc(100%-4rem)]">
+            <div className="h-[calc(95%-4rem)]">
               <TaxoniumBit
                 // backendUrl="http://localhost:8080"
                 backendUrl="https://api.cov2tree.org"
-                query={queryRef.current} onClickNode={onClickNode}
+                query={query} updateQuery={updateQuery} onClickNode={onClickNode}
               />
             </div>        
         </div>
@@ -167,7 +189,14 @@ useEffect(() => {
         </div> 
       </div> 
       }
-      <p>{uploadProgress.toFixed(1)}%</p>
+      {(uploadProgress<100)? 
+      <div className="progress-bar">
+        <div className="progress-bar-fill" style={{ flexBasis: `${uploadProgress}%` }}></div>
+      </div>
+      :
+      <>
+      </>
+      } 
     </div>
   </>
 );
