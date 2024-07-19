@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 
-const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRef, setuploadProgress}) => {
+const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery, setuploadProgress}) => {
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -30,7 +30,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
           setuploadProgress(event.data.progress);
         } else if (event.data.message) {
             setMessage(event.data.message);
-            const selected_nodes = event.data.data.selected_nodes
+            const selected_nodes = event.data.data.response
             handleFileProcessing(selected_nodes)
         } else if (event.data.error) {
             setMessage(event.data.error);
@@ -42,36 +42,28 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
 
       const handleFileProcessing = (filenames_nodes) => {
       
-        const nodes = Object.keys(filenames_nodes);
+        // const nodes = Object.keys(filenames_nodes);
+        console.log("filename_nodes", filenames_nodes)
+        // const nodes = filenames_nodes.map(groupName => fileDict[groupName].node_name);
+        const nodes = Object.keys(filenames_nodes).map(key => filenames_nodes[key].node_name);
         mark_nodeRef.current = nodes;
+        
         const default_search = createDefaultSearch(nodes);
     
         const zoom_to_indexes = [];
         for (let i = 0; i < nodes.length; i++) {
             zoom_to_indexes.push(i.toString());
         }
-    
-        // const query = {
-        //       srch: JSON.stringify(default_search),
-        //       enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
-        //       backend: "",
-        //       xType: "x_dist",
-        //       zoomToSearch: zoom_to_indexes,
-        //       mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
-        //       treenomeEnabled: false,
-        //   };
-        
-        // updateQuery(query)
-        
-        queryRef.current = {
-            srch: JSON.stringify(default_search),
-            enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
-            backend: "",
-            xType: "x_dist",
-            zoomToSearch: zoom_to_indexes,
-            mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
-            treenomeEnabled: false,
-        };
+        const query = {
+              srch: JSON.stringify(default_search),
+              enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
+              backend: "",
+              xType: "x_dist",
+              zoomToSearch: zoom_to_indexes,
+              mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
+              treenomeEnabled: false,
+          };
+        updateQuery(query)
         setSelectedFile(filenames_nodes);
     }
 
@@ -81,7 +73,6 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
                 This dashboard provides insights into the genomic data by using BAM files of the sequenced waste water samples, 
                 allowing for the monitoring and analysis of viral strains present in the community.
             </p>
-      
             <div className='flex' style={{ justifyContent: "center", alignItems: "center", margin: '30px auto'}}>
                 <input type="file" ref={(ref) => {
                   uploadInput = ref;

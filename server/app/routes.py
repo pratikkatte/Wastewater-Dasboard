@@ -26,7 +26,7 @@ def selectNodes(uploaded_filenames):
     #         saved_filenames.append(filename)
     # else:
     #     saved_filenames = uploaded_filenames
-    print(uploaded_filenames)
+
     for filename in uploaded_filenames:
         try:
             bam = pysam.AlignmentFile(filename, 'rb')
@@ -39,17 +39,14 @@ def selectNodes(uploaded_filenames):
                     for read_group in read_groups:
                         node_name = read_group['DS'].replace("Node:","")
                         group_name = read_group['ID']
-                        file_dict[node_name] = {"filename":os.path.basename(filename), "groupname":group_name}
+                        file_dict[group_name] = {"filename": os.path.basename(filename), "node_name": node_name}
+                        # file_dict[node_name] = {"filename":os.path.basename(filename), "groupname":group_name}
         except Exception as e:
-            print("error",e)
             return file_dict
-        
-    print("file_dict",file_dict)
     return file_dict
 
 def allowedFile(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 @app.route('/uploads/<name>')
 def download_file(name):
@@ -75,6 +72,6 @@ def fileUpload():
         
         file_dict = selectNodes(uploaded_files)
 
-        return jsonify({"selected_nodes": file_dict, "status": "success"})
+        return jsonify({"response": file_dict, "status": "success"})
     else:
         return jsonify({"status":"failed"})

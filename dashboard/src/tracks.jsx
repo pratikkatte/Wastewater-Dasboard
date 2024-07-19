@@ -9,7 +9,7 @@ const tracks = [
         type: "FromConfigAdapter",
         features: [
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "E",
             uniqueId: 4,
             start: 26244,
@@ -17,7 +17,7 @@ const tracks = [
             fill: "#D9AD3D",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "M",
             uniqueId: 5,
             start: 26522,
@@ -25,7 +25,7 @@ const tracks = [
             fill: "#5097BA",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "N",
             uniqueId: 10,
             start: 28273,
@@ -33,7 +33,7 @@ const tracks = [
             fill: "#E67030",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "Orf1a",
             uniqueId: 0,
             start: 265,
@@ -41,7 +41,7 @@ const tracks = [
             fill: "#8EBC66",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF1b",
             uniqueId: 1,
             start: 13467,
@@ -49,7 +49,7 @@ const tracks = [
             fill: "#E59637",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF3a",
             uniqueId: 3,
             start: 25392,
@@ -57,7 +57,7 @@ const tracks = [
             fill: "#AABD52",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF6",
             uniqueId: 6,
             start: 27201,
@@ -65,7 +65,7 @@ const tracks = [
             fill: "#DF4327",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF7a",
             uniqueId: 7,
             start: 27393,
@@ -73,7 +73,7 @@ const tracks = [
             fill: "#C4B945",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF7b",
             uniqueId: 8,
             start: 27755,
@@ -81,7 +81,7 @@ const tracks = [
             fill: "#75B681",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF8",
             uniqueId: 9,
             start: 27893,
@@ -89,7 +89,7 @@ const tracks = [
             fill: "#60AA9E",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "ORF9b",
             uniqueId: 11,
             start: 28283,
@@ -97,7 +97,7 @@ const tracks = [
             fill: "#D9AD3D",
           },
           {
-            refName: 'NC_045512.2',
+            refName: 'NC_045512v2',
             name: "S",
             uniqueId: 2,
             start: 21562,

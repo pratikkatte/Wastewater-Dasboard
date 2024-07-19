@@ -36,21 +36,17 @@ function App() {
 
   const [viewState, setViewState] = useState();
   const [all_tracks, setTracks] = useState([])
-  const [patches, setPatches] = useState();
   const [showTrack, setShowTrack] = useState(null)
-
   const clickedNodeRef = useRef(null);
-  const queryRef = useRef(null);
   const mark_nodeRef = useRef(null);
   const trackIDsRef = useRef([]);
-
   const [createTract, setCreateTrack] = useState(null)
-
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
   const [uploadProgress, setuploadProgress] = useState(0);
   // const [query, updateQuery] = useState(default_query);
-
+  const [patches, setPatches] = useState();
+  
   const [backupQuery, setBackupQuery] = useState(default_query);
   const backupUpdateQuery = useCallback((newQuery) => {
     setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
@@ -60,7 +56,6 @@ function App() {
   const updateQuery = backupUpdateQuery;
 
   const [refNames, setRefNames] = useState([]);
-
 
   const toggleJBrowse = () => {
     setJBrowseOpen(!JBrowseOpen);
@@ -89,7 +84,8 @@ useEffect(() => {
         setTracks, 
         setShowTrack, 
         viewState, all_tracks);
-      }      
+      }
+    setCreateTrack(false);
   }, [createTract])
 
   useEffect(() => {
@@ -101,6 +97,7 @@ useEffect(() => {
         setShowTrack(null)
         setCreateTrack(false);
     }
+    
     }, [showTrack])
 
     const onClickNode = useCallback((selectedNode) => {
@@ -113,31 +110,6 @@ useEffect(() => {
             setJBrowseOpen(true);
     }
     }, [JBrowseOpen]);
-
-    // const onbuttonclick = useCallback(() => {
-    //   console.log("button clicked")
-    //   const prev_nodes = Object.keys(selectedFile);
-    //   const additional_nodes = ["England/PHEC-3V07BV6F/2021"];
-    //   const nodes = [...prev_nodes, ...additional_nodes]
-      
-    //     mark_nodeRef.current = nodes;
-    //     const default_search = createDefaultSearch(nodes);
-    
-    //     const zoom_to_indexes = [];
-    //     for (let i = 0; i < nodes.length; i++) {
-    //         zoom_to_indexes.push(i.toString());
-    //     }
-    //     const query = {
-    //           srch: JSON.stringify(default_search),
-    //           enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
-    //           backend: "",
-    //           xType: "x_dist",
-    //           zoomToSearch: zoom_to_indexes,
-    //           mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
-    //           treenomeEnabled: false,
-    //       };
-    //   updateQuery(query)
-    // })
 
     if (!viewState) {
       return null
@@ -159,8 +131,8 @@ useEffect(() => {
           <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="h-[calc(95%-4rem)]">
               <TaxoniumBit
-                // backendUrl="http://localhost:8080"
-                backendUrl="https://api.cov2tree.org"
+                backendUrl="http://localhost:8080"
+                // backendUrl="https://api.cov2tree.org"
                 query={query} updateQuery={updateQuery} onClickNode={onClickNode}
               />
             </div>        
