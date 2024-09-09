@@ -1,5 +1,5 @@
 server/app/data/*
 dashboard/node_modules/*
 taxonium_component/dist/*
-taxonium_backend
+server/app/__pycache_/
 test.ipynb

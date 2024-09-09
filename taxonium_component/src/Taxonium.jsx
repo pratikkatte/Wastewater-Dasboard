@@ -33,9 +33,7 @@ function Taxonium({
   configDict,
   configUrl,
   query,
-
   updateQuery,
-  overlayContent,
   setAboutEnabled,
   setOverlayContent,
   setTitle,
