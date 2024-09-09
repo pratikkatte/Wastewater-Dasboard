@@ -8,7 +8,9 @@ from flask import send_from_directory
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__))+ '/data'
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+    
 ALLOWED_EXTENSIONS = set(['bam', 'bai'])
 
 
