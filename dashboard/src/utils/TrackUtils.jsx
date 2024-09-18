@@ -1,11 +1,15 @@
 const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowTrack, viewState, all_tracks) => {
 
-    console.log("selectedFile", selectedFile,clickedNodeRef.current.nodeDetails.name, selectedFile[clickedNodeRef.current.nodeDetails.name].filename)
-    const trackId = clickedNodeRef.current.nodeDetails.name;
-    const bam_filename = selectedFile[clickedNodeRef.current.nodeDetails.name]['filename']
-    const read_groupname = selectedFile[clickedNodeRef.current.nodeDetails.name]['groupname']
+    const node_name = clickedNodeRef.current.nodeDetails.name
+    const key = Object.keys(selectedFile).find(key => selectedFile[key].node_name === node_name);
+    const read_groupname = key
+
+    const bam_filename = selectedFile[key]['filename']
+    const trackId = node_name
+
+    console.log("selectedFile", trackId, bam_filename, read_groupname)
+
     const bam_location = "http://localhost:5000/uploads/"+bam_filename;
-    console.log("bam_location", bam_location)
     const bami_location = bam_location + ".bai";
 
     const new_track_addition = {

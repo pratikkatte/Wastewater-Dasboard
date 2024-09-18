@@ -2,4 +2,4 @@ server/app/data/*
 dashboard/node_modules/*
 taxonium_component/dist/*
 server/app/__pycache_/
-test.ipynb
+server/__pycache_/
