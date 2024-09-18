@@ -27,3 +27,24 @@ Start the taxonium-backend server with taxonium file on port 8080. The taxonium-
 ```
 node server.js --port 8080 --data_file updated_1_public-2023-04-10.all.masked.jsonl --config_json config_public.json
 ```
+## Bam File Data Format
+
+### Header Section
+- Each node that needs to be annotated in the tree is assigned a unique Read-Group(RG) ID.
+  
+  Example:
+  <img width="1192" alt="image" src="https://github.com/user-attachments/assets/f25d1f02-4da4-444c-a9e0-0dfad49d05ed">
+
+- Each read is assigned one or more than one group-IDs in the BAM File.
+  
+  Example:
+  <img width="1184" alt="image" src="https://github.com/user-attachments/assets/833b971a-270d-4318-a952-481f6f40af4f">
+
+- Custom Tag (EP): Equal Parsimony Parity Score (EPP) for each read.
+  
+  Example:
+  <img width="1262" alt="image" src="https://github.com/user-attachments/assets/e9e5a555-7e06-4476-b605-8007d31d1771">
+
+
+
+
