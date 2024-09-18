@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 
-const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRef}) => {
+const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery}) => {
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -50,8 +50,9 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
           if (response.status === 200) {
             
             setisUploading(false)
-            const selected_nodes = response.data.selected_nodes
-            
+            const selected_nodes = response.data.response
+            console.log("selected_nodes", selected_nodes)
+
             handleFileProcessing(selected_nodes)
             console.log("file uploaded")
           }
@@ -73,27 +74,28 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, queryRe
 
       const handleFileProcessing = (filenames_nodes) => {
       
-        const nodes = Object.keys(filenames_nodes);
-        console.log("nodes", nodes);
-        
+        // const nodes = Object.keys(filenames_nodes);
+        console.log("filename_nodes", filenames_nodes)
+        // const nodes = filenames_nodes.map(groupName => fileDict[groupName].node_name);
+        const nodes = Object.keys(filenames_nodes).map(key => filenames_nodes[key].node_name);
         mark_nodeRef.current = nodes;
-        console.log("mark_nodeRef",mark_nodeRef)
+        
         const default_search = createDefaultSearch(nodes);
     
         const zoom_to_indexes = [];
         for (let i = 0; i < nodes.length; i++) {
             zoom_to_indexes.push(i.toString());
         }
-    
-        queryRef.current = {
-            srch: JSON.stringify(default_search),
-            enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
-            backend: "",
-            xType: "x_dist",
-            zoomToSearch: zoom_to_indexes,
-            mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
-            treenomeEnabled: false,
-        };
+        const query = {
+              srch: JSON.stringify(default_search),
+              enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
+              backend: "",
+              xType: "x_dist",
+              zoomToSearch: zoom_to_indexes,
+              mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
+              treenomeEnabled: false,
+          };
+        updateQuery(query)
         setSelectedFile(filenames_nodes);
     }
 

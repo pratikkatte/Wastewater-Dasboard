@@ -42,12 +42,10 @@ def selectNodes(uploaded_filenames):
                     for read_group in read_groups:
                         node_name = read_group['DS'].replace("Node:","")
                         group_name = read_group['ID']
-                        file_dict[node_name] = {"filename":os.path.basename(filename), "groupname":group_name}
+                        file_dict[group_name] = {"filename": os.path.basename(filename), "node_name": node_name}
+                        # file_dict[node_name] = {"filename":os.path.basename(filename), "groupname":group_name}
         except Exception as e:
-            print("error",e)
             return file_dict
-        
-    print("file_dict",file_dict)
     return file_dict
 
 def allowedFile(filename):
@@ -62,8 +60,9 @@ def download_file(name):
 def fileUpload():
     if request.method == 'POST':
         uploaded_files = []
-
+        print(request.files)
         file = request.files.getlist('file')
+        print(file)
         for f in file:
             filename = secure_filename(f.filename)
             if allowedFile(filename):
@@ -77,7 +76,7 @@ def fileUpload():
         
         file_dict = selectNodes(uploaded_files)
 
-        return jsonify({"selected_nodes": file_dict, "status": "success"})
+        return jsonify({"response": file_dict, "status": "success"})
     else:
         return jsonify({"status":"failed"})
 
