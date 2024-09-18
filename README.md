@@ -45,6 +45,13 @@ node server.js --port 8080 --data_file updated_1_public-2023-04-10.all.masked.js
   Example:
   <img width="1262" alt="image" src="https://github.com/user-attachments/assets/e9e5a555-7e06-4476-b605-8007d31d1771">
 
+## Miscellaneous commands
 
-
-
+- SAM File to BAM File:
+  ```
+  samtools view -Sb input.bam -o output.bam
+  ```
+- sorting and indexing BAM file
+  ```
+  samtools sort input.bam -o output.bam && samtools index output.bam
+  ```
