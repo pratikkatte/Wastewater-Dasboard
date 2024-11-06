@@ -108,6 +108,7 @@ export interface IFilter {
     flagInclude: number
     readName?: string
     tagFilter?: { tag: string; value: string }
+    filterReads?: any
   }
 
 export default FilterByTagDialog

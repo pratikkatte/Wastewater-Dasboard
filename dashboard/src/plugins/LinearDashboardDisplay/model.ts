@@ -15,10 +15,13 @@ import {
 } from '@jbrowse/core/util'
 // icons
 import FilterListIcon from '@mui/icons-material/FilterList'
+import SortIcon from '@mui/icons-material/Sort'
 import { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 import { SimpleFeatureSerialized } from '@jbrowse/core/util/simpleFeature'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
+
 // locals
+
 import configSchemaF from './configSchema'
 import PluginManager from '@jbrowse/core/PluginManager'
 import {IFilter} from './FilterByTag'
@@ -28,6 +31,7 @@ import { observable } from 'mobx'
 import { IAnyStateTreeNode, addDisposer, isAlive, getSnapshot } from 'mobx-state-tree'
 import { lazy } from 'react'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 
 const FilterByTagDialog = lazy(() => import('./FilterByTag'))
@@ -35,6 +39,11 @@ import { IAutorunOptions, autorun } from 'mobx'
 
 type DisplayModel = IAnyStateTreeNode & { setError: (arg: unknown) => void }
 import { getUniqueTagValues} from '../shared'
+import { setFlagsFromString } from 'v8'
+import { group } from 'console'
+import { setDefaultHighWaterMark } from 'stream'
+import { constrainedMemory } from 'process'
+import { Checkbox } from '@headlessui/react'
 
 
 function createAutorun(
@@ -78,8 +87,15 @@ function createAutorun(
         value: types.string,
       }),
     ),
+    filterReads: types.optional(types.frozen(), {})
+  })
+
+  const unseenModel = types.model({
+    show: types.boolean,
+    mutation: types.string
   })
   
+
   // using a map because it preserves order
 const rendererTypes = new Map([
     ['pileup', 'PileupRenderer'],
@@ -107,12 +123,10 @@ export default (
           configuration: ConfigurationReference(configSchema),
           colorBy: ColorByModel,
           filterBy: types.optional(FilterModel, {}),
-          groupname: types.maybe(
-            types.model({
-              name: types.string,
-            })
-          ),
+
           showEPColor: false,
+          unseenKeys: types.optional(types.map(unseenModel), {})
+          
         }),
         
       )
@@ -120,6 +134,8 @@ export default (
         colorTagMap: observable.map<string, string>({}),
         tagsReady: false,
         featureUnderMouseVolatile: undefined as undefined | Feature,
+        group_id:'' as string
+        
       }))
       .actions(self => ({
           setColorScheme(colorScheme: {
@@ -200,25 +216,60 @@ export default (
             self.showEPColor = !self.showEPColor
             if(self.showEPColor)
             {
-              self.setColorScheme({type: 'tag', tag: 'EP'})
+              self.setColorScheme({type: 'tag', tag: 'EPP'})
             }
             else{
               self.setColorScheme({type: 'mappingQuality'});
             }
           },
 
+          toggleUnaccountedMutationsDisplay(um_group: string) {
+
+            
+            const item = self.unseenKeys.get(um_group);
+            if(item){
+              item.show = !item.show;
+            }
+
+            const filter_reads_by_tag = {}
+
+            filter_reads_by_tag[self.group_id] = []
+
+            self.unseenKeys.forEach((value, key) => {
+              if(value.show){
+                filter_reads_by_tag[self.group_id].push({'unseenKey':key, 'mutation': value.mutation})
+              }
+            });
+
+            let um_filter_reads: IFilter = {
+              flagExclude: 1540, 
+              flagInclude: 0,
+              filterReads: filter_reads_by_tag
+            }
+            self.setFilterBy(um_filter_reads)
+        },
+
         afterAttach() {
           const group_name = getConf(self, 'groupname_tag')
+
+          console.log("LinearDashboardLayer:", group_name)
+
+            const group_name_keys = Object.keys(group_name);
+            self.group_id = group_name_keys[0]
+
+            group_name[self.group_id].map(item => {
+              self.unseenKeys.set(item.unseenKey, unseenModel.create({ show: false, mutation: item.mutation}))
+            })
+
+            const filter_reads_tags = {}
+            filter_reads_tags[self.group_id] = []
 
             self.setColorScheme({type: 'mappingQuality'});
             
             let filter_reads: IFilter = {
               flagExclude: 1540,
               flagInclude: 0,
-              tagFilter: {
-                tag: 'RG',
-                value: group_name
-              }
+              filterReads: filter_reads_tags
             }
             self.setFilterBy(filter_reads)
 
@@ -242,7 +293,7 @@ export default (
             },
             { delay: 1000 },
           )
-  
+
           addDisposer(
             self,
             autorun(async () => {
@@ -339,20 +390,32 @@ export default (
               //     },
               // },
               {
-                label: 'color by EP',
+                label: 'color by EPP',
                 icon: VisibilityIcon,
                 type: 'checkbox',
                 checked: self.showEPColor,
                 onClick: () => {
                   self.toggleEPDisplay()
                 }
+              },
+              {
+                label: "unseen mutations",
+                icon: SortIcon,
+                subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
+                  label: key,
+                  type:'checkbox',
+                  checked: item.show,
+                  onClick: () => {
+                    self.toggleUnaccountedMutationsDisplay(key)
+                  }
+                }))
               }
             ]
             },
-            
+
             renderPropsPre() {
               const { colorTagMap, colorBy, filterBy, rpcDriverName } = self
-    
+
               const superProps = superRenderProps()
               return {
                 ...superProps,
@@ -392,7 +455,7 @@ export default (
                     session.notify(`${e}`)
                   }
                 },
-    
+
                 onClick() {
                   self.clearFeatureSelection()
                 },

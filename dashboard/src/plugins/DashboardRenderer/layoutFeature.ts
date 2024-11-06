@@ -1,7 +1,9 @@
-import { bpSpanPx, Feature, Region } from '@jbrowse/core/util'
-import { BaseLayout } from '@jbrowse/core/util/layouts'
+import { bpSpanPx, Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import { BaseLayout} from '@jbrowse/core/util/layouts'
 // locals
 import { Mismatch } from '../MismatchParser'
+// import SimpleFeature, { SimpleFeatureArgs } from '@jbrowse/core/util/simpleFeature';
+
 
 export interface LayoutRecord {
   feature: Feature
@@ -11,6 +13,12 @@ export interface LayoutRecord {
   heightPx: number
 }
 
+
+// export interface UnseenPair {
+//   unseenKey: any;  // Replace 'any' with a more specific type if possible
+//   mutation: any;      // Replace 'any' with a more specific type if possible
+// }
+
 export function layoutFeature({
   feature,
   layout,
@@ -19,6 +27,7 @@ export function layoutFeature({
   showSoftClip,
   heightPx,
   displayMode,
+  unseen_mutations
 }: {
   feature: Feature
   layout: BaseLayout<Feature>
@@ -27,10 +36,13 @@ export function layoutFeature({
   showSoftClip?: boolean
   heightPx: number
   displayMode: string
+  unseen_mutations: {}
 }): LayoutRecord | null {
+
   let expansionBefore = 0
   let expansionAfter = 0
 
+  
   // Expand the start and end of feature when softclipping enabled
   if (showSoftClip) {
     const mismatches = feature.get('mismatches') as Mismatch[]
@@ -43,6 +55,16 @@ export function layoutFeature({
       }
     }
   }
+  
+  const myfeature = new SimpleFeature(feature.toJSON())
+  
+  const unseenid = feature.get('UM');
+
+  if (unseen_mutations[unseenid]){
+    myfeature.set("UM", `${unseenid}: ${unseen_mutations[unseenid]}`);  
+  }
+
+  feature = new SimpleFeature(myfeature.toJSON())
 
   const [leftPx, rightPx] = bpSpanPx(
     feature.get('start') - expansionBefore,
@@ -54,6 +76,7 @@ export function layoutFeature({
   if (displayMode === 'compact') {
     heightPx /= 3
   }
+  
   if (feature.get('refName') !== region.refName) {
     throw new Error(
       `feature ${feature.id()} is not on the current region's reference sequence ${
@@ -61,6 +84,7 @@ export function layoutFeature({
       }`,
     )
   }
+
   const topPx = layout.addRect(
     feature.id(),
     feature.get('start') - expansionBefore,

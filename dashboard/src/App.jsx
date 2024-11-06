@@ -111,10 +111,11 @@ useEffect(() => {
             setJBrowseOpen(true);
     }
     }, [JBrowseOpen]);
-
+    console.log("start: query",query, "updateQuery",updateQuery)
     if (!viewState) {
       return null
   }
+  
   return (
     <>
       <div>
@@ -129,9 +130,10 @@ useEffect(() => {
         <div style={{display:"flex", height: "92vh"}} >
           <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="h-[calc(100%-4rem)]">
+
             <TaxoniumBit
-                // backendUrl="http://localhost:8080"
-                backendUrl="https://api.cov2tree.org"
+                backendUrl="http://localhost:8080"
+                // backendUrl="https://api.cov2tree.org"
                 query={query} updateQuery={updateQuery} onClickNode={onClickNode}
               />
             </div>

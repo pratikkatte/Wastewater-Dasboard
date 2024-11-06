@@ -75,10 +75,13 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
       const handleFileProcessing = (filenames_nodes) => {
       
         // const nodes = Object.keys(filenames_nodes);
-        console.log("filename_nodes", filenames_nodes)
+        
         // const nodes = filenames_nodes.map(groupName => fileDict[groupName].node_name);
-        const nodes = Object.keys(filenames_nodes).map(key => filenames_nodes[key].node_name);
+        // const nodes = Object.keys(filenames_nodes).map(key => filenames_nodes[key].node_name);
+        const nodes = Object.keys(filenames_nodes);
+        console.log("nodes", nodes)
         mark_nodeRef.current = nodes;
+
         
         const default_search = createDefaultSearch(nodes);
     
