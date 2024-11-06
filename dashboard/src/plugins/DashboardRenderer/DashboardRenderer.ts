@@ -38,7 +38,14 @@ export interface RenderArgsDeserialized extends BoxRenderArgsDeserialized {
       refName: string
       assemblyName: string
       tag?: string
-    }
+    },
+    filterBy?:{
+      flagExclude: number
+      flagInclude: number
+      readName?: string
+      tagFilter?: { tag: string; value: string }
+      filterReads?: any
+    },
     showSoftClip: boolean
     highResolutionScaling: number
 }
@@ -57,7 +64,7 @@ export default class DashboardRenderer extends BoxRendererType {
         
         return fetchSequence(region, dataAdapter as BaseFeatureDataAdapter)
       }
-    
+     
       getExpandedRegion(region: Region, renderArgs: RenderArgsDeserialized) {
         const { config, showSoftClip } = renderArgs
         const { start, end } = region
@@ -77,7 +84,6 @@ export default class DashboardRenderer extends BoxRendererType {
         const layout = this.createLayoutInWorker(renderProps)
         const { regions, bpPerPx } = renderProps
         const [region] = regions
-    
         const layoutRecords = layoutFeats({
           ...renderProps,
           features,
@@ -107,7 +113,7 @@ export default class DashboardRenderer extends BoxRendererType {
             },
           }),
         )
-    
+        
         const results = await super.render({
           ...renderProps,
           ...res,

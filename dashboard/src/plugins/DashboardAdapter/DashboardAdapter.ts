@@ -191,9 +191,13 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           flagExclude = 0,
           tagFilter,
           readName,
+          filterReads
         } = filterBy || {}
-        
-        
+
+        const rg_filter = filterReads ? Object.keys(filterReads)[0] : ''
+
+        const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
+
         for (const record of records) {
           let ref: string | undefined
           
@@ -209,32 +213,38 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           if ((flags & flagInclude) !== flagInclude && !(flags & flagExclude)) {
             continue
           }
-
-          if (tagFilter) {            
+          if (tagFilter) {
             const v = record.get(tagFilter.tag)
-
             if (
               !(tagFilter.value === '*'
                 ? v !== undefined
-                // : `${v}` === tagFilter.value
                 : `${v}`.split(',').includes(tagFilter.value)
-                // : tagFilter.value.split(',').includes(`${v}`)
             )) {
-              // console.log("tagfilter", tagFilter, (tagFilter.value === '*'
-              // ? v !== undefined
-              // // : `${v}` === tagFilter.value
-              // : `${v}`.split(',').includes(tagFilter.value)))
               continue
             }
-            // console.log("tagfilter", tagFilter, (tagFilter.value === '*'
-            //     ? v !== undefined
-            //     // : `${v}` === tagFilter.value
-            //     : tagFilter.value.split(',').includes(`${v}`)))
           }
-          if (readName && record.get('name') !== readName) {
+          const rg = record.get("RG")
+          
+          if (`${rg}`.split(',').includes(rg_filter)){
+            if(um_filter.length>0){
+
+              const um = record.get('UM')
+              if(!(um_filter.includes(um))){
+                continue
+              }
+            }
+
+          }
+          else {
             continue
           }
 
+          
+
+          if (readName && record.get('name') !== readName) {
+            continue
+          }
+          
           observer.next(new BamSlightlyLazyFeature(record, this, ref))
         }
         observer.complete()

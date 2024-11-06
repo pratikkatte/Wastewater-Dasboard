@@ -43,10 +43,9 @@ import {
       case 'xs':
       case 'tag': {
         const tags = feature.get('tags')
-        
         const val = tags ? tags[tag] : feature.get(tag)
+
         if(tag === 'EP'){
-          console.log("val", val, tag)
           return `hsl(${feature.get(tag)},50%,50%)`
         }
         
