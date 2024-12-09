@@ -137,8 +137,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
       assemblyName: '',
     })
 
-
-
     const seqChunks = await firstValueFrom(features.pipe(toArray()))
 
     let sequence = ''
@@ -175,9 +173,10 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
 
     const { refName, start, end, originalRefName } = region
     const { signal, filterBy, statusCallback = () => {} } = opts || {}
+    
     return ObservableCreate<Feature>(async observer => {
+
       const { bam } = await this.configure()
-      
       await this.setup(opts)
       const records = await updateStatus(
         'Downloading alignments',
@@ -186,6 +185,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
       )
 
       await updateStatus('Processing alignments', statusCallback, async () => {
+
         const {
           flagInclude = 0,
           flagExclude = 0,
@@ -193,10 +193,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           readName,
           filterReads
         } = filterBy || {}
-
-        const rg_filter = filterReads ? Object.keys(filterReads)[0] : ''
-
-        const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
 
         for (const record of records) {
           let ref: string | undefined
@@ -208,11 +204,13 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
               record.get('end'),
             )
           }
-
+          
           const flags = record.flags
+
           if ((flags & flagInclude) !== flagInclude && !(flags & flagExclude)) {
             continue
           }
+
           if (tagFilter) {
             const v = record.get(tagFilter.tag)
             if (
@@ -223,23 +221,27 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
               continue
             }
           }
-          const rg = record.get("RG")
           
-          if (`${rg}`.split(',').includes(rg_filter)){
-            if(um_filter.length>0){
+          if (filterReads){
+            const rg = record.get("RG")
+            const rg_filter = Object.keys(filterReads)[0]
+            const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
 
-              const um = record.get('UM')
-              if(!(um_filter.includes(um))){
+            if (rg_filter) {
+
+              if (`${rg}`.split(',').includes(rg_filter)){
+                if(um_filter.length>0){
+                  const um = record.get('UM')
+                  if(!(um_filter.includes(um))){
+                      continue
+                  }
+                }
+              }
+              else {
                 continue
               }
             }
-
           }
-          else {
-            continue
-          }
-
-          
 
           if (readName && record.get('name') !== readName) {
             continue

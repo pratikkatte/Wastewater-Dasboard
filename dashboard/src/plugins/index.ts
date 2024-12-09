@@ -5,6 +5,7 @@ import { ConfigurationSchema } from '@jbrowse/core/configuration'
 import { DisplayType, TrackType, createBaseTrackConfig, createBaseTrackModel, RendererType } from '@jbrowse/core/pluggableElementTypes'
 
 import LinearDashboardDisplayF from './LinearDashboardDisplay'
+
 import AdapterType from '@jbrowse/core/pluggableElementTypes/AdapterType'
 // import  DashboardRenderingSchema from './DashboardRenderer/configSchema'
 // import DashboardRenderingComponent from './DashboardRenderer/component/DashboardRendering'
@@ -42,10 +43,11 @@ export default class DashboardPlugin extends Plugin {
       ),
     })
     const linearPileupDisplay = pluginManager.getDisplayType('LinearPileupDisplay')
-
+    const linearAlignmentDisplay = pluginManager.getDisplayType('LinearAlignmentsDisplay')
     const linearDashboardDisplay = pluginManager.getDisplayType('LinearDashboardDisplay')
     track.addDisplayType(linearPileupDisplay)
     track.addDisplayType(linearDashboardDisplay)
+    track.addDisplayType(linearAlignmentDisplay)
     return track
   }) 
 
