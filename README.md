@@ -1,5 +1,5 @@
 # Wastewater-Dasboard
-
+** port forwarding is important while running from server. 
 ## Dashboard
 
 Install taxonium, etc. 
@@ -25,7 +25,7 @@ flask run
 ## Taxonium Backend
 Start the taxonium-backend server with taxonium file on port 8080. The taxonium-jsonl file can be reitreived from [Taxonium](https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2//).
 ```
-node server.js --port 8080 --data_file updated_1_public-2023-04-10.all.masked.jsonl --config_json config_public.json
+node server.js --port 8080 --data_file latest.jsonl --config_json config_public.json
 ```
 ## Bam File Data Format
 
