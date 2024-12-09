@@ -28,6 +28,8 @@ import { observable } from 'mobx'
 import { IAnyStateTreeNode, addDisposer, isAlive, getSnapshot } from 'mobx-state-tree'
 import { lazy } from 'react'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import SortIcon from '@mui/icons-material/Sort'
+
 
 
 const FilterByTagDialog = lazy(() => import('./FilterByTag'))
@@ -35,6 +37,12 @@ import { IAutorunOptions, autorun } from 'mobx'
 
 type DisplayModel = IAnyStateTreeNode & { setError: (arg: unknown) => void }
 import { getUniqueTagValues} from '../shared'
+
+
+const unseenModel = types.model({
+  show: types.boolean,
+  mutation: types.string
+})
 
 
 function createAutorun(
@@ -78,6 +86,7 @@ function createAutorun(
         value: types.string,
       }),
     ),
+    filterReads: types.optional(types.frozen(), {})
   })
   
   // using a map because it preserves order
@@ -113,6 +122,8 @@ export default (
             })
           ),
           showEPColor: false,
+          unseenKeys: types.optional(types.map(unseenModel), {})
+          
         }),
         
       )
@@ -120,6 +131,7 @@ export default (
         colorTagMap: observable.map<string, string>({}),
         tagsReady: false,
         featureUnderMouseVolatile: undefined as undefined | Feature,
+        group_id:'' as string
       }))
       .actions(self => ({
           setColorScheme(colorScheme: {
@@ -207,18 +219,57 @@ export default (
             }
           },
 
+          toggleUnaccountedMutationsDisplay(um_group: string) {
+
+            
+            const item = self.unseenKeys.get(um_group);
+            if(item){
+              item.show = !item.show;
+            }
+
+            const filter_reads_by_tag = {}
+
+            filter_reads_by_tag[self.group_id] = []
+
+            self.unseenKeys.forEach((value, key) => {
+              if(value.show){
+                filter_reads_by_tag[self.group_id].push({'unseenKey':key, 'mutation': value.mutation})
+              }
+            });
+
+            let um_filter_reads: IFilter = {
+              flagExclude: 1540, 
+              flagInclude: 0,
+              filterReads: filter_reads_by_tag
+            }
+            self.setFilterBy(um_filter_reads)
+        },
+        
         afterAttach() {
           const group_name = getConf(self, 'groupname_tag')
+          console.log("group_name", group_name)
+
+          const group_name_keys = Object.keys(group_name);
+          self.group_id = group_name_keys[0]
+
+          group_name[self.group_id].map(item => {
+            self.unseenKeys.set(item.unseenKey, unseenModel.create({ show: false, mutation: item.mutation}))
+          })
+
+          // const group_name = "group1";
+          const filter_reads_tags = {}
+          filter_reads_tags[self.group_id] = []
 
             self.setColorScheme({type: 'mappingQuality'});
             
             let filter_reads: IFilter = {
               flagExclude: 1540,
               flagInclude: 0,
-              tagFilter: {
-                tag: 'RG',
-                value: group_name
-              }
+              // tagFilter: {
+              //   tag: 'RG',
+              //   value: group_name
+              // }
+              filterReads: filter_reads_tags
             }
             self.setFilterBy(filter_reads)
 
@@ -346,6 +397,20 @@ export default (
                 onClick: () => {
                   self.toggleEPDisplay()
                 }
+              },
+              {
+                label: "unseen mutations",
+                icon: SortIcon,
+                subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => (
+                  {
+                    label: key,
+                    type:'checkbox',
+                    checked: item.show,
+                    onClick: () => {
+                      self.toggleUnaccountedMutationsDisplay(key)
+                    }
+                  }
+                ))
               }
             ]
             },

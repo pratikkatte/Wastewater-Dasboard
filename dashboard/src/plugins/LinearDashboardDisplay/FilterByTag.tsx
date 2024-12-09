@@ -103,11 +103,19 @@ const FilterByTagDialog = observer(function (props: {
 
 )})
 
+// export interface IFilter {
+//     flagExclude: number
+//     flagInclude: number
+//     readName?: string
+//     tagFilter?: { tag: string; value: string }
+//   }
+
 export interface IFilter {
-    flagExclude: number
-    flagInclude: number
-    readName?: string
-    tagFilter?: { tag: string; value: string }
-  }
+  flagExclude: number
+  flagInclude: number
+  readName?: string
+  tagFilter?: { tag: string; value: string }
+  filterReads?: any
+}
 
 export default FilterByTagDialog

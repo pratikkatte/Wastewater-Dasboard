@@ -1,4 +1,4 @@
-import { bpSpanPx, Feature, Region } from '@jbrowse/core/util'
+import { bpSpanPx, Feature, Region, SimpleFeature } from '@jbrowse/core/util'
 import { BaseLayout } from '@jbrowse/core/util/layouts'
 // locals
 import { Mismatch } from '../MismatchParser'
@@ -19,6 +19,7 @@ export function layoutFeature({
   showSoftClip,
   heightPx,
   displayMode,
+  unseen_mutations
 }: {
   feature: Feature
   layout: BaseLayout<Feature>
@@ -27,6 +28,7 @@ export function layoutFeature({
   showSoftClip?: boolean
   heightPx: number
   displayMode: string
+  unseen_mutations: {}
 }): LayoutRecord | null {
   let expansionBefore = 0
   let expansionAfter = 0
@@ -54,6 +56,17 @@ export function layoutFeature({
   if (displayMode === 'compact') {
     heightPx /= 3
   }
+
+  const myfeature = new SimpleFeature(feature.toJSON())
+
+  const unseenid = feature.get('UM');
+
+  if (unseen_mutations[unseenid]){
+    myfeature.set("UM", `${unseenid}: ${unseen_mutations[unseenid]}`);
+  }
+
+  feature = new SimpleFeature(myfeature.toJSON())
+  
   if (feature.get('refName') !== region.refName) {
     throw new Error(
       `feature ${feature.id()} is not on the current region's reference sequence ${

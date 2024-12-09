@@ -8,6 +8,21 @@ export default (pluginManager: PluginManager) => {
     const { baseLinearDisplayConfigSchema } = (
     pluginManager.getPlugin('LinearGenomeViewPlugin') as LinearGenomeViewPlugin
   ).exports
+
+    // Define the unseen object schema
+    const Unseen = types.model({
+      unseenKey: types.string,    // e.g., "unseen1" or "unseen2"
+      value: types.string         // e.g., "AT10:10%" or "GC10:20%"
+    });
+  
+    // Define the group schema which holds an array of unseen objects
+    const Group = types.array(Unseen);
+  
+    // Define the root schema
+    const RootModel = types.model({
+      groupname_tag: types.map(types.array(Unseen))    // Map where the keys are group names and values are arrays of unseen objects
+    });
+
   return ConfigurationSchema(
     'LinearDashboardDisplay',
     {
@@ -34,11 +49,22 @@ export default (pluginManager: PluginManager) => {
       description: 'color scheme to use',
       defaultValue: 'mappingQuality',
     },
-    
+
     groupname_tag: {
-      type: 'string',
-      defaultValue: "",
-    }
+      // type: 'string',
+      // defaultValue: "",
+      type: 'frozen',
+      mode: RootModel,
+      description: "read groups",
+      defaultValue: {
+        "group1": [
+          {unseenKey:'unseen8',mutation:'22599A:0.18'},
+          {unseenKey:'unseen5',mutation:'21987A:0.55'},
+          {unseenKey:'unseen4',mutation:'26364C:0.10'},
+          {unseenKey:'unseen3',mutation:'1452A:0.20'},
+        ],
+      },
+    },
   },
     { baseConfiguration: baseLinearDisplayConfigSchema, explicitlyTyped: true },
   )

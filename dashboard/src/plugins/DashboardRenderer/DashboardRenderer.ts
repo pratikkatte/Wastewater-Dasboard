@@ -38,7 +38,14 @@ export interface RenderArgsDeserialized extends BoxRenderArgsDeserialized {
       refName: string
       assemblyName: string
       tag?: string
-    }
+    },
+    filterBy?:{
+      flagExclude: number
+      flagInclude: number
+      readName?: string
+      tagFilter?: { tag: string; value: string }
+      filterReads?: any
+    },
     showSoftClip: boolean
     highResolutionScaling: number
 }

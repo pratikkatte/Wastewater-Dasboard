@@ -191,8 +191,13 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           flagExclude = 0,
           tagFilter,
           readName,
+          filterReads
         } = filterBy || {}
+
+        console.log("filterReads", filterReads)
         
+        // const rg_filter = filterReads ? Object.keys(filterReads)[0] : ''
+        // const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
         
         for (const record of records) {
           let ref: string | undefined
@@ -231,6 +236,20 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
             //     // : `${v}` === tagFilter.value
             //     : tagFilter.value.split(',').includes(`${v}`)))
           }
+
+          // const rg = record.get("RG")
+          // if (`${rg}`.split(',').includes(rg_filter)){
+          //   if(um_filter.length>0){
+          //     const um = record.get('UM')
+          //     if(!(um_filter.includes(um))){
+          //       continue
+          //     }
+          //   }
+          // }
+          // else{
+          //   continue
+          // }
+
           if (readName && record.get('name') !== readName) {
             continue
           }

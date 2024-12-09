@@ -10,7 +10,7 @@ import { sortFeature } from './sortutil'
 export function layoutFeats(
   props: RenderArgsDeserializedWithFeaturesAndLayout,
 ) {
-  const { layout, features, sortedBy, config, bpPerPx, showSoftClip, regions } =
+  const { layout, features, sortedBy,filterBy, config, bpPerPx, showSoftClip, regions } =
     props
   const [region] = regions
   if (!layout) {
@@ -19,6 +19,14 @@ export function layoutFeats(
   if (!layout.addRect) {
     throw new Error('invalid layout object')
   }
+
+  const unseen_mutations = {}
+
+  Object.keys(filterBy?.filterReads).forEach(group => {
+    filterBy?.filterReads[group].forEach(item => {
+      unseen_mutations[item.unseenKey] = item.mutation
+    });
+  });
 
   const featureMap =
     sortedBy?.type && region.start === sortedBy.pos
@@ -38,6 +46,7 @@ export function layoutFeats(
         showSoftClip,
         heightPx,
         displayMode,
+        unseen_mutations
       }),
     featureMap.size,
   )
