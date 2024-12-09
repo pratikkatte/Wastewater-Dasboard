@@ -28,7 +28,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     console.log("selectedFile", trackId, bam_filename, read_groupname, unseenKey_dict)
 
-    const bam_location = "http://localhost:5000/uploads/"+bam_filename;
+    const bam_location = "http://127.0.0.1:5000/uploads/"+bam_filename;
     const bami_location = bam_location + ".bai";
 
     const new_track_addition = {
