@@ -11,7 +11,6 @@ import {
 } from '@mui/material'
 import { makeStyles } from 'tss-react/mui'
 
-
 const useStyles = makeStyles()(theme => ({
     paper: {
       padding: theme.spacing(2),
@@ -100,7 +99,6 @@ const FilterByTagDialog = observer(function (props: {
         </DialogActions>
       </DialogContent>
     </Dialog>
-
 )})
 
 export interface IFilter {

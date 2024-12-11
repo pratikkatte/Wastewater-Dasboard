@@ -10,6 +10,8 @@ import {
   shouldDrawSNPsMuted,
 } from './util'
 import { renderAlignment } from './renderAlignment'
+import { renderMismatches } from './renderMismatches'
+
 
 export type RenderArgsWithColor = RenderArgsDeserializedWithFeaturesAndLayout
 
@@ -18,6 +20,20 @@ interface LayoutFeature {
   topPx: number
   feature: Feature
 }
+
+// function checkStopToken(stopToken?: string) {
+//   if (typeof jest === 'undefined' && stopToken !== undefined) {
+//     const xhr = new XMLHttpRequest()
+
+//     // synchronous XHR usage to check the token
+//     xhr.open('GET', stopToken, false)
+//     try {
+//       xhr.send(null)
+//     } catch (e) {
+//       throw new Error('aborted')
+//     }
+//   }
+// }
 
 export function makeImageData({
   ctx,
@@ -46,7 +62,14 @@ export function makeImageData({
   const { charWidth, charHeight } = getCharWidthHeight()
   const drawSNPsMuted = shouldDrawSNPsMuted(colorBy?.type)
   const drawIndels = shouldDrawIndels()
+  let start = performance.now()
+  console.log("render makeimagedata")
   for (const feat of layoutRecords) {
+    if (performance.now() - start > 400) {
+      // checkStopToken(stopToken)
+      start = performance.now()
+    }
+
     renderAlignment({
       ctx,
       feat,
@@ -56,6 +79,22 @@ export function makeImageData({
       contrastForBase,
       charWidth,
       charHeight,
+      canvasWidth,
+    })
+
+    renderMismatches({
+      ctx,
+      feat,
+      renderArgs,
+      mismatchAlpha,
+      drawSNPsMuted,
+      drawIndels,
+      largeInsertionIndicatorScale,
+      minSubfeatureWidth,
+      charWidth,
+      charHeight,
+      colorForBase,
+      contrastForBase,
       canvasWidth,
     })
   }

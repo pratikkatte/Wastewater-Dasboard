@@ -3,6 +3,8 @@ import {
     Feature,
     SimpleFeatureSerialized,
   } from '@jbrowse/core/util/simpleFeature'
+
+  
   import { BamRecord } from '@gmod/bam'
   
   // locals
@@ -16,6 +18,7 @@ import {
       private record: BamRecord,
       private adapter: DashboardAdapter,
       private ref?: string,
+      private unseen_mutations?: any
     ) {}
   
     _get_name() {
@@ -68,8 +71,10 @@ import {
       return this.record.qualRaw()
     }
   
-    set() {}
-  
+    set() {
+
+    }
+
     tags() {
       const properties = Object.getOwnPropertyNames(
         BamSlightlyLazyFeature.prototype,
@@ -96,6 +101,7 @@ import {
   
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     get(field: string): any {
+      
       const methodName = `_get_${field}`
 
       if (this[methodName]) {
@@ -105,6 +111,15 @@ import {
       return this.record.get(field)
     }
   
+    _get_UM() {
+      const unseenid = this.record.get("UM")
+      if (unseenid){
+        const um = `${unseenid} -> ${this.unseen_mutations[unseenid]}`
+        console.log("unseen_mutations, bam", um, this.unseen_mutations[unseenid])
+        return um
+      }
+    }
+
     _get_refName() {
       return this.adapter.refIdToName(this.record.seq_id())
     }
@@ -141,7 +156,7 @@ import {
         this.qualRaw(),
       )
     }
-  
+
     _get_clipPos() {
       const cigar = this.get('CIGAR') || ''
       return getClip(cigar, this.get('strand'))

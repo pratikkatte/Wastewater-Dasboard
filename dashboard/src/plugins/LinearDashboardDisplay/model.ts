@@ -7,6 +7,7 @@ import {
 import { getParentRenderProps } from '@jbrowse/core/util/tracks'
 import {
   getSession,
+  getContainingTrack,
   isSessionModelWithWidgets,
   Feature,
   getContainingView,
@@ -19,6 +20,21 @@ import SortIcon from '@mui/icons-material/Sort'
 import { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 import { SimpleFeatureSerialized } from '@jbrowse/core/util/simpleFeature'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
+
+import { getUniqueModifications } from '../shared/getUniqueModifications'
+
+
+import {
+  createAutorun,
+  getColorForModification,
+  modificationData,
+} from '../util'
+
+import type {
+  ModificationType,
+  ModificationTypeWithColor,
+  SortedBy,
+} from '../shared/types'
 
 // locals
 
@@ -45,25 +61,6 @@ import { setDefaultHighWaterMark } from 'stream'
 import { constrainedMemory } from 'process'
 import { Checkbox } from '@headlessui/react'
 
-
-function createAutorun(
-    self: DisplayModel,
-    cb: () => Promise<void>,
-    opts?: IAutorunOptions,
-  ) {
-    addDisposer(
-      self,
-      autorun(async () => {
-        try {
-          await cb()
-        } catch (e) {
-          if (isAlive(self)) {
-            self.setError(e)
-          }
-        }
-      }, opts),
-    )
-  }
   
   
   interface ExtraColorBy {
@@ -124,9 +121,10 @@ export default (
           colorBy: ColorByModel,
           filterBy: types.optional(FilterModel, {}),
 
-          showEPColor: false,
-          unseenKeys: types.optional(types.map(unseenModel), {})
           
+          showEPColor: false,
+          unseenKeys: types.optional(types.map(unseenModel), {}),
+          modificationsReady: false,
         }),
         
       )
@@ -134,7 +132,10 @@ export default (
         colorTagMap: observable.map<string, string>({}),
         tagsReady: false,
         featureUnderMouseVolatile: undefined as undefined | Feature,
-        group_id:'' as string
+        group_id:'' as string,
+        visibleModifications: observable.map<string, ModificationTypeWithColor>(
+          {},
+        ),
         
       }))
       .actions(self => ({
@@ -148,6 +149,21 @@ export default (
             if (colorScheme.tag) {
               self.tagsReady = false
             }
+          },
+
+          updateVisibleModifications(uniqueModifications: ModificationType[]) {
+            uniqueModifications.forEach(value => {
+              if (!self.visibleModifications.has(value.type)) {
+                self.visibleModifications.set(value.type, {
+                  ...value,
+                  color: getColorForModification(value.type),
+                })
+              }
+            })
+          },
+
+          setModificationsReady(flag: boolean) {
+            self.modificationsReady = flag
           },
 
           updateColorTagMap(uniqueTag: string[]) {
@@ -192,7 +208,9 @@ export default (
               const featureWidget = session.addWidget(
                 'AlignmentsFeatureWidget',
                 'alignmentFeature',
-                { featureData: feature.toJSON(), view: getContainingView(self) },
+                { featureData: feature.toJSON(), view: getContainingView(self),
+                  track: getContainingTrack(self)
+                 },
               )
               session.showWidget(featureWidget)
             }
@@ -276,18 +294,33 @@ export default (
           createAutorun(
             self,
             async () => {
+
               const view = getContainingView(self) as LGV
               if (!self.autorunReady) {
                 return
               }
-  
+
+
               const { colorBy, tagsReady } = self
 
               const { staticBlocks } = view
 
+
+              const vals = await getUniqueModifications({
+                self,
+                adapterConfig: getConf(self.parentTrack, 'adapter'),
+                blocks: staticBlocks,
+              })
+              if (isAlive(self)) {
+                self.updateVisibleModifications(vals)
+                self.setModificationsReady(true)
+              }
+
+              
               if (colorBy?.tag && !tagsReady) {
                 const vals = await getUniqueTagValues(self, colorBy, staticBlocks)
                 self.updateColorTagMap(vals)
+                self.setTagsReady(true)
               }
               self.setTagsReady(true)
             },
@@ -337,6 +370,11 @@ export default (
     }
     ))
       .views(self => ({
+
+        get visibleModificationTypes() {
+          return [...self.visibleModifications.keys()]
+        },
+
         get rendererConfig() {
           const { rendererTypeName } = self
           const configBlob = getConf(self, ['renderers', rendererTypeName]) || {}
@@ -414,7 +452,7 @@ export default (
             },
 
             renderPropsPre() {
-              const { colorTagMap, colorBy, filterBy, rpcDriverName } = self
+              const { colorTagMap, colorBy, filterBy, rpcDriverName, visibleModifications } = self
 
               const superProps = superRenderProps()
               return {
@@ -422,6 +460,9 @@ export default (
                 notReady: superProps.notReady || !self.renderReady(),
                 rpcDriverName,
                 displayModel: self,
+                visibleModifications: Object.fromEntries(
+                  visibleModifications.toJSON(),
+                ),
                 colorBy: colorBy ? getSnapshot(colorBy) : undefined,
                 filterBy: JSON.parse(JSON.stringify(filterBy)),
                 colorTagMap: Object.fromEntries(colorTagMap.toJSON()),

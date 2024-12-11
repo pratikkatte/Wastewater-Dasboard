@@ -1,8 +1,6 @@
 import React, { useState, Suspense, useRef, useEffect, useCallback } from "react";
-import AboutOverlay from "./components/AboutOverlay";
 import TaxoniumBit from "./components/TaxoniumBit";
 import { getDefaultSearch } from "./utils/searchUtil.js";
-import useQueryAsState from "./hooks/useQueryAsState";
 
 import tracks from './tracks.jsx';
 import assembly from './assembly.jsx';
@@ -11,7 +9,6 @@ import addTrack  from './utils/TrackUtils.jsx'
 import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 import {
   createViewState,
@@ -39,7 +36,6 @@ function App() {
   const [showTrack, setShowTrack] = useState(null)
   const clickedNodeRef = useRef(null);
   const mark_nodeRef = useRef(null);
-  const queryRef = useRef(null);
   const trackIDsRef = useRef([]);
   const [createTract, setCreateTrack] = useState(null)
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
@@ -98,9 +94,8 @@ useEffect(() => {
         setShowTrack(null)
         setCreateTrack(false);
     }
-    
     }, [showTrack])
-
+    
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
@@ -115,7 +110,7 @@ useEffect(() => {
     if (!viewState) {
       return null
   }
-  
+
   return (
     <>
       <div>
