@@ -1,4 +1,11 @@
-import { bpSpanPx, Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import { bpSpanPx, Region, SimpleFeature } from '@jbrowse/core/util'
+
+import {
+  Feature,
+  SimpleFeatureSerialized,
+} from '@jbrowse/core/util/simpleFeature'
+
+
 import { BaseLayout} from '@jbrowse/core/util/layouts'
 // locals
 import { Mismatch } from '../MismatchParser'
@@ -27,7 +34,6 @@ export function layoutFeature({
   showSoftClip,
   heightPx,
   displayMode,
-  unseen_mutations
 }: {
   feature: Feature
   layout: BaseLayout<Feature>
@@ -36,13 +42,13 @@ export function layoutFeature({
   showSoftClip?: boolean
   heightPx: number
   displayMode: string
-  unseen_mutations: {}
 }): LayoutRecord | null {
 
   let expansionBefore = 0
   let expansionAfter = 0
 
-  
+  // showSoftClip = true;
+
   // Expand the start and end of feature when softclipping enabled
   if (showSoftClip) {
     const mismatches = feature.get('mismatches') as Mismatch[]
@@ -54,17 +60,7 @@ export function layoutFeature({
         }
       }
     }
-  }
-  
-  const myfeature = new SimpleFeature(feature.toJSON())
-  
-  const unseenid = feature.get('UM');
-
-  if (unseen_mutations[unseenid]){
-    myfeature.set("UM", `${unseenid}: ${unseen_mutations[unseenid]}`);  
-  }
-
-  feature = new SimpleFeature(myfeature.toJSON())
+  } 
 
   const [leftPx, rightPx] = bpSpanPx(
     feature.get('start') - expansionBefore,

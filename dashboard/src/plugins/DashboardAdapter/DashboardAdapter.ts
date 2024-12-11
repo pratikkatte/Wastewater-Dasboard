@@ -197,6 +197,8 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
         for (const record of records) {
           let ref: string | undefined
           
+          let unseen_mutations = {}
+
           if (!record.get('MD')) {
             ref = await this.seqFetch(
               originalRefName || refName,
@@ -226,9 +228,15 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
             const rg = record.get("RG")
             const rg_filter = Object.keys(filterReads)[0]
             const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
+            
+            unseen_mutations = filterReads[rg_filter] && filterReads[rg_filter].length > 0 
+            ? filterReads[rg_filter].reduce((acc, item) => {
+                acc[item.unseenKey] = item.mutation;
+                return acc;
+              }, {}) 
+            : {};
 
             if (rg_filter) {
-
               if (`${rg}`.split(',').includes(rg_filter)){
                 if(um_filter.length>0){
                   const um = record.get('UM')
@@ -247,7 +255,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
             continue
           }
           
-          observer.next(new BamSlightlyLazyFeature(record, this, ref))
+          observer.next(new BamSlightlyLazyFeature(record, this, ref, unseen_mutations))
         }
         observer.complete()
       })

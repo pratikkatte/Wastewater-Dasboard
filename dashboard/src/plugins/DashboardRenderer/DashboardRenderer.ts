@@ -17,7 +17,7 @@ import BoxRendererType, {
   import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
   
   // locals
-  import { fetchSequence, shouldFetchReferenceSequence } from '../util'
+  import { fetchSequence } from '../util'
   import { layoutFeats } from './layoutFeatures'
 
   export interface RenderArgsDeserializedWithFeaturesAndLayout
@@ -64,7 +64,7 @@ export default class DashboardRenderer extends BoxRendererType {
         
         return fetchSequence(region, dataAdapter as BaseFeatureDataAdapter)
       }
-     
+
       getExpandedRegion(region: Region, renderArgs: RenderArgsDeserialized) {
         const { config, showSoftClip } = renderArgs
         const { start, end } = region
@@ -78,7 +78,7 @@ export default class DashboardRenderer extends BoxRendererType {
           end: Math.ceil(end + bpExpansion),
         }
       }
-    
+
       async render(renderProps: RenderArgsDeserialized) {
         const features = await this.getFeatures(renderProps)
         const layout = this.createLayoutInWorker(renderProps)
@@ -92,10 +92,9 @@ export default class DashboardRenderer extends BoxRendererType {
     
         // only need reference sequence if there are features and only for some
         // cases
-        const regionSequence =
-          features.size && shouldFetchReferenceSequence(renderProps.colorBy?.type)
-            ? await this.fetchSequence(renderProps)
-            : undefined
+        const regionSequence = features.size
+        ? await this.fetchSequence(renderProps)
+        : undefined
         const width = (region.end - region.start) / bpPerPx
         const height = Math.max(layout.getTotalHeight(), 1)
     
