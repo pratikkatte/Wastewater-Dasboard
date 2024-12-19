@@ -437,7 +437,7 @@ export default (
                 }
               },
               {
-                label: "unseen mutations",
+                label: "unaccounted mutations",
                 icon: SortIcon,
                 subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
                   label: key,
