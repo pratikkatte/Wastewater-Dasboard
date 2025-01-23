@@ -57,12 +57,12 @@ export default (pluginManager: PluginManager) => {
       mode: RootModel,
       description: "read groups",
       defaultValue: {
-        "group1": [
-          {unseenKey:'unseen8',mutation:'22599A:0.18'},
-          {unseenKey:'unseen5',mutation:'21987A:0.55'},
-          {unseenKey:'unseen4',mutation:'26364C:0.10'},
-          {unseenKey:'unseen3',mutation:'1452A:0.20'},
-        ],
+        // "group1": [
+        //   {unseenKey:'unseen8',mutation:'22599A:0.18'},
+        //   {unseenKey:'unseen5',mutation:'21987A:0.55'},
+        //   {unseenKey:'unseen4',mutation:'26364C:0.10'},
+        //   {unseenKey:'unseen3',mutation:'1452A:0.20'},
+        // ],
       },
     },
     

@@ -42,6 +42,7 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(false);
   const [uploadProgress, setuploadProgress] = useState(0);
   // const [query, updateQuery] = useState(default_query);
+  
   const [patches, setPatches] = useState();
   
   const [backupQuery, setBackupQuery] = useState(default_query);
@@ -97,7 +98,9 @@ useEffect(() => {
     }, [showTrack])
     
     const onClickNode = useCallback((selectedNode) => {
+      console.log("clicked", selectedNode)
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
+          
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
             selectedNode.clearNodeDetails()
@@ -106,7 +109,6 @@ useEffect(() => {
             setJBrowseOpen(true);
     }
     }, [JBrowseOpen]);
-    console.log("start: query",query, "updateQuery",updateQuery)
     if (!viewState) {
       return null
   }

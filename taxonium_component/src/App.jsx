@@ -31,13 +31,11 @@ import {
     const queryRef = useRef(null);
     const mark_nodeRef = useRef(null);
     const trackIDsRef = useRef([]);
-
-
+    
     const [createTract, setCreateTrack] = useState(null)
 
     const [JBrowseOpen, setJBrowseOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState(false);
-
 
     useEffect(() => {
 
@@ -60,7 +58,7 @@ import {
             
             selectedNode.clearNodeDetails()
             // addTrack();
-
+            
             setCreateTrack(true);
 
             setJBrowseOpen(true);

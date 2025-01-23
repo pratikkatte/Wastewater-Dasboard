@@ -45,7 +45,7 @@ const session = {
     "trackSelectorType": "hierarchical",
     "showCenterLine": false,
     "showCytobandsSetting": true,
-    "trackLabels": "overlapping",
+    "trackLabels": "offset",
     "showGridlines": true
   }
 }
