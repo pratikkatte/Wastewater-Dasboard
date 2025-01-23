@@ -4,7 +4,6 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     // 'group2': {'filename': 'output_multi.bam', 'node_name': 'England/PHEC-Z306ZA27/2021'}}
     console.log("selectedFile", selectedFile)
     const node_name = clickedNodeRef.current.nodeDetails.name
-    
 
     // const key = Object.keys(selectedFile).find(key => selectedFile[key].node_name === node_name);
 
@@ -23,12 +22,13 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     
     // const read_groupname = key
 
+
+    
     const bam_filename = selectedFile[node_name]['filename']
     const trackId = node_name
 
-    console.log("selectedFile", trackId, bam_filename, read_groupname, unseenKey_dict)
 
-    const bam_location = "http://127.0.0.1:5000/uploads/"+bam_filename;
+    const bam_location = "http://127.0.0.1:5000/uploads/"+ bam_filename;
     const bami_location = bam_location + ".bai";
 
     const new_track_addition = {
@@ -68,12 +68,56 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
         ]
     };
 
+
+    const haplotype_sequences = selectedFile['HP_SEQ']['filename']
+
+    console.log("haplotype_sequences", haplotype_sequences)
+
+
+    const hap_location = "http://127.0.0.1:5000/uploads/"+haplotype_sequences;
+    const hapi_location = hap_location + ".bai";
+
+    const haplotype_trackid = "sequenceid-"+read_groupname
+
+    const haplotype_track = {
+
+        type: "DashboardTrack",
+        trackId: haplotype_trackid,
+        name: "sequence-"+clickedNodeRef.current.nodeDetails.name,
+        assemblyNames: ['NC_045512'],
+        category: [],
+        adapter: {
+            type: "DashboardAdapter",
+            bamLocation: {
+                uri: hap_location
+            },
+            index: {
+                location: {
+                    uri: hapi_location
+                },
+            },
+        },
+        displays: [
+            {
+                type:'LinearDashboardDisplay',
+                displayId: 'display-id'+"haplotype_track"+read_groupname,
+                groupname_tag: {
+                    [read_groupname]: []
+                }
+            }
+        ]
+    }
+
     if (!trackIDsRef.current.includes(trackId))
     {
-        setTracks([...all_tracks, new_track_addition])
+        setTracks([...all_tracks, new_track_addition, haplotype_track])
+        // setTracks([...all_tracks, new_track_addition])
+        viewState.session.addTrackConf(haplotype_track);
         viewState.session.addTrackConf(new_track_addition);
-    
-        trackIDsRef.current = [...trackIDsRef.current, trackId];
+
+        trackIDsRef.current = [...trackIDsRef.current, haplotype_trackid, trackId];
+        // trackIDsRef.current = [...trackIDsRef.current, trackId];
+
         setShowTrack(trackId);
     }
 }

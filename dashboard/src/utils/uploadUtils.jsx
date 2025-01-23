@@ -31,7 +31,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         const data = new FormData()
 
         for (let i =0; i < uploadInput.files.length; i++){
-          data.append("file", uploadInput.files[i], uploadInput.files[i].name)
+          data.append("files", uploadInput.files[i], uploadInput.files[i].name)
         }
         try {
           const config = {
@@ -73,13 +73,13 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
     };
 
       const handleFileProcessing = (filenames_nodes) => {
-      
-        // const nodes = Object.keys(filenames_nodes);
+
+        const keysToExclude = ['HP_SEQ']; // replace 'key1', 'key2' with actual keys
+        // Filter out the keys to exclude
+        const nodes = Object.keys(filenames_nodes).filter(key => !keysToExclude.includes(key));
+        // const nodes = Object.keys(filenames_nodes)
+        console.log("nodes", nodes);
         
-        // const nodes = filenames_nodes.map(groupName => fileDict[groupName].node_name);
-        // const nodes = Object.keys(filenames_nodes).map(key => filenames_nodes[key].node_name);
-        const nodes = Object.keys(filenames_nodes);
-        console.log("nodes", nodes)
         mark_nodeRef.current = nodes;
 
         
@@ -101,7 +101,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         updateQuery(query)
         setSelectedFile(filenames_nodes);
     }
-
+    
     return (
         <div style={{ background: '#f0f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '90%', margin: '0 auto'  }}>
             <p style={{ textAlign: 'center', margin: '20px 0', fontSize: '16px', color: '#333', maxWidth:'90%',margin: '10px auto' }}>

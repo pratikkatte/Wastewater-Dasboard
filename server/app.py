@@ -45,14 +45,24 @@ def selectNodes(uploaded_filenames):
         try:
             bam = pysam.AlignmentFile(filename, 'rb')
             headers = bam.header
+            
             read_groups = headers.get('RG', [])
             unseen_mutation_comments = headers.get('CO', [])
+            if "HP_SEQ" in unseen_mutation_comments:
+                file_dict['HP_SEQ']= {
+                    'filename': os.path.basename(filename)
+                }
+                continue
             um_dicts = parseCommentsInfo(unseen_mutation_comments)
             if not read_groups:
                 file_dict[random.choice(array)] = {"filename": filename, "groupname": ""}
             else:
                 for read_group in read_groups:
                     node_name = read_group['DS'].replace("Node:", "")
+                    # if 'node_' in node_name:
+                    #     continue
+                        # pass
+
                     group_name = read_group['ID']
                     unseen_mutations = getUnseenMutationInfo(read_group.get('UM', ''))
                     temp_dict = [{um_key: um_dicts.get(um_key, "")} for um_key in unseen_mutations]
@@ -79,7 +89,7 @@ def fileUpload():
     """Endpoint to handle file uploads."""
     if request.method == 'POST':
         uploaded_files = []
-        files = request.files.getlist('file')
+        files = request.files.getlist('files')
         for f in files:
             filename = secure_filename(f.filename)
             if allowedFile(filename):
