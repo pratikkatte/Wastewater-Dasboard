@@ -5,7 +5,10 @@
 
 ### Before starting the dashboard
 
-- Process the taxonium file. 
+- Process the taxonium file.
+    ```
+    pip install taxoniumtools
+    ```
     ```
     cd taxonium_component
 
