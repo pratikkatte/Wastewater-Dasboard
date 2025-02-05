@@ -32,8 +32,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Mount the React app (Vite build output) as a static folder
 
-frontend_dir = "../dashboard/dist"
-app.mount("/assets", StaticFiles(directory=f"{frontend_dir}/assets"), name="assets")
+# frontend_dir = "./dist"
+# app.mount("/assets", StaticFiles(directory=f"{frontend_dir}/assets"), name="assets")
 
 def allowed_file(filename: str) -> bool:
     """Check if the file is of an allowed type."""
@@ -95,11 +95,9 @@ def select_nodes(uploaded_filenames: List[str]) -> dict:
 async def status():
     return {"status": "success"}
 
-# Serve the index.html for the root endpoint
 @app.get("/")
 async def serve_react_app():
-    index_file = f"{frontend_dir}/index.html"
-    return FileResponse(index_file)
+    return  {"status": "success_pratik"}
 
 @app.get('/uploads/{name}')
 def download_file(name: str):
@@ -110,7 +108,7 @@ def download_file(name: str):
     else:
         raise HTTPException(status_code=404, detail="File not found")
 
-@app.post('/api/upload')
+@app.post('/upload')
 def file_upload(files: List[UploadFile] = File(...)):
 
 
@@ -134,5 +132,5 @@ def file_upload(files: List[UploadFile] = File(...)):
     file_dict = select_nodes(uploaded_files)
     return {"response": file_dict, "status": "success"}
 
-if __name__ == "__main__":
-    uvicorn.run("interface:app", host="127.0.0.1", port=5000, reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run("interface:app", host="127.0.0.1", port=5000, reload=True)

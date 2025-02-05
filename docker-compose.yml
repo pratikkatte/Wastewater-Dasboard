@@ -1,0 +1,46 @@
+services:
+  react_app:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: react_app
+    ports:
+      - "5173:5173" # Only expose ReactJS frontend to user
+    depends_on:
+      - fastapi
+      - backend
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: "."
+      dockerfile: ./taxonium_backend/Dockerfile
+    container_name: backend_service
+    
+    ports:
+      - "8080:8080"  # Internal port mapping
+    expose:
+      - "8080"  # Expose the port for inter-service communication
+    networks:
+      - app_network
+    volumes:
+      - ${HOST_FILE_PATH}:/app/taxonium_backend/pruned_public-2023-12-25.all.masked.jsonl  # Mount the file
+
+  fastapi:
+    build:
+      context: ./server  # Path to the frontend folder
+      dockerfile: ./Dockerfile
+    container_name: fastapi_service
+    working_dir: /app
+    ports:
+      - "5000:5000"  # Expose port 5000 to the user
+    expose:
+      - "5000"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge

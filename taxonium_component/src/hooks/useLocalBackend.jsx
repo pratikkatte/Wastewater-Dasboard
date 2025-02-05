@@ -94,6 +94,9 @@ function useLocalBackend(uploaded_data) {
 
   const queryNodes = useCallback(
     async (boundsForQueries, setResult, setTriggerRefresh, config) => {
+
+      console.log("setResult", setResult)
+
       console.log("queryNodes", boundsForQueries);
       worker.postMessage({
         type: "query",
@@ -102,8 +105,7 @@ function useLocalBackend(uploaded_data) {
       onQueryReceipt = (receivedData) => {
         //  console.log("CONFIG IS", config);
         console.log(
-          "got query result" //, receivedData
-        );
+          "got query result","->", receivedData);
         receivedData.nodes.forEach((node) => {
           if (node.node_id === config.rootId) {
             node.mutations = config.rootMutations.map(
