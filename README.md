@@ -1,7 +1,22 @@
 # Wastewater-Dasboard
 ** port forwarding is important while running from server. 
 
-## Starting up the dashboard. 
+## Starting up the dashboard via Docker
+
+
+### Edit the `.env` file
+
+change the path to the taxonium jsonl file. 
+```
+HOST_FILE_PATH="./pruned_public-2023-12-25.all.masked.jsonl"
+```
+
+### Run the docker containers. 
+```
+docker compose --env-file .env up --build
+```
+
+## Starting up the dashboard via Docker
 
 ### Before starting the dashboard
 
