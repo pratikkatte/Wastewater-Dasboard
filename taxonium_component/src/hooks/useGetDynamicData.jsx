@@ -7,7 +7,6 @@ function addNodeLookup(data) {
     ...data,
     nodeLookup: Object.fromEntries(data.nodes.map((n) => [n.node_id, n])),
   };
-  console.log("cc");
   return output;
 }
 function useGetDynamicData(backend, colorBy, viewState, config, xType) {

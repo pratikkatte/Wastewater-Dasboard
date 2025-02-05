@@ -1,3 +1,5 @@
+import config from '../config';
+
 const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowTrack, viewState, all_tracks) => {
 
     // {'group1': {'filename': 'output_multi.bam', 'node_name': 'Germany/IMS-10209-CVDP-D48209F5-5BED-436E-BFC4-D2118C232BC4/2021'}, 
@@ -28,7 +30,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     const trackId = node_name
 
 
-    const bam_location = "http://127.0.0.1:5000/uploads/"+ bam_filename;
+    const bam_location = `${config.API_BASE}/api/uploads/${bam_filename}`
     const bami_location = bam_location + ".bai";
 
     const new_track_addition = {
@@ -71,10 +73,10 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     const haplotype_sequences = selectedFile['HP_SEQ']['filename']
 
-    console.log("haplotype_sequences", haplotype_sequences)
 
 
-    const hap_location = "http://127.0.0.1:5000/uploads/"+haplotype_sequences;
+    const hap_location = `${config.API_BASE}/api/uploads/${haplotype_sequences}`;
+    
     const hapi_location = hap_location + ".bai";
 
     const haplotype_trackid = "sequenceid-"+read_groupname

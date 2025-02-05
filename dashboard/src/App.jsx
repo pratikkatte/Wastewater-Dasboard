@@ -9,6 +9,7 @@ import addTrack  from './utils/TrackUtils.jsx'
 import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
+import config from './config';
 
 import {
   createViewState,
@@ -18,6 +19,7 @@ import {
 const default_query = {};
 
 default_query.backend = null;
+
 
 const createDefaultSearch = (mark_nodes) => {
   return mark_nodes.map(node => {
@@ -89,6 +91,7 @@ useEffect(() => {
   useEffect(() => {
     if(showTrack)
     {
+      console.log(viewState.session.view)
         trackIDsRef.current.forEach((trackId) => {
         viewState.session.view.showTrack(trackId);
         })
@@ -96,11 +99,9 @@ useEffect(() => {
         setCreateTrack(false);
     }
     }, [showTrack])
-    
+
     const onClickNode = useCallback((selectedNode) => {
-      console.log("clicked", selectedNode)
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
-          
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
             selectedNode.clearNodeDetails()
@@ -108,6 +109,7 @@ useEffect(() => {
             setCreateTrack(true);
             setJBrowseOpen(true);
     }
+
     }, [JBrowseOpen]);
     if (!viewState) {
       return null
@@ -127,9 +129,9 @@ useEffect(() => {
         <div style={{display:"flex", height: "92vh"}} >
           <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="h-[calc(100%-4rem)]">
-
-            <TaxoniumBit
-                backendUrl="http://localhost:8080"
+              <TaxoniumBit
+                backendUrl={`${config.API_BASE}/taxonium`}
+                // backendUrl="http://localhost:8080"
                 // backendUrl="https://api.cov2tree.org"
                 query={query} updateQuery={updateQuery} onClickNode={onClickNode}
               />
@@ -139,11 +141,11 @@ useEffect(() => {
             {JBrowseOpen &&
             <div>
               <JBrowseLinearGenomeView viewState={viewState} />
-              </div>
+            </div>
             }
-          </div> 
+          </div>
         </div> 
-      </div> 
+      </div>
       }
     </div>
   </>

@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js --port 8080 --data_file pruned_public-2023-12-25.all.masked.jsonl"
   },
   "author": "",
   "license": "ISC",
