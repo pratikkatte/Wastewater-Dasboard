@@ -34,9 +34,9 @@ services:
     container_name: fastapi_service
     working_dir: /app
     ports:
-      - "5000:5000"  # Expose port 5000 to the user
+      - "8000:8000"  # Expose port 5000 to the user
     expose:
-      - "5000"
+      - "8000"
     depends_on:
       - backend
     networks:
