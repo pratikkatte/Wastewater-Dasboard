@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: react_app
     ports:
-      - "5173:5173" # Only expose ReactJS frontend to user
+      - "80:80" # For Nginx
     depends_on:
       - fastapi
       - backend
