@@ -91,10 +91,11 @@ useEffect(() => {
   useEffect(() => {
     if(showTrack)
     {
-      console.log(viewState.session.view)
-        trackIDsRef.current.forEach((trackId) => {
-        viewState.session.view.showTrack(trackId);
-        })
+        // trackIDsRef.current.forEach((trackId) => {
+        // viewState.session.view.showTrack(trackId);
+        // })
+        viewState.session.view.showTrack(showTrack);
+
         setShowTrack(null)
         setCreateTrack(false);
     }
@@ -115,6 +116,7 @@ useEffect(() => {
       return null
   }
 
+  console.log("Taxonium", config.TAXONIUM_BASE)
   return (
     <>
       <div>
@@ -130,7 +132,7 @@ useEffect(() => {
           <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="h-[calc(100%-4rem)]">
               <TaxoniumBit
-                backendUrl={`${config.API_BASE}/taxonium`}
+                backendUrl={`${config.TAXONIUM_BASE}`}
                 // backendUrl="http://localhost:8080"
                 // backendUrl="https://api.cov2tree.org"
                 query={query} updateQuery={updateQuery} onClickNode={onClickNode}
