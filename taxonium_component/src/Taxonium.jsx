@@ -34,6 +34,7 @@ function Taxonium({
   configUrl,
   query,
   updateQuery,
+  overlayContent,
   setAboutEnabled,
   setOverlayContent,
   setTitle,
@@ -65,6 +66,13 @@ function Taxonium({
   const deckRef = useRef();
   const jbrowseRef = useRef();
   const [mouseDownIsMinimap, setMouseDownIsMinimap] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+    setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 100);
+  };
 
   const [deckSize, setDeckSize] = useState(null);
   const settings = useSettings({ query, updateQuery });
@@ -203,6 +211,47 @@ function Taxonium({
           />
         </div>
       </div>
+
+      <div
+          className={
+            sidebarOpen
+              ? "flex-grow min-h-0 h-1/2 md:h-full 2xl:w-1/4 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
+                (settings.treenomeEnabled ? " md:w-1/4" : " md:w-1/3")
+              : "bg-white shadow-xl"
+          }
+        >
+          {!sidebarOpen && (
+            <button onClick={toggleSidebar}>
+              <br />
+              {window.innerWidth > 768 ? (
+                <MdArrowBack className="mx-auto w-5 h-5 sidebar-toggle" />
+              ) : (
+                <MdArrowUpward className="mx-auto w-5 h-5 sidebar-toggle" />
+              )}
+            </button>
+          )}
+
+      {sidebarOpen && (
+            <SearchPanel
+              className="flex-grow min-h-0 h-full bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden"
+              backend={backend}
+              search={search}
+              colorBy={colorBy}
+              colorHook={colorHook}
+              config={config}
+              selectedDetails={selectedDetails}
+              xType={xType}
+              setxType={setxType}
+              settings={settings}
+              treenomeState={treenomeState}
+              view={view}
+              overlayContent={overlayContent}
+              setAboutEnabled={setAboutEnabled}
+              perNodeFunctions={perNodeFunctions}
+              toggleSidebar={toggleSidebar}
+            />
+          )}
+        </div>
     </div>
   );
 }

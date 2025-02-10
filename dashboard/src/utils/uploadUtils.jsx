@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import config from '../config';
+
 
 
 const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery}) => {
@@ -34,16 +36,18 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
           data.append("files", uploadInput.files[i], uploadInput.files[i].name)
         }
         try {
-          const config = {
+          const p_config = {
             onUploadProgress: (progressEvent) => {
               const { loaded, total } = progressEvent;
               setuploadProgress(Math.round((loaded / total) * 100));
             },
           };
+          console.log(`${config.API_BASE}/upload`)
           const response = await axios.post(
-            "/api/upload",
+            `${config.API_BASE}/upload`,
+            // "/api/upload",
             data,
-            config,
+            p_config,
           );
           
           console.log("response", response)

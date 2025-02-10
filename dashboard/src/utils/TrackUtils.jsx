@@ -30,7 +30,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     const trackId = node_name
 
 
-    const bam_location = `${config.API_BASE}/api/uploads/${bam_filename}`
+    const bam_location = `${config.API_BASE}/uploads/${bam_filename}`
     const bami_location = bam_location + ".bai";
 
     const new_track_addition = {
@@ -75,7 +75,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
 
 
-    const hap_location = `${config.API_BASE}/api/uploads/${haplotype_sequences}`;
+    const hap_location = `${config.API_BASE}/uploads/${haplotype_sequences}`;
     
     const hapi_location = hap_location + ".bai";
 
@@ -112,15 +112,21 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     if (!trackIDsRef.current.includes(trackId))
     {
-        setTracks([...all_tracks, new_track_addition, haplotype_track])
+        // setTracks([...all_tracks, new_track_addition, haplotype_track])
         // setTracks([...all_tracks, new_track_addition])
         viewState.session.addTrackConf(haplotype_track);
         viewState.session.addTrackConf(new_track_addition);
 
+        viewState.session.view.showTrack(haplotype_trackid);
+        viewState.session.view.showTrack(trackId);
+
         trackIDsRef.current = [...trackIDsRef.current, haplotype_trackid, trackId];
         // trackIDsRef.current = [...trackIDsRef.current, trackId];
-
-        setShowTrack(trackId);
+        // setShowTrack(trackId);
+    }
+    else {
+        viewState.session.view.showTrack(haplotype_trackid);
+        viewState.session.view.showTrack(trackId);
     }
 }
 
