@@ -25,7 +25,7 @@ services:
     networks:
       - app_network
     volumes:
-      - ${HOST_FILE_PATH}:/app/taxonium_backend/pruned_public-2023-12-25.all.masked.jsonl  # Mount the file
+      - ${HOST_FILE_PATH}:/app/taxonium_backend/taxonium.jsonl  # Mount the file
 
   fastapi:
     build:
