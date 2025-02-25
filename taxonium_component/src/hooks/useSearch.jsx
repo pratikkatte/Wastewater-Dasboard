@@ -134,7 +134,6 @@ const useSearch = ({
 
         return true;
       }
-
       return false;
     });
 
@@ -142,7 +141,6 @@ const useSearch = ({
     if (json_changed.length > 0) {
       setJsonSearch(spec_json);
     }
-
     const all_changed_with_dupes = json_changed.concat(result_changed);
     const all_changed = [...new Set(all_changed_with_dupes)];
     // remove dupes
@@ -151,10 +149,8 @@ const useSearch = ({
     if (all_changed.length > 0) {
       all_changed.forEach((key) => {
         // console.log("searching for " + key, JSON.parse(spec_json[key]));
-
         const this_json = spec_json[key];
         // console.log("performing search");
-
         const do_search = () => {
           setIndividualSearchLoadingStatus(key, "loading");
 
