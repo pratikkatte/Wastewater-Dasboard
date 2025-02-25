@@ -7,7 +7,7 @@ import { MdArrowForward, MdArrowDownward } from "react-icons/md";
 import ReactTooltip from "react-tooltip";
 import prettifyName from "../utils/prettifyName";
 
-import { FaSearch, FaShare } from "react-icons/fa";
+import { FaSearch, FaShare, FaFilter } from "react-icons/fa";
 
 import { Select } from "./Basic";
 import ListOutputModal from "./ListOutputModal";
@@ -395,10 +395,40 @@ function SearchPanel({
       </div>
       <div className="py-3 flex flex-col md:min-h-0">
         <h2 className="font-bold text-gray-700 flex justify-between items-center mb-2">
-          <div className="flex items-center">
-            <FaSearch className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
-            Search
-          </div>
+          <div className="flex flex-col items-start">
+            <div className="flex items-center">
+              <FaFilter className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
+              Filter
+              </div>
+              <div className="flex">
+                <button 
+                  className="px-2 py-1 bg-blue-500 text-white rounded"
+                  onClick={() => {
+                    search.searchSpec.forEach(item => {
+                      search.setEnabled(item.key, false)
+                    });
+                  }}
+                >
+                 Deselect All
+                </button>
+                <button 
+                  className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
+                  onClick={() => {
+                    search.searchSpec.forEach(item => {
+                      search.setEnabled(item.key, true)
+                    });
+                  }}
+                >
+                 Select All
+                </button>
+              </div>
+
+            <div className="flex items-center">
+              <FaSearch className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
+              Search
+            </div>
+            </div>
+
           <SearchDisplayToggle settings={settings} />
         </h2>
         <div className="space-y-2 md:overflow-y-auto -mr-4 pr-4">

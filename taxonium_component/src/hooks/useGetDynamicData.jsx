@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 const DEBOUNCE_TIME = 100;
 const CHECK_AGAIN_TIME = 100;
 function addNodeLookup(data) {
-  const output = {
-    ...data,
-    nodeLookup: Object.fromEntries(data.nodes.map((n) => [n.node_id, n])),
-  };
-  return output;
+    const output = {
+      ...data,
+      nodeLookup: Object.fromEntries(data.nodes.map((n) => [n.node_id, n])),
+    };
+    return output;
 }
 function useGetDynamicData(backend, colorBy, viewState, config, xType) {
   const { queryNodes } = backend;

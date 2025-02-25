@@ -40,7 +40,7 @@ function Taxonium({
   setTitle,
   onClickNode
 }) {
-  const [backupQuery, setBackupQuery] = useState(query);
+  const [backupQuery, setBackupQuery] = useState(query ? query: default_query);
   const backupUpdateQuery = useCallback((newQuery) => {
     setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
   }, []);
@@ -168,7 +168,7 @@ function Taxonium({
     settings,
   });
 
-  
+  console.log("search", search)
   const treenomeState = useTreenomeState(data, deckRef, view, settings);
 
   return (
