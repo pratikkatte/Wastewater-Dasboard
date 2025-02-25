@@ -18,8 +18,14 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
       : "Loading";
 
   const getMyIndex = useCallback(() => {
-    const index = search.searchSpec.findIndex((item) => item.key === myKey);
-    return index;
+    const indexes = search.searchSpec.reduce((acc, item, idx) => {
+      if (item.key === myKey) {
+        acc.push(idx);
+      }
+      return acc;
+    }, []);
+    
+    return indexes;
   }, [search.searchSpec, myKey]);
 
   const setThisSearchSpec = useCallback(
@@ -93,7 +99,8 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                 <Button
                   className="inline-block bg-gray-100 text-xs mx-auto h-5 rounded border-gray-300 border  text-gray-700 "
                   onClick={() => {
-                    search.setZoomToSearch({ index: getMyIndex() });
+                    const index = getMyIndex();
+                    search.setZoomToSearch({ index });
                   }}
                   title="Zoom to this search"
                 >

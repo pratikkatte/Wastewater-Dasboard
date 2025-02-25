@@ -35,14 +35,11 @@ const useSearch = ({
     query.zoomToSearch ? { index: query.zoomToSearch } : null
   );
 
-  console.log("zoomToSearch", zoomToSearch)
-
   const searchesEnabled = query.enabled
     ? JSON.parse(query.enabled)
     : JSON.parse(default_query.enabled);
 
   const setEnabled = (key, enabled) => {
-    console.log("setEnabled", key, enabled);
     const newSearchesEnabled = { ...searchesEnabled, [key]: enabled };
     updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
   };
@@ -75,7 +72,6 @@ const useSearch = ({
       if (searchControllers[key]) {
         searchControllers[key].forEach((controller) => {
           if (controller && boundsForQueries == controller.bounds) {
-            console.log("cancelling for ", key);
             controller.con.abort();
           }
         });
@@ -129,12 +125,12 @@ const useSearch = ({
         !(searchResults[key].result.type === "complete") &&
         searchResults[key].boundingBox !== boundsForQueries
       ) {
-        console.log(
-          "result_changed",
-          key,
-          searchResults[key].boundingBox,
-          boundsForQueries
-        );
+        // console.log(
+        //   "result_changed",
+        //   key,
+        //   searchResults[key].boundingBox,
+        //   boundsForQueries
+        // );
 
         return true;
       }
@@ -154,10 +150,10 @@ const useSearch = ({
     // if there are changed json strings, update the search results
     if (all_changed.length > 0) {
       all_changed.forEach((key) => {
-        console.log("searching for " + key, JSON.parse(spec_json[key]));
+        // console.log("searching for " + key, JSON.parse(spec_json[key]));
 
         const this_json = spec_json[key];
-        console.log("performing search");
+        // console.log("performing search");
 
         const do_search = () => {
           setIndividualSearchLoadingStatus(key, "loading");
@@ -211,7 +207,6 @@ const useSearch = ({
         // debounce the search
         if (timeouts.current[key]) {
           clearTimeout(timeouts.current[key]);
-          console.log("clearing timeout");
         }
         timeouts.current[key] = setTimeout(do_search, 500);
       });
@@ -259,7 +254,7 @@ const useSearch = ({
         relevant.push(searchResults[key])
       })
       // const relevant = searchResults[searchSpec[index].key];
-      console.log("zoom relevant", relevant);
+
 
       // if (!relevant) {
       //   console.log("no search results for index", index);
