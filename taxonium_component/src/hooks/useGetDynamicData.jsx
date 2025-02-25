@@ -37,7 +37,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
         console.log([viewState.min_x, boundsForQueries.min_x]);
       }
 
-      console.log("updating parameters to query");
+      // console.log("updating parameters to query");
 
       const newBoundForQuery = {
         min_x: viewState.min_x - viewState.real_width,
@@ -49,7 +49,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
       };
 
       setBoundsForQueries(newBoundForQuery);
-      console.log("updating bounds", newBoundForQuery);
+      // console.log("updating bounds", newBoundForQuery);
     }
   }, [viewState, boundsForQueries, triggerRefresh, xType]);
 
@@ -74,7 +74,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
           if (!boundsForQueries) return;
 
           if (dynamicData.status === "loading") {
-            console.log("not trying to get as we are still loading");
+            // console.log("not trying to get as we are still loading");
             clearTimeout(timeoutRef);
             setTimeoutRef(
               setTimeout(() => {
@@ -83,7 +83,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
             );
             return;
           }
-          console.log("attempting get");
+          // console.log("attempting get");
           // Make call to backend to get data
 
           setDynamicData({ ...dynamicData, status: "loading" });
@@ -109,7 +109,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
                   new_result.base_data = addNodeLookup(result);
                 } else {
                   if (!prevData.base_data || prevData.base_data_is_invalid) {
-                    console.log("query for minimap");
+                    // console.log("query for minimap");
                     queryNodes(
                       null,
                       (base_result) => {

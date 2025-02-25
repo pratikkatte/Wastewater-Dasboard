@@ -35,7 +35,7 @@ import {
     const [createTract, setCreateTrack] = useState(null)
 
     const [JBrowseOpen, setJBrowseOpen] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(true);
 
     useEffect(() => {
 
@@ -181,6 +181,8 @@ return (
         <div style={{display:"flex", height: "80vh"}} >
           <div className='flex-grow'>
             <Taxonium sourceData={sourceData} query={queryRef.current} onClickNode={onClickNode}/>
+            {/* <Taxonium backendUrl="https://api.cov2tree.org" query={queryRef.current} onClickNode={onClickNode} />  */}
+
           </div>
           <div className='flex' style={{margin: "10px"}}>
             {JBrowseOpen &&

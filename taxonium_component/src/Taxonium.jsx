@@ -168,6 +168,7 @@ function Taxonium({
     settings,
   });
 
+  
   const treenomeState = useTreenomeState(data, deckRef, view, settings);
 
   return (
@@ -182,8 +183,12 @@ function Taxonium({
         effect="solid"
       />
       <div className="flex-grow overflow-hidden flex flex-col md:flex-row">
-        <div
-          className={ "md:col-span-12 h-5/6 md:h-full w-full"
+      <div
+          className={
+            sidebarOpen
+              ? "h-1/2 md:h-full w-full 2xl:w-3/4 md:flex-grow" +
+                (settings.treenomeEnabled ? " md:w-3/4" : " md:w-2/3")
+              : "md:col-span-12 h-5/6 md:h-full w-full"
           }
         >
           <Deck
