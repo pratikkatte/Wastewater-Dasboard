@@ -3,7 +3,7 @@ import { useState } from "react";
 import Taxonium from "../Taxonium";
 
 const WithState = (args) => {
-  const [state, setState] = useState({});
+  const [state, setState] = useState({"mutationTypesEnabled": JSON.stringify({ aa: true, nt: false }),});
   const updateQuery = (newState) => {
     setState({ ...state, ...newState });
   };
@@ -26,7 +26,9 @@ export default {
 
 export const WithBackend = {
   args: {
-    backendUrl: "https://api.cov2tree.org",
+    backendUrl: "https://localhost:8080",
+    // query:{"mutationTypesEnabled": JSON.stringify({ aa: true, nt: false })},
+    
   },
 
   parameters: {

@@ -44,6 +44,14 @@ const useSearch = ({
     updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
   };
 
+  const setEnabledAll = (enabled) => {
+    const newSearchesEnabled = Object.keys(searchesEnabled).reduce((acc, key) => {
+      acc[key] = enabled;
+      return acc;
+    }, {});
+    updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
+  }
+
   const setSearchSpec = (newSearchSpec) => {
     updateQuery({
       srch: JSON.stringify(newSearchSpec),
@@ -342,6 +350,7 @@ const useSearch = ({
     searchesEnabled,
     setEnabled,
     searchLoadingStatus,
+    setEnabledAll
   };
 };
 

@@ -132,5 +132,5 @@ def file_upload(files: List[UploadFile] = File(...)):
     file_dict = select_nodes(uploaded_files)
     return {"response": file_dict, "status": "success"}
 
-# if __name__ == "__main__":
-#     uvicorn.run("interface:app", host="127.0.0.1", port=5000, reload=True)
+if __name__ == "__main__":
+    uvicorn.run("interface:app", host="127.0.0.1", port=8000, reload=True)
