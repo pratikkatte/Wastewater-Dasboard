@@ -50,6 +50,7 @@ export const LocalData = {
       filename: "test.nwk",
       data: testTree,
       filetype: "nwk",
+      mutationTypesEnabled: JSON.stringify({ aa: true, nt: true }),
     },
   },
 

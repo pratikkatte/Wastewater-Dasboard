@@ -404,9 +404,8 @@ function SearchPanel({
                 <button 
                   className="px-2 py-1 bg-blue-500 text-white rounded"
                   onClick={() => {
-                    search.searchSpec.forEach(item => {
-                      search.setEnabled(item.key, false)
-                    });
+                    console.log("search clicked deselect", search)
+                    search.setEnabledAll(false)
                   }}
                 >
                  Deselect All
@@ -414,9 +413,8 @@ function SearchPanel({
                 <button 
                   className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
                   onClick={() => {
-                    search.searchSpec.forEach(item => {
-                      search.setEnabled(item.key, true)
-                    });
+                    console.log("search clicked select", search)
+                    search.setEnabledAll(true)
                   }}
                 >
                  Select All

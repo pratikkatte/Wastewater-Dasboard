@@ -116,7 +116,7 @@ useEffect(() => {
       return null
   }
 
-  console.log("Taxonium", config.TAXONIUM_BASE)
+  // console.log("Taxonium", config.TAXONIUM_BASE)
   return (
     <>
       <div>
