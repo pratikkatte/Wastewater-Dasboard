@@ -1,1 +1,0 @@
-import{o as r,R as e,c4 as l}from"./index-6d06863a.js";import{Y as o}from"./YScaleBars-3292c17d.js";import"./util-f1617a72.js";const i=r(a=>{const{model:t}=a;return e.createElement("div",null,e.createElement(l,{...a}),e.createElement(o,{model:t}))});export{i as default};
