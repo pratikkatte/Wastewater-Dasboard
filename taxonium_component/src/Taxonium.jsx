@@ -99,9 +99,10 @@ function Taxonium({
   }
   const selectedDetails = useNodeDetails("selected", backend);
 
+  
 
   useEffect(() => {
-    if(selectedDetails.nodeDetails != null){
+    if(selectedDetails.nodeDetails != null && onClickNode){
       onClickNode(selectedDetails)
     }
  }, [selectedDetails])
@@ -220,7 +221,7 @@ function Taxonium({
       <div
           className={
             sidebarOpen
-              ? "flex-grow min-h-0 h-1/2 md:h-full 2xl:w-1/4 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
+              ? "flex min-h-0 h-1/2 md:h-full 2xl:w-1/4 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
                 (settings.treenomeEnabled ? " md:w-1/4" : " md:w-1/3")
               : "bg-white shadow-xl"
           }

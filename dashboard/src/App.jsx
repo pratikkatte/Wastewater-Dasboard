@@ -128,9 +128,9 @@ useEffect(() => {
               </div>
           :
          <div>
-        <div style={{display:"flex", height: "92vh"}} >
+        <div style={{display:"flex", height: "100vh"}} >
           <div className="h-screen w-screen flex flex-col overflow-hidden">
-            <div className="h-[calc(100%-4rem)]">
+            <div className="h-full">
               <TaxoniumBit
                 backendUrl={`${config.TAXONIUM_BASE}`}
                 // backendUrl="http://localhost:8080"
