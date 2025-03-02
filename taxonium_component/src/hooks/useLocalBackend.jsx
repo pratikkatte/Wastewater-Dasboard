@@ -69,10 +69,10 @@ worker.onmessage = (event) => {
 function useLocalBackend(uploaded_data) {
   const [statusMessage, setStatusMessage] = useState({ message: null });
   onStatusReceipt = (receivedData) => {
-    console.log("STATUS:", receivedData.data);
+    // console.log("STATUS:", receivedData.data);
     if (receivedData.data.error) {
       window.alert(receivedData.data.error);
-      console.log("ERROR33:", receivedData.data.error);
+      // console.log("ERROR33:", receivedData.data.error);
     }
     const total_nodes = receivedData.data.total;
     if (total_nodes && total_nodes > 6000000) {
@@ -95,17 +95,13 @@ function useLocalBackend(uploaded_data) {
   const queryNodes = useCallback(
     async (boundsForQueries, setResult, setTriggerRefresh, config) => {
 
-      console.log("setResult", setResult)
-
-      console.log("queryNodes", boundsForQueries);
       worker.postMessage({
         type: "query",
         bounds: boundsForQueries,
       });
       onQueryReceipt = (receivedData) => {
         //  console.log("CONFIG IS", config);
-        console.log(
-          "got query result","->", receivedData);
+
         receivedData.nodes.forEach((node) => {
           if (node.node_id === config.rootId) {
             node.mutations = config.rootMutations.map(
@@ -126,7 +122,6 @@ function useLocalBackend(uploaded_data) {
   const singleSearch = useCallback(
     (singleSearch, boundsForQueries, setResult) => {
       const key = JSON.parse(singleSearch).key;
-      console.log("singleSearch", singleSearch, "key", key);
       worker.postMessage({
         type: "search",
         search: singleSearch,
@@ -134,13 +129,7 @@ function useLocalBackend(uploaded_data) {
       });
 
       searchSetters[key] = (receivedData) => {
-        console.log(
-          "got search result from ",
-          key,
-          //   singleSearch,
-          "result"
-          //   receivedData
-        );
+
         setResult(receivedData);
       };
       return {
@@ -153,31 +142,31 @@ function useLocalBackend(uploaded_data) {
   );
 
   const getDetails = useCallback((node_id, setResult) => {
-    console.log("getDetails", node_id);
+
     worker.postMessage({
       type: "details",
       node_id: node_id,
     });
     onDetailsReceipt = (receivedData) => {
-      console.log("got details result", receivedData);
+
       setResult(receivedData);
     };
   }, []);
 
   const getConfig = useCallback((setResult) => {
-    console.log("getConfig");
+
     worker.postMessage({
       type: "config",
     });
 
     onConfigReceipt = (receivedData) => {
-      console.log("got config result", receivedData);
+
       setResult(receivedData);
     };
   }, []);
 
   const getTipAtts = useCallback((nodeId, selectedKey, callback) => {
-    console.log("getTipAtts", nodeId, selectedKey);
+    
     worker.postMessage({
       type: "list",
       node_id: nodeId,
@@ -185,13 +174,13 @@ function useLocalBackend(uploaded_data) {
     });
 
     onListReceipt = (receivedData) => {
-      console.log("got list result", receivedData);
+
       callback(null, receivedData);
     };
   }, []);
 
   const getNextstrainJson = useCallback((nodeId, config) => {
-    console.log("getNextstrainJson", nodeId);
+
     worker.postMessage({
       type: "nextstrain",
       node_id: nodeId,

@@ -110,7 +110,6 @@ export default (
       pluginManager.getPlugin('LinearGenomeViewPlugin') as LinearGenomeViewPlugin
     )?.exports
   
-  
     return types
       .compose(
         'LinearDashboardDisplay',
@@ -120,8 +119,6 @@ export default (
           configuration: ConfigurationReference(configSchema),
           colorBy: ColorByModel,
           filterBy: types.optional(FilterModel, {}),
-
-          
           showEPColor: false,
           unseenKeys: types.optional(types.map(unseenModel), {}),
           modificationsReady: false,
@@ -202,14 +199,16 @@ export default (
           setFeatureUnderMouse(feat?: Feature) {
             self.featureUnderMouseVolatile = feat
           },
-          selectFeature(feature: Feature) {
+
+          selectFeature(feature: Feature, display_id) {
             const session = getSession(self)
             if (isSessionModelWithWidgets(session)) {
               const featureWidget = session.addWidget(
-                'AlignmentsFeatureWidget',
+                'DashboardFeatureWidget',
                 'alignmentFeature',
                 { featureData: feature.toJSON(), view: getContainingView(self),
-                  track: getContainingTrack(self)
+                  track: getContainingTrack(self), 
+                  "display_id": display_id,
                  },
               )
               session.showWidget(featureWidget)
@@ -217,6 +216,7 @@ export default (
             session.setSelection(feature)
           }
         }))
+
         .views(self => ({
           get autorunReady() {
             const view = getContainingView(self) as LGV
@@ -227,16 +227,15 @@ export default (
             )
           },
         }))
-        .actions(self => ({
-        
-          toggleEPDisplay() {
 
+        .actions(self => ({ 
+          toggleEPDisplay() {
             self.showEPColor = !self.showEPColor
             if(self.showEPColor)
             {
               self.setColorScheme({type: 'tag', tag: 'EPP'})
             }
-            else{
+            else {
               self.setColorScheme({type: 'mappingQuality'});
             }
           },
@@ -254,7 +253,7 @@ export default (
             filter_reads_by_tag[self.group_id] = []
 
             self.unseenKeys.forEach((value, key) => {
-              if(value.show){
+              if(value.show) {
                 filter_reads_by_tag[self.group_id].push({'unseenKey':key, 'mutation': value.mutation})
               }
             });
@@ -268,19 +267,28 @@ export default (
         },
 
         afterAttach() {
+
+          const is_sequence = self.configuration.toJSON().displayId.includes("sequence") ? true : false
+          
           const group_name = getConf(self, 'groupname_tag')
-
-          console.log("LinearDashboardLayer:", group_name)
-
             const group_name_keys = Object.keys(group_name);
             self.group_id = group_name_keys[0]
+
+
 
             group_name[self.group_id].map(item => {
               self.unseenKeys.set(item.unseenKey, unseenModel.create({ show: false, mutation: item.mutation}))
             })
 
             const filter_reads_tags = {}
-            filter_reads_tags[self.group_id] = []
+            if(is_sequence){
+
+              filter_reads_tags[self.group_id] = group_name[self.group_id]
+            }
+            else {
+              filter_reads_tags[self.group_id] = []
+            }
+            
 
             self.setColorScheme({type: 'mappingQuality'});
             
@@ -289,6 +297,7 @@ export default (
               flagInclude: 0,
               filterReads: filter_reads_tags
             }
+            
             self.setFilterBy(filter_reads)
 
           createAutorun(
@@ -299,13 +308,9 @@ export default (
               if (!self.autorunReady) {
                 return
               }
-
-
               const { colorBy, tagsReady } = self
 
               const { staticBlocks } = view
-
-
               const vals = await getUniqueModifications({
                 self,
                 adapterConfig: getConf(self.parentTrack, 'adapter'),
@@ -316,7 +321,6 @@ export default (
                 self.setModificationsReady(true)
               }
 
-              
               if (colorBy?.tag && !tagsReady) {
                 const vals = await getUniqueTagValues(self, colorBy, staticBlocks)
                 self.updateColorTagMap(vals)
@@ -488,7 +492,8 @@ export default (
                       )) as { feature: SimpleFeatureSerialized | undefined }
     
                       if (feature) {
-                        self.selectFeature(new SimpleFeature(feature))
+
+                        self.selectFeature(new SimpleFeature(feature), self.configuration.toJSON().displayId)
                       }
                     }
                   } catch (e) {
@@ -496,7 +501,6 @@ export default (
                     session.notify(`${e}`)
                   }
                 },
-
                 onClick() {
                   self.clearFeatureSelection()
                 },

@@ -16,7 +16,7 @@ const useColor = (colorMapping) => {
           parseInt(color.slice(3, 5), 16),
           parseInt(color.slice(5, 7), 16),
         ];
-        console.log(rgb);
+        
         return rgb;
       }
 

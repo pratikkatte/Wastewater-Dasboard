@@ -9,4 +9,3 @@ export default (pluginManager: PluginManager) => {
       stateModel: modelF(pluginManager, schema),
     }
   }
-

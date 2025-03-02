@@ -44,6 +44,7 @@ export function layoutFeature({
   displayMode: string
 }): LayoutRecord | null {
 
+
   let expansionBefore = 0
   let expansionAfter = 0
 

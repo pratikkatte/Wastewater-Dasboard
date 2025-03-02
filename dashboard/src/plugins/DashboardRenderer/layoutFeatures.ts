@@ -22,14 +22,10 @@ export function layoutFeats(
     throw new Error('invalid layout object')
   }
 
-
   const featureMap =
     sortedBy?.type && region.start === sortedBy.pos
       ? sortFeature(features, sortedBy)
       : features
-
-  
-  
 
   const heightPx = readConfObject(config, 'height')
   const displayMode = readConfObject(config, 'displayMode')

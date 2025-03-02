@@ -15,6 +15,13 @@ export function getTagAlt(feature: Feature, tag: string, alt: string) {
   return tags[tag] ?? tags[alt]
 }
 
+// get tag from BAM or CRAM feature, where CRAM uses feature.get('tags') and
+// BAM does not
+export function getTag(feature: Feature, tag: string) {
+  const tags = feature.get('tags')
+  return tags !== undefined ? tags[tag] : feature.get(tag)
+}
+
 // orientation definitions from igv.js, see also
 // https://software.broadinstitute.org/software/igv/interpreting_pair_orientations
 export const orientationTypes = {

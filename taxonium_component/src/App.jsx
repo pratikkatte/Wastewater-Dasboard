@@ -54,7 +54,6 @@ import {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
-            console.log(selectedNode)
             
             selectedNode.clearNodeDetails()
             // addTrack();
@@ -141,7 +140,6 @@ useEffect(() => {
         for (let i = 0; i < fileNames.length; i++) {
           zoom_to_indexes.push(i.toString());
         }
-        console.log("zoom_to_indexes", zoom_to_indexes);
 
         queryRef.current = {
           srch: JSON.stringify(default_search),

@@ -27,9 +27,7 @@ const URL_ON_FAIL = "https://fail.org/";
 
 function Taxonium({
   sourceData,
-
   backendUrl,
-
   configDict,
   configUrl,
   query,
@@ -44,8 +42,6 @@ function Taxonium({
   const backupUpdateQuery = useCallback((newQuery) => {
     setBackupQuery((oldQuery) => ({ ...oldQuery, ...newQuery }));
   }, []);
-  
-
   query = backupQuery; // query
   updateQuery = backupUpdateQuery;
   
@@ -98,16 +94,11 @@ function Taxonium({
     hoverDetails = gisaidHoverDetails;
   }
   const selectedDetails = useNodeDetails("selected", backend);
-
-  
-
   useEffect(() => {
     if(selectedDetails.nodeDetails != null && onClickNode){
       onClickNode(selectedDetails)
     }
  }, [selectedDetails])
-
-
 
   const config = useConfig(
     backend,

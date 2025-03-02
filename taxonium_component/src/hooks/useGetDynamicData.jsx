@@ -34,7 +34,7 @@ function useGetDynamicData(backend, colorBy, viewState, config, xType) {
           Math.abs(viewState.zoom - boundsForQueries.zoom) > 0.5))
     ) {
       if (window.log) {
-        console.log([viewState.min_x, boundsForQueries.min_x]);
+        // console.log([viewState.min_x, boundsForQueries.min_x]);
       }
 
       // console.log("updating parameters to query");
