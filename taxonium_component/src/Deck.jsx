@@ -340,7 +340,6 @@ function Deck({
           window.setTimeout(() => {
             treenomeState.handleResize();
           }, 50);
-          console.log("resize", size);
         }}
         onAfterRender={(event) => {
           if (isNaN(deckSize.width)) {
@@ -377,7 +376,6 @@ function Deck({
             loading={data.status === "loading"}
             requestOpenSettings={() => {
               console.log("opening");
-              console.log(treenomeSettingsOpen);
 
               setTreenomeSettingsOpen(true);
             }}

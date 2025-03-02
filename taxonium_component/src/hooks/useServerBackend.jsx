@@ -32,7 +32,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
       axios
         .get(url)
         .then(function (response) {
-          console.log("got data", response.data);
+
           response.data.nodes.forEach((node) => {
             if (node.node_id === config.rootId) {
               node.mutations = config.rootMutations.map(
@@ -95,7 +95,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
       axios
         .get(url, { signal: abortController.signal })
         .then(function (response) {
-          console.log("got data", response.data);
+
           setResult(response.data);
         })
         .catch(function (error) {
@@ -126,7 +126,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
     (setResult) => {
       let url = backend_url + "/config/?sid=" + sid;
       axios.get(url).then(function (response) {
-        console.log("got config", response.data);
+
         if (response.data.error) {
           window.alert(
             response.data.error + (url_on_fail ? "\nRedirecting you." : "")

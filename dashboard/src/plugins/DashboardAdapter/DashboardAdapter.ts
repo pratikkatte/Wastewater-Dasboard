@@ -206,9 +206,8 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
               record.get('end'),
             )
           }
-          
-          const flags = record.flags
 
+          const flags = record.flags
           if ((flags & flagInclude) !== flagInclude && !(flags & flagExclude)) {
             continue
           }
@@ -223,12 +222,12 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
               continue
             }
           }
-          
+
           if (filterReads){
             const rg = record.get("RG")
             const rg_filter = Object.keys(filterReads)[0]
-            const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item)=> item.unseenKey) : []
-            
+            const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item) => item.unseenKey) : []
+
             unseen_mutations = filterReads[rg_filter] && filterReads[rg_filter].length > 0 
             ? filterReads[rg_filter].reduce((acc, item) => {
                 acc[item.unseenKey] = item.mutation;
@@ -238,9 +237,9 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
 
             if (rg_filter) {
               if (`${rg}`.split(',').includes(rg_filter)){
-                if(um_filter.length>0){
-                  const um = record.get('UM')
-                  if(!(um_filter.includes(um))){
+                if(um_filter.length>0) {
+                  const um = record.get('UM') ? record.get('UM').split(",")  : ''
+                  if (!um || !um.some(u => um_filter.includes(u))) {
                       continue
                   }
                 }
@@ -254,7 +253,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           if (readName && record.get('name') !== readName) {
             continue
           }
-          
           observer.next(new BamSlightlyLazyFeature(record, this, ref, unseen_mutations))
         }
         observer.complete()

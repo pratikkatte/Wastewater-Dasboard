@@ -113,11 +113,18 @@ import {
   
     _get_UM() {
       const unseenid = this.record.get("UM")
+      let um = {};
       if (unseenid){
-        const um = `${unseenid} -> ${this.unseen_mutations[unseenid]}`
-        console.log("unseen_mutations, bam", um, this.unseen_mutations[unseenid])
+        const unseenidArray = unseenid.split(',');
+        unseenidArray.forEach(item => {
+          const value = this.unseen_mutations[item].split(":")
+          um[item] = value
+        });
+          // const um = `${unseenid} -> ${this.unseen_mutations[unseenid]}`
+          // console.log("jbrowse filterreads, bam", um, this.unseen_mutations)
         return um
       }
+      return um
     }
 
     _get_refName() {

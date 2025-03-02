@@ -30,9 +30,9 @@ const useConfig = (
 
       function afterPossibleGet() {
         if (query.config) {
-          console.log("FOUND QUERY", query.config);
+          // console.log("FOUND QUERY", query.config);
           const unpacked = JSON.parse(query.config);
-          console.log("UNPACKED", unpacked);
+          // console.log("UNPACKED", unpacked);
           delete unpacked.validate_SID;
           Object.assign(results, unpacked);
         }
@@ -41,7 +41,7 @@ const useConfig = (
           setTitle(results.title);
           // set the title with window
           window.document.title = results.title;
-          console.log("setting title to ", config.title);
+          // console.log("setting title to ", config.title);
         }
 
         Object.assign(results, configDict);
@@ -65,16 +65,16 @@ const useConfig = (
       }
 
       if (query.configUrl) {
-        console.log("FOUND QUERY", query.configUrl);
+        // console.log("FOUND QUERY", query.configUrl);
         fetch(query.configUrl)
           .then((response) => response.json())
           .then((data) => {
-            console.log("FOUND CONFIG URL", data);
+            // console.log("FOUND CONFIG URL", data);
             fromFile = data;
             afterPossibleGet();
           })
           .catch((error) => {
-            console.log("ERROR", error);
+            // console.log("ERROR", error);
             afterPossibleGet();
           });
       } else {

@@ -1,7 +1,18 @@
-const API_BASE = window.location.origin + '/api';
-// const API_BASE = 'http://localhost:8000';
-const TAXONIUM_BASE = window.location.origin + '/taxonium/'
-// const TAXONIUM_BASE = 'http://localhost:8080';
+
+const DEV = false
+
+let API_BASE = null
+let TAXONIUM_BASE = null
+
+if(DEV) {
+  API_BASE = 'http://localhost:8000';
+  TAXONIUM_BASE = 'http://localhost:8080';
+}else {
+
+  API_BASE = window.location.origin + '/api';
+  TAXONIUM_BASE = window.location.origin + '/taxonium/'
+
+}
 
 export default {
   API_BASE,

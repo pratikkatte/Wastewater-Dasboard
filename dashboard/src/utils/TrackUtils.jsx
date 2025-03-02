@@ -4,7 +4,6 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     // {'group1': {'filename': 'output_multi.bam', 'node_name': 'Germany/IMS-10209-CVDP-D48209F5-5BED-436E-BFC4-D2118C232BC4/2021'}, 
     // 'group2': {'filename': 'output_multi.bam', 'node_name': 'England/PHEC-Z306ZA27/2021'}}
-    console.log("selectedFile", selectedFile)
     const node_name = clickedNodeRef.current.nodeDetails.name
 
     // const key = Object.keys(selectedFile).find(key => selectedFile[key].node_name === node_name);
@@ -24,15 +23,13 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     
     // const read_groupname = key
 
-
-    
     const bam_filename = selectedFile[node_name]['filename']
     const trackId = node_name
-
 
     const bam_location = `${config.API_BASE}/uploads/${bam_filename}`
     const bami_location = bam_location + ".bai";
 
+    
     const new_track_addition = {
         type: "DashboardTrack",
         trackId: trackId,
@@ -102,9 +99,9 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
         displays: [
             {
                 type:'LinearDashboardDisplay',
-                displayId: 'display-id'+"haplotype_track"+read_groupname,
+                displayId: 'sequence-display-id'+"haplotype_track"+read_groupname,
                 groupname_tag: {
-                    [read_groupname]: []
+                    [read_groupname]: unseenKey_dict
                 }
             }
         ]

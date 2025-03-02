@@ -9,10 +9,13 @@ import LinearDashboardDisplayF from './LinearDashboardDisplay'
 import AdapterType from '@jbrowse/core/pluggableElementTypes/AdapterType'
 // import  DashboardRenderingSchema from './DashboardRenderer/configSchema'
 // import DashboardRenderingComponent from './DashboardRenderer/component/DashboardRendering'
-
-import { AdapterClass, configSchema } from './DashboardAdapter'
+import WidgetType from '@jbrowse/core/pluggableElementTypes/WidgetType'
+import { AdapterClass, configSchema as adapterSchema } from './DashboardAdapter'
 
 import {DashboardRender, configSchema as DashboardRenderingSchema, ReactComponent as DashboardRenderingComponent} from './DashboardRenderer'
+
+import {stateModelFactory as DashboardWidgetModelFactory, configSchema as dashboardWidgetConfigSchema } from './DashboardFeatureWidget'
+
 
 export default class DashboardPlugin extends Plugin {
   name = 'DashboardPlugin'
@@ -45,12 +48,12 @@ export default class DashboardPlugin extends Plugin {
     const linearPileupDisplay = pluginManager.getDisplayType('LinearPileupDisplay')
     const linearAlignmentDisplay = pluginManager.getDisplayType('LinearAlignmentsDisplay')
     const linearDashboardDisplay = pluginManager.getDisplayType('LinearDashboardDisplay')
+
     track.addDisplayType(linearPileupDisplay)
     track.addDisplayType(linearDashboardDisplay)
     track.addDisplayType(linearAlignmentDisplay)
     return track
-  }) 
-
+  })
 
   pluginManager.addDisplayType(() => {
     const { configSchema, stateModel } = LinearDashboardDisplayF(pluginManager)
@@ -69,7 +72,7 @@ export default class DashboardPlugin extends Plugin {
       new AdapterType({
         name: 'DashboardAdapter',
         AdapterClass,
-        configSchema,
+        configSchema: adapterSchema,
       }),
   )
 
@@ -82,6 +85,17 @@ export default class DashboardPlugin extends Plugin {
       pluginManager
     })
   })
+
+    pluginManager.addWidgetType(
+      () =>
+        new WidgetType({
+          name: 'DashboardFeatureWidget',
+          heading: 'Feature details',
+          configSchema: dashboardWidgetConfigSchema,
+          stateModel: DashboardWidgetModelFactory(pluginManager),
+          ReactComponent: lazy(() => import('./DashboardFeatureWidget/DashboardFeatureDetail')),
+        }),
+    )
 
   }
 }

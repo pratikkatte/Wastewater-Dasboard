@@ -4,7 +4,7 @@ import getDefaultQuery from "../utils/getDefaultQuery";
 const default_query = getDefaultQuery();
 export const useSettings = ({ query, updateQuery }) => {
 
-  console.log("query",query, updateQuery)
+
   const [minimapEnabled, setMinimapEnabled] = useState(true);
   const [displayTextForInternalNodes, setDisplayTextForInternalNodes] =
     useState(false);

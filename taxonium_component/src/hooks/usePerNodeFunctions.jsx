@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 function usePerNodeFunctions(data, config) {
   const getNodeGenotype = (node_id) => {
-    console.log("data", data);
 
     let data_to_use;
     if (data.data.nodeLookup[node_id]) {
@@ -10,12 +9,7 @@ function usePerNodeFunctions(data, config) {
     } else if (data.base_data.nodeLookup[node_id]) {
       data_to_use = data.base_data;
     } else {
-      console.log(
-        "UNEXPECTED ERROR: node not found",
-        node_id,
-        data.data,
-        data.base_data
-      );
+
       return null;
     }
     let cur_node = data_to_use.nodeLookup[node_id];

@@ -748,7 +748,7 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@jbrowse/core@^2.11.0":
+"@jbrowse/core@2.11.0", "@jbrowse/core@^2.11.0":
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/@jbrowse/core/-/core-2.11.0.tgz#411ee74eebdc24e3e07c8d313b40a95aee639874"
   integrity sha512-KxMhGScXY4q8GoevA3OhqBzQRNI4tQTqZ+Ue1LuMg+TTJEELIThIY59MikmiHq3Lfr2zDpxcv3FY3PWDuVRFog==
