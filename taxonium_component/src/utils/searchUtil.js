@@ -15,5 +15,6 @@ export function getDefaultSearch(config, key) {
     position: 484,
     new_residue: "any",
     min_tips: 0,
+    hs_value: 0.01
   };
 }

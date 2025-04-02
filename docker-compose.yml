@@ -16,8 +16,10 @@ services:
     build:
       context: "."
       dockerfile: ./taxonium_backend/Dockerfile
+      args:
+        MEMORY_SIZE: ${MEMORY_SIZE}
+        PORT: ${PORT}
     container_name: backend_service
-    
     ports:
       - "8080:8080"  # Internal port mapping
     expose:

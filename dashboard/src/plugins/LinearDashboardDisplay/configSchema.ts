@@ -29,7 +29,7 @@ export default (pluginManager: PluginManager) => {
       defaultRendering: {
         type: 'stringEnum',
         model: types.enumeration('Rendering', ['pileup', 'Dashboard']),
-        defaultValue: 'Dashboard',
+        defaultValue: 'pileup',
     },
     renderers: ConfigurationSchema('RenderersConfiguration', {
       DashboardRenderer:
@@ -49,7 +49,10 @@ export default (pluginManager: PluginManager) => {
       description: 'color scheme to use',
       defaultValue: 'mappingQuality',
     },
-
+    all_group_name: {
+      type: 'frozen',
+      defaultValue: {}
+    },
     groupname_tag: {
       // type: 'string',
       // defaultValue: "",

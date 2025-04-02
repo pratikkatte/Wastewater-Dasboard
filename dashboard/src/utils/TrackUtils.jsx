@@ -12,8 +12,14 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     const unseenKey_dict = []
 
+    const all_group_name = {}
+    Object.entries(selectedFile).forEach(([node_name, read_groups]) => {
+        all_group_name[read_groups['groupname']] = node_name
+    })
+
     selectedFile[node_name][read_groupname].forEach(obj => {
         Object.entries(obj).forEach(([key, value]) => {
+            
             unseenKey_dict.push({
                 "unseenKey":key, 
                 "mutation":value
@@ -28,7 +34,6 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     const bam_location = `${config.API_BASE}/uploads/${bam_filename}`
     const bami_location = bam_location + ".bai";
-
     
     const new_track_addition = {
         type: "DashboardTrack",
@@ -53,8 +58,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
                 displayId: 'display-id'+trackId,
                 groupname_tag: { 
                     [read_groupname]: unseenKey_dict
-                }
-
+                },
+                all_group_name : all_group_name
                 // groupname_tag: read_groupname
                 /*
                     groupname_tag: {
@@ -102,7 +107,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
                 displayId: 'sequence-display-id'+"haplotype_track"+read_groupname,
                 groupname_tag: {
                     [read_groupname]: unseenKey_dict
-                }
+                },
+                all_group_name : all_group_name
             }
         ]
     }

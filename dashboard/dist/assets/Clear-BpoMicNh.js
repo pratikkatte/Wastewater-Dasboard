@@ -1,0 +1,2 @@
+import{E as o,G as i,H as l,g as n}from"./index-DzQFCP26.js";var e={},r;function s(){if(r)return e;r=1;var a=o();Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var t=a(i()),u=l();return e.default=(0,t.default)((0,u.jsx)("path",{d:"M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"}),"Clear"),e}var f=s();const C=n(f);export{C};
+//# sourceMappingURL=Clear-BpoMicNh.js.map

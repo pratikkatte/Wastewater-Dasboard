@@ -117,6 +117,34 @@ const tracks = [
       },
     ],
   },
+  // {
+  //   type: "DashboardTrack",
+  //   trackId: "sequenceid-USA/IA-CDC-LC1017569/2023|OQ631456.1|2023-02-16",
+  //   name: "USA/IA-CDC-LC1017569/2023|OQ631456.1|2023-02-16",
+  //   assemblyNames: ['NC_045512'],
+  //   category: [],
+  //   adapter: {
+  //       type: "DashboardAdapter",
+  //       bamLocation: {
+  //           uri: "http://localhost:8000/uploads/my_vcf_haplotypes.bam"
+  //       },
+  //       index: {
+  //           location: {
+  //               uri: "http://localhost:8000/uploads/my_vcf_haplotypes.bam.bai"
+  //           },
+  //       },
+  //   },
+  //   displays: [
+  //       {
+  //           type:'LinearDashboardDisplay',
+  //           displayId: 'sequence-display-id'+"USA/IA-CDC-LC1017569/2023|OQ631456.1|2023-02-16",
+  //           groupname_tag: { 
+  //             "group77": [{"unseenKey":"unaccounted1" , "mutation": "28877T:0.140006"}],
+  //           }
+  //       }
+  //   ]
+  // }
+
   //   {
   //     type: 'AlignmentsTrack',
   //     trackId: 'genes',
