@@ -19,6 +19,7 @@ services:
       args:
         MEMORY_SIZE: ${MEMORY_SIZE}
         PORT: ${PORT}
+        DATA_FILE_EXTENSION: ${DATA_FILE_EXTENSION:-.jsonl}
     container_name: backend_service
     ports:
       - "8080:8080"  # Internal port mapping
@@ -27,7 +28,7 @@ services:
     networks:
       - app_network
     volumes:
-      - ${HOST_FILE_PATH}:/app/taxonium_backend/taxonium.jsonl  # Mount the file
+      - ${HOST_FILE_PATH}:/app/taxonium_backend/taxonium${DATA_FILE_EXTENSION}  # Mount the file
 
   fastapi:
     build:

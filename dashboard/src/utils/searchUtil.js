@@ -10,13 +10,13 @@ export function getDefaultSearch(config, text, hs_value ) {
     return {
       key,
       type: "name",
-      method: "text_match",
+      method: "text_exact",
       text,
       gene: "S",
       position: 484,
       new_residue: "any",
       min_tips: 0,
-      hs_value:((parseFloat(hs_value) || 0) * 100).toFixed(3)
+      ...(hs_value ? { hs_value: (parseFloat(hs_value) * 100).toFixed(3) } : {})
     };
   }
   
