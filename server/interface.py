@@ -63,6 +63,8 @@ def select_nodes(uploaded_filenames: List[str]) -> dict:
         try:
             bam = pysam.AlignmentFile(filename, 'rb')
             headers = bam.header
+
+
             read_groups = headers.get('RG', [])
             unseen_mutation_comments = headers.get('CO', [])
 
@@ -79,6 +81,7 @@ def select_nodes(uploaded_filenames: List[str]) -> dict:
             else:
                 for read_group in read_groups:
                     node_name = read_group['DS'].replace("Node:", "")
+                    haplotype_proportion = read_group['HS'].replace('Z:','')
                     group_name = read_group['ID']
                     unseen_mutations = get_unseen_mutation_info(read_group.get('UM', ''))
                     temp_dict = [{um_key: um_dicts.get(um_key, "")} for um_key in unseen_mutations]
@@ -86,6 +89,7 @@ def select_nodes(uploaded_filenames: List[str]) -> dict:
                         "filename": os.path.basename(filename),
                         "groupname": group_name,
                         group_name: temp_dict,
+                        "HS": haplotype_proportion
                     }
         except Exception as e:
             print(f"Exception occurred: {e}")

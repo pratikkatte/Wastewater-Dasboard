@@ -3,7 +3,7 @@ import { RiAddCircleLine, RiArrowLeftUpLine } from "react-icons/ri";
 import { BiPalette } from "react-icons/bi";
 import { Button } from "../components/Basic";
 import { BsBoxArrowInUpRight, BsQuestionCircle } from "react-icons/bs";
-import { MdArrowForward, MdArrowDownward } from "react-icons/md";
+import { MdArrowForward, MdArrowDownward, MdArrowBack } from "react-icons/md";
 import ReactTooltip from "react-tooltip";
 import prettifyName from "../utils/prettifyName";
 
@@ -61,6 +61,7 @@ function SearchPanel({
     ReactTooltip.rebuild();
   });
 
+
   const covSpectrumQuery = useMemo(() => {
     if (selectedDetails.nodeDetails && selectedDetails.nodeDetails.node_id) {
       return perNodeFunctions.getCovSpectrumQuery(
@@ -73,6 +74,11 @@ function SearchPanel({
 
   const [listOutputModalOpen, setListOutputModalOpen] = useState(false);
 
+  const [sortOrder, setSortOrder] = useState('asc')
+
+  useEffect(() => {
+    search.sortedSearchOrder(sortOrder)
+  }, [sortOrder])
   const handleDownloadJson = () => {
     if (selectedDetails.nodeDetails) {
       const node_id = selectedDetails.nodeDetails.node_id;
@@ -239,7 +245,7 @@ function SearchPanel({
       <button onClick={toggleSidebar}>
         <br />
         {window.innerWidth > 768 ? (
-          <MdArrowForward className="mx-auto w-5 h-5 sidebar-toggle" />
+          <MdArrowBack className="mx-auto w-5 h-5 sidebar-toggle" />
         ) : (
           <MdArrowDownward className="mx-auto w-5 h-5 sidebar-toggle" />
         )}
@@ -393,41 +399,45 @@ function SearchPanel({
           </div>
         )}
       </div>
+      <div className="flex flex-col">
+        <div className="flex items-center">
+          <FaFilter className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
+          Filter
+        </div>
+        <div className="flex items-center">
+          <label className="flex items-center">
+            <input 
+              type="checkbox"
+              defaultChecked={true}
+              onChange={(e) => {
+                search.setEnabledAll(e.target.checked)
+              }}
+              className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+            />
+            <span className="ml-2">Select/Deselect All</span> {/* Added label text */}
+          </label>
+
+          <div className="flex items-center ml-auto">
+            <span>Order:</span>
+            <Select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="ml-2"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       <div className="py-3 flex flex-col md:min-h-0">
         <h2 className="font-bold text-gray-700 flex justify-between items-center mb-2">
-          <div className="flex flex-col items-start">
-            <div className="flex items-center">
-              <FaFilter className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
-              Filter
-              </div>
-              <div className="flex">
-                <button 
-                  className="px-2 py-1 bg-blue-500 text-white rounded"
-                  onClick={() => {
-                    console.log("search clicked deselect", search)
-                    search.setEnabledAll(false)
-                  }}
-                >
-                 Deselect All
-                </button>
-                <button 
-                  className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
-                  onClick={() => {
-                    console.log("search clicked select", search)
-                    search.setEnabledAll(true)
-                  }}
-                >
-                 Select All
-                </button>
-              </div>
-
             <div className="flex items-center">
               <FaSearch className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
               Search
             </div>
-            </div>
-
-          <SearchDisplayToggle settings={settings} />
+            <SearchDisplayToggle settings={settings} />
         </h2>
         <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
           {search.searchSpec.map((item) => (

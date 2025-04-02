@@ -14,7 +14,7 @@ import useBackend from "./hooks/useBackend";
 import usePerNodeFunctions from "./hooks/usePerNodeFunctions";
 import useConfig from "./hooks/useConfig";
 import { useSettings } from "./hooks/useSettings";
-import { MdArrowBack, MdArrowUpward } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
 import { useEffect } from "react";
 import { useCallback } from "react";
 import getDefaultQuery from "./utils/getDefaultQuery";
@@ -71,6 +71,7 @@ function Taxonium({
   };
 
   const [deckSize, setDeckSize] = useState(null);
+  
   const settings = useSettings({ query, updateQuery });
   const view = useView({
     settings,
@@ -160,11 +161,50 @@ function Taxonium({
     settings,
   });
 
-  console.log("search", search)
   const treenomeState = useTreenomeState(data, deckRef, view, settings);
 
   return (
     <div className="w-full h-full flex">
+      <div
+          className={
+            sidebarOpen
+              ? "flex min-h-0 h-1/2 md:h-full 2xl:w-1/3 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
+                (settings.treenomeEnabled ? " md:w-1/4" : " md:w-1/3")
+              : "bg-white shadow-xl"
+          }
+      >
+          {!sidebarOpen && (
+            <button onClick={toggleSidebar}>
+              <br />
+              {window.innerWidth > 768 ? (
+                <MdArrowForward className="mx-auto w-5 h-5 sidebar-toggle" />
+              ) : (
+                <MdArrowUpward className="mx-auto w-5 h-5 sidebar-toggle" />
+              )}
+            </button>
+          )}
+
+        {sidebarOpen && (
+              <SearchPanel
+                className="flex-grow min-h-0 h-full bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden"
+                backend={backend}
+                search={search}
+                colorBy={colorBy}
+                colorHook={colorHook}
+                config={config}
+                selectedDetails={selectedDetails}
+                xType={xType}
+                setxType={setxType}
+                settings={settings}
+                treenomeState={treenomeState}
+                view={view}
+                overlayContent={overlayContent}
+                setAboutEnabled={setAboutEnabled}
+                perNodeFunctions={perNodeFunctions}
+                toggleSidebar={toggleSidebar}
+              />
+            )}
+      </div>
       <Toaster />
       <ReactTooltip
         delayHide={400}
@@ -209,46 +249,6 @@ function Taxonium({
         </div>
       </div>
 
-      <div
-          className={
-            sidebarOpen
-              ? "flex min-h-0 h-1/2 md:h-full 2xl:w-1/4 bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden" +
-                (settings.treenomeEnabled ? " md:w-1/4" : " md:w-1/3")
-              : "bg-white shadow-xl"
-          }
-        >
-          {!sidebarOpen && (
-            <button onClick={toggleSidebar}>
-              <br />
-              {window.innerWidth > 768 ? (
-                <MdArrowBack className="mx-auto w-5 h-5 sidebar-toggle" />
-              ) : (
-                <MdArrowUpward className="mx-auto w-5 h-5 sidebar-toggle" />
-              )}
-            </button>
-          )}
-
-      {sidebarOpen && (
-            <SearchPanel
-              className="flex-grow min-h-0 h-full bg-white shadow-xl border-t md:border-0 overflow-y-auto md:overflow-hidden"
-              backend={backend}
-              search={search}
-              colorBy={colorBy}
-              colorHook={colorHook}
-              config={config}
-              selectedDetails={selectedDetails}
-              xType={xType}
-              setxType={setxType}
-              settings={settings}
-              treenomeState={treenomeState}
-              view={view}
-              overlayContent={overlayContent}
-              setAboutEnabled={setAboutEnabled}
-              perNodeFunctions={perNodeFunctions}
-              toggleSidebar={toggleSidebar}
-            />
-          )}
-        </div>
     </div>
   );
 }

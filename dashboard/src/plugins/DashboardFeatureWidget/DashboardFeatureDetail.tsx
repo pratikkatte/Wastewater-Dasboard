@@ -12,6 +12,7 @@ import { AlignmentFeatureWidgetModel } from './stateModelFactory'
 // local components
 import SuppAlignments from './SuppAlignments'
 import UnnaccountedMutations from './UnaccountedMutationsTable'
+import Haplotypes from './haplotypes'
 import Flags from './Flags'
 import PairLink from './PairLink'
 import Formatter from './Formatter'
@@ -19,7 +20,7 @@ import {
     SimpleFeature,
   } from '@jbrowse/core/util'
 
-const omit = ['clipPos', 'flags', "UM"]
+const omit = ['clipPos', 'flags', "UM", "RG"]
 
 const AlignmentsFeatureDetails = observer(function (props: {
   model: AlignmentFeatureWidgetModel
@@ -28,18 +29,17 @@ const AlignmentsFeatureDetails = observer(function (props: {
   const feat = clone(model.featureData)
 
   const display_id = model.display_id
-
+  const all_group_name = model.all_group_name
   if (display_id.includes("sequence")) {
-    omit.push('qual', 'template_length', 'Score', 'MQ', 'CIGAR', 'length_on_ref', 'seq_length')
+    omit.push('qual', 'template_length', 'Score', 'MQ', 'CIGAR', 'length_on_ref', 'seq_length', 'Type')
   }
-
-
 
   const SA = getTag('SA', feat) as string
 
   const UM = getTag('UM', feat) as string
+  let RG = getTag('RG', feat) as string
 
-
+  const RG_arrays = RG?.split(",")
   
   return (
     <Paper data-testid="alignment-side-drawer">
@@ -58,6 +58,13 @@ const AlignmentsFeatureDetails = observer(function (props: {
         }
       />
       
+      {!display_id.includes("sequence") ? (
+      <Haplotypes haplotype_names={all_group_name} RG={RG_arrays} />
+      ): (
+        <>/</>
+      )
+    }
+
       <UnnaccountedMutations UM={UM} />
 
       {SA ? <SuppAlignments model={model} tag={SA} feature={feat} /> : null}

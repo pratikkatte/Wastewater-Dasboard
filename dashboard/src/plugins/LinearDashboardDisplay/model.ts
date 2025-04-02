@@ -97,7 +97,7 @@ import { Checkbox } from '@headlessui/react'
 const rendererTypes = new Map([
     ['pileup', 'PileupRenderer'],
     ['svg', 'SvgFeatureRenderer'],
-    ['Dashboard', 'DashboardRenderer']
+    // ['Dashboard', 'DashboardRenderer']
   ])
 
 type LGV = LinearGenomeViewModel
@@ -200,7 +200,7 @@ export default (
             self.featureUnderMouseVolatile = feat
           },
 
-          selectFeature(feature: Feature, display_id) {
+          selectFeature(feature: Feature, display_id, all_group_name) {
             const session = getSession(self)
             if (isSessionModelWithWidgets(session)) {
               const featureWidget = session.addWidget(
@@ -209,6 +209,7 @@ export default (
                 { featureData: feature.toJSON(), view: getContainingView(self),
                   track: getContainingTrack(self), 
                   "display_id": display_id,
+                  'all_group_name': all_group_name
                  },
               )
               session.showWidget(featureWidget)
@@ -271,6 +272,8 @@ export default (
           const is_sequence = self.configuration.toJSON().displayId.includes("sequence") ? true : false
           
           const group_name = getConf(self, 'groupname_tag')
+          
+
             const group_name_keys = Object.keys(group_name);
             self.group_id = group_name_keys[0]
 
@@ -444,7 +447,7 @@ export default (
                 label: "unaccounted mutations",
                 icon: SortIcon,
                 subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
-                  label: key,
+                  label: item.mutation.split(":")[0],
                   type:'checkbox',
                   checked: item.show,
                   onClick: () => {
@@ -457,6 +460,8 @@ export default (
 
             renderPropsPre() {
               const { colorTagMap, colorBy, filterBy, rpcDriverName, visibleModifications } = self
+
+              const all_groups = getConf(self, 'all_group_name')
 
               const superProps = superRenderProps()
               return {
@@ -487,13 +492,13 @@ export default (
                           featureId: f,
                           sessionId,
                           layoutId: getContainingView(self).id,
-                          rendererType: 'DashboardRenderer',
+                          rendererType: 'PileupRenderer',
                         },
                       )) as { feature: SimpleFeatureSerialized | undefined }
     
                       if (feature) {
 
-                        self.selectFeature(new SimpleFeature(feature), self.configuration.toJSON().displayId)
+                        self.selectFeature(new SimpleFeature(feature), self.configuration.toJSON().displayId, all_groups)
                       }
                     }
                   } catch (e) {

@@ -22,8 +22,10 @@ default_query.backend = null;
 
 
 const createDefaultSearch = (mark_nodes) => {
-  return mark_nodes.map(node => {
-    return getDefaultSearch(null, node);
+  
+  return Object.keys(mark_nodes).map(node => {
+    console.log("mark_nodes", node, mark_nodes[node])
+    return getDefaultSearch(null, node, mark_nodes[node]);
   })
 }
 
@@ -119,6 +121,7 @@ useEffect(() => {
   // console.log("Taxonium", config.TAXONIUM_BASE)
   return (
     <>
+    {/* <JBrowseLinearGenomeView viewState={viewState} /> */}
       <div>
           < Header/>
           <br />

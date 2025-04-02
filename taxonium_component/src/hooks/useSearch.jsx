@@ -26,6 +26,7 @@ const useSearch = ({
     if (!query.srch) {
       //updateQuery({ srch: default_query.srch });
       //console.log("setting default search", default_query.srch);
+      
       return JSON.parse(default_query.srch);
     }
     return JSON.parse(query.srch);
@@ -52,10 +53,26 @@ const useSearch = ({
     updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
   }
 
+  const sortedSearchOrder = (order) => {
+    var srch = null
+    if (order == 'asc'){
+      srch = [...searchSpec].sort((a, b) => (a.hs_value || 0) - (b.hs_value || 0));      
+      console.log("query ascending", searchSpec)
+    }
+    else{
+      srch = [...searchSpec].sort((a, b) => b.hs_value - a.hs_value);
+
+      console.log("query descending", srch)
+    }
+
+    setSearchSpec(srch)
+  }
+
   const setSearchSpec = (newSearchSpec) => {
     updateQuery({
       srch: JSON.stringify(newSearchSpec),
     });
+
   };
 
   const [searchResults, setSearchResults] = useState({});
@@ -107,6 +124,7 @@ const useSearch = ({
 
   useEffect(() => {
     // Remove search results which are no longer in the search spec
+
     const spec_keys = searchSpec.map((spec) => spec.key);
     const result_keys = Object.keys(searchResults);
     const keys_to_remove = result_keys.filter(
@@ -350,7 +368,8 @@ const useSearch = ({
     searchesEnabled,
     setEnabled,
     searchLoadingStatus,
-    setEnabledAll
+    setEnabledAll,
+    sortedSearchOrder
   };
 };
 

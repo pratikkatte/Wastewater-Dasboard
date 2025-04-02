@@ -86,13 +86,16 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         
         mark_nodeRef.current = nodes;
 
-        
-        const default_search = createDefaultSearch(nodes);
+        const haplotype_prop = {}
     
         const zoom_to_indexes = [];
         for (let i = 0; i < nodes.length; i++) {
             zoom_to_indexes.push(i.toString());
+            haplotype_prop[nodes[i]] = filenames_nodes[nodes[i]]['HS']
         }
+        const default_search = createDefaultSearch(haplotype_prop);
+
+        console.log("haplotype_prop", default_search)
         const query = {
               srch: JSON.stringify(default_search),
               enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),
