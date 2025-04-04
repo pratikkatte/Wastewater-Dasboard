@@ -14,7 +14,6 @@ export function getDefaultSearch(config, key) {
     gene: "S",
     position: 484,
     new_residue: "any",
-    min_tips: 0,
-    hs_value: 0.01
+    min_tips: 0
   };
 }

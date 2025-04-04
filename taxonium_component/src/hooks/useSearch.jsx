@@ -57,12 +57,9 @@ const useSearch = ({
     var srch = null
     if (order == 'asc'){
       srch = [...searchSpec].sort((a, b) => (a.hs_value || 0) - (b.hs_value || 0));      
-      console.log("query ascending", searchSpec)
     }
     else{
       srch = [...searchSpec].sort((a, b) => b.hs_value - a.hs_value);
-
-      console.log("query descending", srch)
     }
 
     setSearchSpec(srch)
@@ -102,7 +99,7 @@ const useSearch = ({
         });
       }
       searchControllers[key] = [];
-
+      console.log("singlesearch", boundsForQueries, this_json )
       const { abortController } = singleSearch(
         this_json,
         boundsForQueries,
@@ -113,6 +110,7 @@ const useSearch = ({
           setter(x);
         }
       );
+
       searchControllers[key] = [
         ...searchControllers[key],
         { con: abortController, bounds: boundsForQueries },
@@ -269,7 +267,7 @@ const useSearch = ({
   useEffect(() => {
     if (zoomToSearch && deckSize) {
       const { index } = zoomToSearch;
-      const relevant = [];
+      var relevant = [];
       
       index.forEach(currentIndex => {
         const key = searchSpec[currentIndex].key;
@@ -288,10 +286,17 @@ const useSearch = ({
         return;
       }
 
+      // if (relevant.some(element => Array.isArray(element.overview) && element.overview.length === 0)) {
+      //   return;
+      // }
+
+      relevant = relevant.filter(element => !(Array.isArray(element.overview) && element.overview.length === 0));
+
       // const { overview } = relevant;
-      const overview = []
+      // const overview = []
       const xs = []
       const ys = []
+
 
       relevant.forEach(currelevant => {
         ys.push(currelevant['overview'][0].y)

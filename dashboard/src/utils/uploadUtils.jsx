@@ -42,7 +42,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
               setuploadProgress(Math.round((loaded / total) * 100));
             },
           };
-          console.log(`${config.API_BASE}/upload`)
+          console.log(`server url ${config.API_BASE}/upload`)
           const response = await axios.post(
             `${config.API_BASE}/upload`,
             // "/api/upload",
@@ -95,7 +95,6 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         }
         const default_search = createDefaultSearch(haplotype_prop);
 
-        console.log("haplotype_prop", default_search)
         const query = {
               srch: JSON.stringify(default_search),
               enabled: JSON.stringify(Object.fromEntries(default_search.map(value => [value.key, true]))),

@@ -64,7 +64,6 @@ def select_nodes(uploaded_filenames: List[str]) -> dict:
             bam = pysam.AlignmentFile(filename, 'rb')
             headers = bam.header
 
-
             read_groups = headers.get('RG', [])
             unseen_mutation_comments = headers.get('CO', [])
 

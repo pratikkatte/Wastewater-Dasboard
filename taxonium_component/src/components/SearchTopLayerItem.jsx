@@ -9,7 +9,6 @@ import Modal from "react-modal";
 function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
   const myLoadingStatus = search.searchLoadingStatus[myKey];
 
-  console.log("singleSearchSpec", singleSearchSpec)
   const [permaLinkModalOpen, setPermaLinkModalOpen] = useState(false);
   const this_result = search.searchResults[myKey];
 
@@ -92,6 +91,7 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
             {" "}
             {num_results !== "Loading" && (
               <>
+
                 {formatNumber(num_results)} result{num_results === 1 ? "" : "s"}
               </>
             )}{" "}
@@ -108,9 +108,11 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                 >
                   <FaSearch />
                 </Button>{" "}
-                <div className="text-sm">
-                  <span className="font-semibold">Haplotype Proportion:</span> {singleSearchSpec?.hs_value}%
-                </div>
+                {singleSearchSpec?.hs_value && (
+                  <div className="text-sm">
+                    <span className="font-semibold">Haplotype Proportion:</span> {singleSearchSpec.hs_value}%
+                  </div>
+                )}
                 {
                   // check if window href includes 'protoUrl'
                   (window.location.href.includes("protoUrl") ||
