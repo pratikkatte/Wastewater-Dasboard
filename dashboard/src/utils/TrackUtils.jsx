@@ -19,7 +19,6 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
     selectedFile[node_name][read_groupname].forEach(obj => {
         Object.entries(obj).forEach(([key, value]) => {
-            
             unseenKey_dict.push({
                 "unseenKey":key, 
                 "mutation":value
@@ -38,7 +37,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     const new_track_addition = {
         type: "DashboardTrack",
         trackId: trackId,
-        name: clickedNodeRef.current.nodeDetails.name,
+        name: "Reads mapping to "+clickedNodeRef.current.nodeDetails.name,
         assemblyNames: ['NC_045512'],
         category: [],
         adapter: {

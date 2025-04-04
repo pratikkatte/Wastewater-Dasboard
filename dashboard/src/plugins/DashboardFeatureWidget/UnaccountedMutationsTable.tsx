@@ -9,11 +9,11 @@ import SuppAlignmentsLocStrings from './SuppAlignmentsLocStrings'
 import LaunchBreakpointSplitViewPanel from './LaunchBreakpointSplitViewPanel'
 
 
-export default function UnaccountedMutations(UM) {
+export default function UnaccountedMutations(props) {
 
     // const umArray: string[] = UM.split(",");
 
-
+  const {UM, is_sequence} = props
 //   const { model, tag, feature } = props
 //   const session = getSession(model)
 //   const { pluginManager } = getEnv(session)
@@ -24,12 +24,12 @@ export default function UnaccountedMutations(UM) {
 //   } catch (e) {
 //     // ignore
 //   }
-  console.log("Um", UM['UM'],  Object.keys(UM['UM']).length>0)
+  console.log("Um", UM, is_sequence)
   return (
-    <BaseCard title="Unnaccounted Mutations">
+    <BaseCard title={is_sequence? "Possible Unaccounted Mutations": "Unaccounted Mutations"}>
     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
       
-    {UM && Object.keys(UM['UM']).length > 0 ? (
+    {UM && Object.keys(UM).length > 0 ? (
       <table>
         <thead>
           <tr>
@@ -38,7 +38,7 @@ export default function UnaccountedMutations(UM) {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(UM['UM']).map(([key, value]) => (
+          {Object.entries(UM).map(([key, value]) => (
             <tr key={key} style={{ backgroundColor: '#f9f9f9', borderBottom: '1px solid #ddd' }}>
               <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>{(value as string[])[0]}</td>
               <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>{(value as string[])[1]}</td>

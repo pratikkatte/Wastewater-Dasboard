@@ -59,13 +59,13 @@ const AlignmentsFeatureDetails = observer(function (props: {
       />
       
       {!display_id.includes("sequence") ? (
-      <Haplotypes haplotype_names={all_group_name} RG={RG_arrays} />
+        <Haplotypes haplotype_names={all_group_name} RG={RG_arrays} />
       ): (
         <>/</>
       )
     }
 
-      <UnnaccountedMutations UM={UM} />
+      <UnnaccountedMutations UM={UM} is_sequence={display_id.includes("sequence")}/>
 
       {SA ? <SuppAlignments model={model} tag={SA} feature={feat} /> : null}
       {feat.flags !== undefined ? <Flags feature={feat} {...props} /> : null}

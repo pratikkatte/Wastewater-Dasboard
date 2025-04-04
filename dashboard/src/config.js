@@ -8,10 +8,8 @@ if(DEV) {
   API_BASE = 'http://localhost:8000';
   TAXONIUM_BASE = 'http://localhost:8080';
 }else {
-
   API_BASE = window.location.origin + '/api';
   TAXONIUM_BASE = window.location.origin + '/taxonium/'
-
 }
 
 export default {
