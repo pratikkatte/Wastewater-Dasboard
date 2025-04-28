@@ -128,6 +128,7 @@ useEffect(() => {
               <div>
                 <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} updateQuery={updateQuery}/>
               </div>
+              
           :
          <div>
         <div style={{display:"flex", height: "100vh"}} >

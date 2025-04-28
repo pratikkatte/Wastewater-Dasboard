@@ -5,7 +5,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
   const [statusMessage, setStatusMessage] = useState({ message: null });
   const queryNodes = useCallback(
     (boundsForQueries, setResult, setTriggerRefresh, config) => {
-      let url = backend_url + "/nodes/?type=leaves&sid=" + sid;
+      let url = backend_url + "nodes/?type=leaves&sid=" + sid;
       if (
         boundsForQueries &&
         boundsForQueries.min_x &&
@@ -44,6 +44,8 @@ function useServerBackend(backend_url, sid, url_on_fail) {
               );
             }
           });
+
+          console.log("go data yay - ", response.data)
           setResult(response.data);
         })
         .catch(function (error) {
@@ -62,7 +64,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
 
       let url =
         backend_url +
-        "/search/?json=" +
+        "search/?json=" +
         JSON.stringify(singleSearch) +
         "&sid=" +
         sid;
@@ -114,7 +116,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
 
   const getDetails = useCallback(
     (node_id, setResult) => {
-      let url = backend_url + "/node_details/?id=" + node_id + "&sid=" + sid;
+      let url = backend_url + "node_details/?id=" + node_id + "&sid=" + sid;
       axios.get(url).then(function (response) {
         setResult(response.data);
       });
@@ -124,7 +126,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
 
   const getConfig = useCallback(
     (setResult) => {
-      let url = backend_url + "/config/?sid=" + sid;
+      let url = backend_url + "config/?sid=" + sid;
       axios.get(url).then(function (response) {
 
         if (response.data.error) {
@@ -143,7 +145,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
     (nodeId, selectedKey, callback) => {
       let url =
         backend_url +
-        "/tip_atts?id=" +
+        "tip_atts?id=" +
         nodeId +
         "&att=" +
         selectedKey +
@@ -158,7 +160,7 @@ function useServerBackend(backend_url, sid, url_on_fail) {
 
   const getNextstrainJsonUrl = useCallback(
     (nodeId, config) => {
-      return backend_url + "/nextstrain_json/" + nodeId;
+      return backend_url + "nextstrain_json/" + nodeId;
     },
     [backend_url]
   );
