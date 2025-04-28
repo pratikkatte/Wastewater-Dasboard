@@ -8,23 +8,36 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [isUploading, setisUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const [uploadProgress, setuploadProgress] = useState(0);
 
-  let uploadInput = React.createRef();
+  const [results, setResults] = useState(null);
 
+
+  useEffect(()=> {
+    if(results==null){
+      console.log("config", `${config.PROJECTS}`)
+      axios.post(`${config.PROJECTS}`)
+        .then((response) => {
+      console.log("result", response.data.results)
+      setResults(response.data.results);
+    })
+    .catch((error) => {
+      console.error("Error fetching results", error);
+    });
+    }
+  }, [results])
+
+  let uploadInput = React.createRef();
     const handleFileChange = (event) => {
-      const selectedFileList = []
-      for (let i=0; i< event.target.files.length; i++){
-        selectedFileList.push(event.target.files.item(i));
-      }
-      setUploadedFile(selectedFileList)
+      setUploadedFile(Array.from(event.target.files))
       };
     
     const handleFileUpload = async (ev) => {
       ev.preventDefault();
-      setisUploading(true)
+      setUploading(true)
 
       if (!uploadedFile) {
           alert('Please select a file first');
@@ -32,20 +45,22 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         }
         const data = new FormData()
 
-        for (let i =0; i < uploadInput.files.length; i++){
-          data.append("files", uploadInput.files[i], uploadInput.files[i].name)
-        }
-        try {
+        uploadedFile.forEach(file => data.append('files', file)); // key must match 'files'
+
+       try {
           const p_config = {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
             onUploadProgress: (progressEvent) => {
               const { loaded, total } = progressEvent;
+              console.log("percent", Math.round((loaded / total) * 100))
               setuploadProgress(Math.round((loaded / total) * 100));
             },
           };
-          console.log(`server url ${config.API_BASE}/upload`)
+          console.log(`server url ${config.UPLOAD}`)
           const response = await axios.post(
-            `${config.API_BASE}/upload`,
-            // "/api/upload",
+            `${config.UPLOAD}`,
             data,
             p_config,
           );
@@ -53,36 +68,58 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
           console.log("response", response)
           if (response.status === 200) {
             
-            setisUploading(false)
+            setUploading(false)
             const selected_nodes = response.data.response
             console.log("selected_nodes", selected_nodes)
 
             handleFileProcessing(selected_nodes)
-            console.log("file uploaded")
           }
           if (response.status == 400 ){
             console.log(response)
             alert(response.status)
           }
         }catch (error){
-          setisUploading(false)
-          console.log("error", error)
-          if (error.response.status == 400){
-            alert(error.response.data.status)
+          setUploading(false);
+          console.log("error", error);
+        
+          if (error.response) {
+            if (error.response.status == 400) {
+              alert(error.response.data.status);
+            } else {
+              alert(error.response.statusText);
+            }
+          } else {
+            alert('Network error or CORS error');
           }
-          else {
-            alert(error.response.statusText)
-          }            
       }
     };
 
+    const handleResultsClick = async (idx) => {
+      try {
+
+        const response = await axios.post(
+              `${config.RESULT}${results[idx]}`
+        )
+        console.log('response', response)
+
+        if (response.status === 200) {
+          const selected_nodes = response.data.response
+          handleFileProcessing(selected_nodes)
+        }
+        if (response.status == 400 ){
+          console.log(response)
+          alert(response.status)
+        }
+      } catch (error){
+        console.log("result error", error)
+      }
+    }
+    
       const handleFileProcessing = (filenames_nodes) => {
 
         const keysToExclude = ['HP_SEQ']; // replace 'key1', 'key2' with actual keys
         // Filter out the keys to exclude
         const nodes = Object.keys(filenames_nodes).filter(key => !keysToExclude.includes(key));
-        // const nodes = Object.keys(filenames_nodes)
-        console.log("nodes", nodes);
         
         mark_nodeRef.current = nodes;
 
@@ -109,7 +146,9 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
     }
     
     return (
-        <div style={{ background: '#f0f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: '90%', margin: '0 auto'  }}>
+      <div style={{maxWidth: '90%', margin: '0 auto'  }}>
+
+        <div style={{ background: '#f0f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'}}>
             <p style={{ textAlign: 'center', margin: '20px 0', fontSize: '16px', color: '#333', maxWidth:'90%',margin: '10px auto' }}>
                 This dashboard provides insights into the genomic data by using BAM files of the sequenced waste water samples, 
                 allowing for the monitoring and analysis of viral strains present in the community.
@@ -120,18 +159,33 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
                   uploadInput = ref;
                 }} 
                 onChange={handleFileChange} style={{ padding: '10px', margin: '5px', border: '1px solid #ccc', borderRadius: '5px' }} multiple />
-                <button onClick={handleFileUpload} style={{ padding: '10px 20px', margin: '5px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Upload</button>
-                {isUploading && (
-            <>
+                <button 
+                  disabled={uploading}
+                  onClick={handleFileUpload} 
+                  style={{ padding: '10px 20px', margin: '5px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Upload</button>
+                {uploading && (
             <p>{uploadProgress}%</p>
-            {/* <CircularProgress value={uploadProgress} thickness="12px">
-              <CircularProgressLabel>{uploadProgress}%</CircularProgressLabel>
-            </CircularProgress> */}
-            </>
+
         )}
                 <br/>
             </div>
-           
+        </div>   
+        {results && results.length>0 && (
+          <div className="flex flex-col space-y-3 pt-6">
+            <div className="flex flex-row items-center">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <div className="px-2 text-gray-500 text-sm">results</div>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+            {results.map((result, index) => (
+              <button key={index} 
+              style={{ background: '#f20f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth:'10%', border: '1px solid gray', textAlign: 'center'}}
+              onClick={() => handleResultsClick(index)}>
+                {result}
+              </button>
+            ))}
+          </div>
+        )}
         </div>
 
       );

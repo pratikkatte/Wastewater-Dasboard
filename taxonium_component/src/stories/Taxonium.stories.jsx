@@ -17,7 +17,8 @@ export default {
 
 export const WithBackend = {
   args: {
-    backendUrl: "https://api.cov2tree.org",
+    // backendUrl: "https://api.cov2tree.org",
+    backendUrl: "http://localhost:61132/taxonium/",
   },
 
   parameters: {
@@ -28,10 +29,10 @@ export const WithBackend = {
 
 export const WithBackendAndQUery = {
   args: {
-    backendUrl: "https://api.cov2tree.org",
+    // backendUrl: "https://api.cov2tree.org",
+    backendUrl: "http://localhost:61132/taxonium/",
   },
   component: WithState,
-
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/react/configure/story-layout
     layout: "padded",

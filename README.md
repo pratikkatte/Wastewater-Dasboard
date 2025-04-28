@@ -1,5 +1,8 @@
 # Wastewater-Dasboard
-** port forwarding is important while running from server. 
+** port forwarding is important while running without docker.
+
+- without docker: forward :8080, 5173 ports
+- with docker: forward :80 port
 
 ## Starting up the dashboard via Docker
 
@@ -16,7 +19,7 @@ HOST_FILE_PATH="./pruned_public-2023-12-25.all.masked.jsonl"
 docker compose --env-file .env up --build
 ```
 
-## Starting up the dashboard via Docker
+## Starting Dashboard without Docker
 
 ### Before starting the dashboard
 
@@ -27,23 +30,23 @@ docker compose --env-file .env up --build
     ```
     cd taxonium_component
 
-    usher_to_taxonium -i input.pb -o output_taxonium.jsonl --name_internal_nodes -j config_public.json
+    usher_to_taxonium -i <input_file>.pb -o <output_taxonium_name>.jsonl --name_internal_nodes -j config_public.json
     ```
 - start taxonium backend
     ```
-    node server.js --port 8080 --data_file output_taxonium.jsonl
+    cd taxonoium_backend
+    yarn install
+    node server.js --port 8080 --data_file <output_taxonium_name_path>.jsonl
     ```
 
 ### Running the Dashboard
 ```
-cd server
+cd dashboard
+yarn preinstall && yarn
+yarn run dev 
 
-pip install -r requirements.txt
 ```
-```
-python interface.py
-```
-** dashboard running on http://127.0.0.1:5000
+** dashboard running on http://localhost:5173
 
 
 ## Bam File Data Format

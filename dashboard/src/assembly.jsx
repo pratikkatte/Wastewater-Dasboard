@@ -10,10 +10,11 @@ const assembly = {
       adapter: {
         type: 'IndexedFastaAdapter',
         fastaLocation: {
-          uri: `${config.API_BASE}/uploads/NC_045512v2.fa`,
+          uri: `${config.REF_FA}`
         },
         faiLocation: {
-          uri: `${config.API_BASE}/uploads/NC_045512v2.fa.fai`,
+          uri: `${config.REF_FAI}`
+
         },
       },
     }

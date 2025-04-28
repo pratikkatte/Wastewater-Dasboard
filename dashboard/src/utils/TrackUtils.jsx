@@ -31,7 +31,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     const bam_filename = selectedFile[node_name]['filename']
     const trackId = node_name
 
-    const bam_location = `${config.API_BASE}/uploads/${bam_filename}`
+    // const bam_location = `${config.TAXONIUM_BASE}/uploads/${bam_filename}`
+    const bam_location = `${config.BAM}${bam_filename}`
     const bami_location = bam_location + ".bai";
     
     const new_track_addition = {
@@ -76,7 +77,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
 
 
 
-    const hap_location = `${config.API_BASE}/uploads/${haplotype_sequences}`;
+    // const hap_location = `${config.TAXONIUM_BASE}/uploads/${haplotype_sequences}`;
+    const hap_location = `${config.BAM}${haplotype_sequences}`;
     
     const hapi_location = hap_location + ".bai";
 
