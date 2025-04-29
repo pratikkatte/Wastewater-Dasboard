@@ -14,6 +14,9 @@ export function getDefaultSearch(config, key) {
     gene: "S",
     position: 484,
     new_residue: "any",
-    min_tips: 0
+    min_tips: 0,
+    hl_value: 'BA.2',
+    hs_value: '3.65',
+    uncertain_nodes: ['node1', 'node2', 'node3']
   };
 }

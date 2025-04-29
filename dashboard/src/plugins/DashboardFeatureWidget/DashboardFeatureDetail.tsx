@@ -13,6 +13,7 @@ import { AlignmentFeatureWidgetModel } from './stateModelFactory'
 import SuppAlignments from './SuppAlignments'
 import UnnaccountedMutations from './UnaccountedMutationsTable'
 import Haplotypes from './haplotypes'
+import UncertainNodes from './uncertainnodes'
 import Flags from './Flags'
 import PairLink from './PairLink'
 import Formatter from './Formatter'
@@ -30,6 +31,7 @@ const AlignmentsFeatureDetails = observer(function (props: {
 
   const display_id = model.display_id
   const all_group_name = model.all_group_name
+  const uncertain_nodes = model.uncertain_nodes_names
   if (display_id.includes("sequence")) {
     omit.push('qual', 'template_length', 'Score', 'MQ', 'CIGAR', 'length_on_ref', 'seq_length', 'Type')
   }
@@ -63,7 +65,13 @@ const AlignmentsFeatureDetails = observer(function (props: {
       ): (
         <>/</>
       )
-    }
+      }
+      {display_id.includes("sequence") ? (
+        <UncertainNodes uncertain_nodes_names={uncertain_nodes} />
+      ):(
+        <></>
+      )
+      }
 
       <UnnaccountedMutations UM={UM} is_sequence={display_id.includes("sequence")}/>
 

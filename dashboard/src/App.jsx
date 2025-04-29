@@ -21,10 +21,10 @@ const default_query = {};
 default_query.backend = null;
 
 
-const createDefaultSearch = (mark_nodes) => {
+const createDefaultSearch = (mark_nodes, hap_lin, unc_nodes) => {
   
   return Object.keys(mark_nodes).map(node => {
-    return getDefaultSearch(null, node, mark_nodes[node]);
+    return getDefaultSearch(null, node, mark_nodes[node], hap_lin[node], unc_nodes[node]);
   })
 }
 

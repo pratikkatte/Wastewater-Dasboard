@@ -99,7 +99,6 @@ const useSearch = ({
         });
       }
       searchControllers[key] = [];
-      console.log("singlesearch", boundsForQueries, this_json )
       const { abortController } = singleSearch(
         this_json,
         boundsForQueries,

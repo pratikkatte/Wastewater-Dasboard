@@ -53,6 +53,10 @@ export default (pluginManager: PluginManager) => {
       type: 'frozen',
       defaultValue: {}
     },
+    uncertain_nodes: {
+      type: 'frozen',
+      defaultValue: {}
+    },
     groupname_tag: {
       // type: 'string',
       // defaultValue: "",

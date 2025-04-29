@@ -109,7 +109,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
                 groupname_tag: {
                     [read_groupname]: unseenKey_dict
                 },
-                all_group_name : all_group_name
+                all_group_name : all_group_name,
+                uncertain_nodes: ['node1', 'node2', 'node3']
             }
         ]
     }

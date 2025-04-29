@@ -170,10 +170,8 @@ const logStatusMessage = (status_obj) => {
 // This will handle /uploads/:filename
 app.get('/uploads/:filename', (req, res) => {
   const { filename } = req.params;
-  console.log("filename", filename)
   var filePath = path.join(uploadDir, projectName);
   
-  console.log("filePath", filePath)
   // Check if file exists
   if (fs.existsSync(filePath)) {
     // return res.sendFile(filePath);
@@ -230,9 +228,7 @@ const getFilesRecursively = (directory, result = {}) => {
 app.post('/api/projects', function(req, res) {
 
   const dir_path = `${uploadDir}/`
-  console.log("path", dir_path)
   const bamFiles = getFilesRecursively(dir_path);
-  console.log(Object.keys(bamFiles));
   res.send({"results": Object.keys(bamFiles)})
 
 });
@@ -250,7 +246,6 @@ app.post('/api/result/:folder', async function(req, res) {
     
     const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
   
-    console.log("files", files)
 
   const results_config = await selectNodes(files, projectName)
   res.json({ "response": results_config,"status": "success"});
@@ -702,11 +697,13 @@ async function selectNodes(uploadedFilenames, project_name) {
               var group_name = ''
               var node_name = ''
               var um = {}
-              var haplotype_proportion
+              var haplotype_proportion = ''
+              var haplotype_lineage = ''
+              var uncertain_haplotype = []
+
               entry.data.forEach((d)=>{
                 if(d.tag === 'ID'){
                   group_name = d.value
-
                 }
                 else if(d.tag === "DS") {
                   node_name = d.value.replace('Node:','')
@@ -720,6 +717,10 @@ async function selectNodes(uploadedFilenames, project_name) {
                   //haplotype_proportion = read_group['HS'].replace('Z:','')
                   
                   haplotype_proportion = d.value.replace('Z:', '')
+                } else if (d.tag == 'HL'){
+                  haplotype_lineage = d.value.replace('Z:', '')
+                }else if (d.tag == 'UH'){
+                  uncertain_haplotype = d.value.replace('Z:','').split(',')
                 }
                
               })
@@ -727,7 +728,9 @@ async function selectNodes(uploadedFilenames, project_name) {
                 "filename": `${filename}`,
                 'groupname':group_name,
                 [group_name]: um,
-                "HS": haplotype_proportion
+                "HS": haplotype_proportion, 
+                'HL': 'BA.2',
+                'UH': ['node1', 'node2', 'node3']
               }
             });
 
