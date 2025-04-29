@@ -200,7 +200,7 @@ export default (
             self.featureUnderMouseVolatile = feat
           },
 
-          selectFeature(feature: Feature, display_id, all_group_name) {
+          selectFeature(feature: Feature, display_id, all_group_name, uncertain_nodes_names) {
             const session = getSession(self)
             if (isSessionModelWithWidgets(session)) {
               const featureWidget = session.addWidget(
@@ -209,7 +209,8 @@ export default (
                 { featureData: feature.toJSON(), view: getContainingView(self),
                   track: getContainingTrack(self), 
                   "display_id": display_id,
-                  'all_group_name': all_group_name
+                  'all_group_name': all_group_name,
+                  "uncertain_nodes_names": uncertain_nodes_names
                  },
               )
               session.showWidget(featureWidget)
@@ -462,7 +463,7 @@ export default (
               const { colorTagMap, colorBy, filterBy, rpcDriverName, visibleModifications } = self
 
               const all_groups = getConf(self, 'all_group_name')
-
+              const uncertain_nodes = getConf(self, 'uncertain_nodes')
               const superProps = superRenderProps()
               return {
                 ...superProps,
@@ -498,7 +499,7 @@ export default (
     
                       if (feature) {
 
-                        self.selectFeature(new SimpleFeature(feature), self.configuration.toJSON().displayId, all_groups)
+                        self.selectFeature(new SimpleFeature(feature), self.configuration.toJSON().displayId, all_groups, uncertain_nodes)
                       }
                     }
                   } catch (e) {

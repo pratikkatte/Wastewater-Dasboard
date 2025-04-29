@@ -124,13 +124,17 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         mark_nodeRef.current = nodes;
 
         const haplotype_prop = {}
+        const haplotype_lineage = {}
+        const uncertain_nodes = {}
     
         const zoom_to_indexes = [];
         for (let i = 0; i < nodes.length; i++) {
             zoom_to_indexes.push(i.toString());
             haplotype_prop[nodes[i]] = filenames_nodes[nodes[i]]['HS']
+            haplotype_lineage[nodes[i]] = filenames_nodes[nodes[i]]['HL']
+            uncertain_nodes[nodes[i]] = filenames_nodes[nodes[i]]['UH']
         }
-        const default_search = createDefaultSearch(haplotype_prop);
+        const default_search = createDefaultSearch(haplotype_prop, haplotype_lineage, uncertain_nodes);
 
         const query = {
               srch: JSON.stringify(default_search),

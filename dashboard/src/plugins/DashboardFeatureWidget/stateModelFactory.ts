@@ -13,6 +13,7 @@ export function stateModelFactory(pluginManager: PluginManager) {
       type: types.literal('DashboardFeatureWidget'),
       display_id: types.string,
       all_group_name: types.frozen(),
+      uncertain_nodes_names: types.frozen()
     }),
   )
 }

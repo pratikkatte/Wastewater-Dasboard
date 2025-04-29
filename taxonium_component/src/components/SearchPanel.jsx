@@ -437,7 +437,7 @@ function SearchPanel({
               <FaSearch className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
               Search
             </div>
-            <SearchDisplayToggle settings={settings} />
+            {/* <SearchDisplayToggle settings={settings} /> */}
         </h2>
         <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
           {search.searchSpec.map((item) => (
