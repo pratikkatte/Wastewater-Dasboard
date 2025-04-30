@@ -1,5 +1,5 @@
 
-const DEV = true
+const DEV = false
 
 let API_BASE = null
 let TAXONIUM_BASE = null
