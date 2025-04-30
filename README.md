@@ -4,22 +4,20 @@
 - without docker: forward :8080, 5173 ports
 - with docker: forward :80 port
 
-## Starting up the dashboard via Docker
 
+### Run with docker. 
 
-### Edit the `.env` file
-
-change the path to the taxonium jsonl file. 
 ```
-HOST_FILE_PATH="./pruned_public-2023-12-25.all.masked.jsonl"
+docker build -t taxonium-dashboard .
 ```
-
-### Run the docker containers. 
 ```
-docker compose --env-file .env up --build
+docker run \
+  -v /storage2/pratik/usher-data/pruned_public-2023-12-25.all.masked.jsonl:/data/taxonium.jsonl -e NODE_MEMORY_LIMIT=6144 -e  /data/taxonium.jsonl \
+  -p 80:80 \
+  dashboard
 ```
 
-## Starting Dashboard without Docker
+## Run without Docker
 
 ### Before starting the dashboard
 
@@ -32,20 +30,9 @@ docker compose --env-file .env up --build
 
     usher_to_taxonium -i <input_file>.pb -o <output_taxonium_name>.jsonl --name_internal_nodes -j config_public.json
     ```
-- start taxonium backend
-    ```
-    cd taxonoium_backend
-    yarn install
-    node server.js --port 8080 --data_file <output_taxonium_name_path>.jsonl
-    ```
+- start taxonium backend: follow the instructions in taxonium_backend/README.md
+- start frontend: follow the instructions in dashboard/README.md
 
-### Running the Dashboard
-```
-cd dashboard
-yarn preinstall && yarn
-yarn run dev 
-
-```
 ** dashboard running on http://localhost:5173
 
 
@@ -58,13 +45,3 @@ Main BAM File.
 
 ![alt text](image-1.png)
 
-## Miscellaneous commands
-
-- SAM File to BAM File:
-  ```
-  samtools view -Sb input.bam -o output.bam
-  ```
-- sorting and indexing BAM file
-  ```
-  samtools sort input.bam -o output.bam && samtools index output.bam
-  ```
