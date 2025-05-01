@@ -1,0 +1,2 @@
+import{bB as g,g as i}from"./index-DWVeNptX.js";function n(t,s){for(var o=0;o<s.length;o++){const e=s[o];if(typeof e!="string"&&!Array.isArray(e)){for(const r in e)if(r!=="default"&&!(r in t)){const a=Object.getOwnPropertyDescriptor(e,r);a&&Object.defineProperty(t,r,a.get?a:{enumerable:!0,get:()=>e[r]})}}}return Object.freeze(Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}))}var c=g();const f=i(c),p=n({__proto__:null,default:f},[c]);export{p as E};
+//# sourceMappingURL=ErrorMessageStackTraceDialog-B7X6aBwx.js.map
