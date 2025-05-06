@@ -1,14 +1,11 @@
 
-const DEV = false
+const PRODUCTION = true
 
-let API_BASE = null
 let TAXONIUM_BASE = null
 
-if(DEV) {
-  API_BASE = 'http://localhost:8000/';
+if(!PRODUCTION) {
   TAXONIUM_BASE = 'http://localhost:8080/';
 }else {
-  API_BASE = window.location.origin + '/api';
   TAXONIUM_BASE = window.location.origin + '/taxonium/'
 }
 
@@ -24,7 +21,6 @@ const RESULT = `${TAXONIUM_BASE}api/result/`
 const UPLOAD = `${TAXONIUM_BASE}api/upload`
 
 export default {
-  API_BASE,
   TAXONIUM_BASE,
   REF_FA,
   REF_FAI,
