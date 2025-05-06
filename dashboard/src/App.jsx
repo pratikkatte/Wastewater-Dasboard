@@ -113,14 +113,37 @@ useEffect(() => {
     }
 
     }, [JBrowseOpen]);
+
+
+    useEffect(() => {
+      const handlePopState = () => {
+        if (selectedFile) {
+          const confirmLeave = window.confirm(
+            "Do you want to leave and lose this session?"
+          );
+          if (!confirmLeave) {
+            // 👇 Push a new dummy state again to intercept future back presses
+            window.history.pushState(null, '', window.location.href);
+          }
+        }
+      };
+    
+      // Initial trap
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }, [selectedFile]);    
+
     if (!viewState) {
       return null
   }
 
-  // console.log("Taxonium", config.TAXONIUM_BASE)
   return (
     <>
-    {/* <JBrowseLinearGenomeView viewState={viewState} /> */}
+
       <div>
           < Header/>
           <br />
