@@ -1,0 +1,52 @@
+/* SplitPane base container */
+.SplitPane {
+    position: relative !important;
+  }
+  
+  /* Resizer between panes */
+  .SplitPane .Resizer {
+    background: #f0f0f0; /* off-white */
+
+    opacity: 1;
+    z-index: 1;
+    box-sizing: border-box;
+    background-clip: padding-box;
+    transition: width 0.25s ease, margin 0.25s ease, background 0.25s ease;
+
+  }
+  
+  /* Vertical resizer (for left-right splits) */
+  .SplitPane .Resizer.vertical {
+    width: 6px;
+    /* margin: 0 -3px; */
+    cursor: col-resize;
+    border-left: 3px solid #fffdfd;
+    border-right: 3px solid #ffffff;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    border: '2px solid #fff',
+
+
+  }
+  
+  /* Optional: highlight on hover */
+  .SplitPane .Resizer.vertical:hover {
+    background: #1a1919;  /* slightly darker off-white */
+    border-left:4px solid #dcd9d9;
+    border-right: 4px solid #dcd9d9;
+    /* width: 10px; */
+  }
+  
+  .jbrowse-toggle {
+    border: 2px solid rgb(136, 135, 135) !important;
+    border-radius: 3px;
+    margin: 5px 10px 5px 10px;
+    margin-left: auto;
+  }
+
+  .jbrowse-display {
+    background-color: #f2f0f0;
+    position: 'relative';
+    z-index: 10;
+
+    padding: 5px;
+  }
