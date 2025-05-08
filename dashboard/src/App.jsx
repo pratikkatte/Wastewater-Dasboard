@@ -10,6 +10,14 @@ import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
 import config from './config';
+import SplitPane from 'react-split-pane';
+import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
+
+// import 'react-split-pane/lib/styles.css';
+import './App.css'
+
+
+
 
 import {
   createViewState,
@@ -44,6 +52,8 @@ function App() {
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
   const [uploadProgress, setuploadProgress] = useState(0);
+  const [paneSize, setPaneSize] = useState('98%');
+
   // const [query, updateQuery] = useState(default_query);
   
   const [patches, setPatches] = useState();
@@ -58,9 +68,20 @@ function App() {
 
   const [refNames, setRefNames] = useState([]);
 
-  const toggleJBrowse = () => {
-    setJBrowseOpen(!JBrowseOpen);
-  };
+  // const toggleJBrowse = () => {
+  //   setJBrowseOpen(!JBrowseOpen);
+  //   setPaneSize(prev => (JBrowseOpen ? '1%' : '30%'));
+  // };
+
+  const toggleJBrowse = useCallback((input_jbrowse) => {
+    setJBrowseOpen(() => {
+      // const newState = !prev;
+      const newState = input_jbrowse
+      // setLeftPaneSize(newState ? '70%' : '90%'); // expand left when hidden
+      setPaneSize(newState ? '60%' : '98%');
+      return newState;
+    });
+  }, [JBrowseOpen]);
 
   useEffect(() => {
     const state = createViewState({
@@ -109,8 +130,10 @@ useEffect(() => {
             selectedNode.clearNodeDetails()
             // addTrack();
             setCreateTrack(true);
-            setJBrowseOpen(true);
-    }
+            // setJBrowseOpen(true);
+            toggleJBrowse(true)
+
+          }
 
     }, [JBrowseOpen]);
 
@@ -153,29 +176,45 @@ useEffect(() => {
               </div>
               
           :
-         <div>
-        <div style={{display:"flex", height: "100vh"}} >
-          <div className="h-screen w-screen flex flex-col overflow-hidden">
-            <div className="h-full">
-              <TaxoniumBit
-                backendUrl={`${config.TAXONIUM_BASE}`}
-                // backendUrl="http://localhost:8080"
-                // backendUrl="https://api.cov2tree.org"
-                query={query} updateQuery={updateQuery} onClickNode={onClickNode}
-              />
-            </div>
-        </div>
-          <div className='flex' style={{margin: "10px"}}>
-            {JBrowseOpen &&
-            <div>
-              <JBrowseLinearGenomeView viewState={viewState} />
-            </div>
-            }
+                <SplitPane
+                  split="vertical"
+                  minSize={0}
+                  // defaultSize="70%"
+                  size={paneSize}
+
+                  style={{ height: "100vh" }}
+                  >
+                    {/* Left Pane: TaxoniumBit */}
+                    <div className="h-full w-full flex flex-col overflow-hidden">
+                    <TaxoniumBit
+                      backendUrl={`${config.TAXONIUM_BASE}`}
+                      query={query}
+                      updateQuery={updateQuery}
+                      onClickNode={onClickNode}
+                    />
+                </div>
+
+          {/* Right Pane: JBrowse */}
+          <div className="h-full w-full overflow-auto jbrowse-display">
+            <button
+            onClick={() => toggleJBrowse(!JBrowseOpen)}
+            className="jbrowse-toggle"
+            style={{
+              display:'flex',
+              marginLeft: !JBrowseOpen ? 'auto' : 'inherit',
+            }}
+          >
+            {JBrowseOpen ? <MdArrowForward/> : <MdArrowBack/>}
+          </button>
+          {JBrowseOpen && (
+       
+            <JBrowseLinearGenomeView viewState={viewState}/>
+          )}
           </div>
-        </div> 
-      </div>
+        </SplitPane>
       }
     </div>
+
   </>
 );
 }
