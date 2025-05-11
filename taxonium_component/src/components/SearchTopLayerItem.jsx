@@ -1,11 +1,14 @@
 import SearchItem from "./SearchItem";
 import { FaSearch, FaLink, FaTrash, FaArrowUp, FaArrowDown} from "react-icons/fa";
+import { getDefaultSearch } from "../utils/searchUtil";
+
 import { useCallback, useState } from "react";
 import { Button } from "../components/Basic";
 import { formatNumber } from "../utils/formatNumber";
 import { ClipLoader } from "react-spinners";
 import DisplayHaplotype from './DisplayHaplotypes'
 import Modal from "react-modal";
+import { useEffect } from "react";
 
 
 function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
@@ -13,6 +16,8 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
   const [permaLinkModalOpen, setPermaLinkModalOpen] = useState(false);
   const this_result = search.searchResults[myKey];
   const [isOpen, setIsOpen] = useState(false);
+  const [issearched, setIssearched] = useState(false);
+
 
   const num_results =
     this_result && this_result.result
@@ -33,11 +38,12 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
   const setThisSearchSpec = useCallback(
     (thisSpec) => {
       // find the index of the item in the searchSpec array
-      const index = getMyIndex();
-
+      const index = getMyIndex()
+   
       // make a copy of the searchSpec array
-      const newSearchSpec = [...search.searchSpec];
       // replace the item at the index with the new item
+      const newSearchSpec = [...search.searchSpec]
+
       newSearchSpec[index] = thisSpec;
       // set the new searchSpec array
       search.setSearchSpec(newSearchSpec);
@@ -45,10 +51,22 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
     [search, getMyIndex]
   );
 
+  const showUncertainNodes = useCallback(()=>{
+
+          const index = getMyIndex()
+          console.log("index", index)
+
+          search.searchUncertain_nodes(singleSearchSpec.uncertain_nodes, index);
+          console.log(search.searchSpec)
+
+  },[search.searchSpec, singleSearchSpec, search.searchesEnabled])
+
   const enabled =
     search.searchesEnabled[myKey] !== undefined
       ? search.searchesEnabled[myKey]
       : false;
+
+  console.log("top layer enabled", enabled)
 
   const thecolor = search.getLineColor(getMyIndex());
 
@@ -111,8 +129,8 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                   <FaSearch />
                 </Button>
 
-                <DisplayHaplotype />
-
+                <DisplayHaplotype showUncertainNodes={showUncertainNodes}/>
+                
                 {singleSearchSpec?.hs_value && (
                   <div className="text-sm">
                     <span className="font-semibold">Haplotype Proportion:</span> {singleSearchSpec.hs_value}%
@@ -154,7 +172,7 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
           </div>
 
         </div>
-
+        {singleSearchSpec.uncertain_nodes && singleSearchSpec.uncertain_nodes.length > 0 && (
         <div style={{
       border: '1px solid #e0e0e0',
       borderRadius: '4px',
@@ -163,32 +181,37 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
       fontFamily: 'Arial, sans-serif',
       backgroundColor: '#fafafa'
     }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        cursor: 'pointer'
-      }} 
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <strong style={{ fontSize: '14px', color: '#333' }}>Uncertain Nodes</strong>
-        {isOpen ? <FaArrowUp size={14} /> : <FaArrowDown size={14} />}
-      </div>
-
-      {isOpen && (
-        <div style={{ marginTop: '8px', paddingLeft: '5px' }}>
-          {singleSearchSpec.uncertain_nodes.length === 0 ? (
-            <p style={{ fontSize: '13px', color: '#777' }}>No uncertain nodes.</p>
-          ) : (
-            singleSearchSpec.uncertain_nodes.map((node, index) => (
-              <p key={index} style={{ margin: '2px 0', fontSize: '13px', color: '#555' }}>
-                {node}
-              </p>
-            ))
+     
+        <>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            cursor: 'pointer'
+          }} 
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <strong style={{ fontSize: '14px', color: '#333' }}>Uncertain Nodes</strong>
+            {isOpen ? <FaArrowUp size={14} /> : <FaArrowDown size={14} />}
+          </div>
+          {isOpen && (
+            <div style={{ marginTop: '8px', paddingLeft: '5px' }}>
+              {singleSearchSpec.uncertain_nodes.length === 0 ? (
+                <p style={{ fontSize: '13px', color: '#777' }}>No uncertain nodes.</p>
+              ) : (
+                singleSearchSpec.uncertain_nodes.map((node, index) => (
+                  <p key={index} style={{ margin: '2px 0', fontSize: '13px', color: '#555' }}>
+                    {node}
+                  </p>
+                ))
+              )}
+            </div>
           )}
-        </div>
-      )}
+        </>
+
+        
     </div>
+  )}
       </div>
     </>
   );

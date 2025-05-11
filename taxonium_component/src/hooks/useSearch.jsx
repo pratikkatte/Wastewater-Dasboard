@@ -46,6 +46,7 @@ const useSearch = ({
   };
 
   const setEnabledAll = (enabled) => {
+    console.log("enabled", enabled)
     const newSearchesEnabled = Object.keys(searchesEnabled).reduce((acc, key) => {
       acc[key] = enabled;
       return acc;
@@ -61,7 +62,6 @@ const useSearch = ({
     else{
       srch = [...searchSpec].sort((a, b) => b.hs_value - a.hs_value);
     }
-
     setSearchSpec(srch)
   }
 
@@ -69,7 +69,6 @@ const useSearch = ({
     updateQuery({
       srch: JSON.stringify(newSearchSpec),
     });
-
   };
 
   const [searchResults, setSearchResults] = useState({});
@@ -239,6 +238,29 @@ const useSearch = ({
     boundsForQueries,
   ]);
 
+  const searchUncertain_nodes = (nodes,haplotype_index) => {
+    let newsearchSpec = []
+    let newSearchesEnabled = {};
+
+    nodes.map((node, index) => {
+      const newSearch = getDefaultSearch(config);
+      newSearch.text = node;
+      newSearch.show = 'points';
+      newSearch.index = haplotype_index
+      newsearchSpec.push(newSearch);
+      newSearchesEnabled = { ...newSearchesEnabled, [newSearch.key]:true};
+    })
+    setSearchSpec([...searchSpec, ...newsearchSpec])
+    setTimeout(() => {
+      updateQuery({ enabled: JSON.stringify({...searchesEnabled, ...newSearchesEnabled})});
+    },50)
+
+    // setTimeout(() => {
+    //   updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
+    //   // setEnabled(newSearch.key, true);
+    // }, 50);
+  }
+
   const addNewTopLevelSearch = () => {
     // get a random string key
     const newSearch = getDefaultSearch(config);
@@ -373,7 +395,8 @@ const useSearch = ({
     setEnabled,
     searchLoadingStatus,
     setEnabledAll,
-    sortedSearchOrder
+    sortedSearchOrder,
+    searchUncertain_nodes
   };
 };
 
