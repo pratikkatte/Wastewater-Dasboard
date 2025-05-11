@@ -56,8 +56,8 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
           const index = getMyIndex()
           console.log("index", index)
 
-          search.searchUncertain_nodes(singleSearchSpec.uncertain_nodes, index);
-          console.log(search.searchSpec)
+          var keys = search.searchUncertain_nodes(singleSearchSpec.uncertain_nodes, index);
+          return keys
 
   },[search.searchSpec, singleSearchSpec, search.searchesEnabled])
 
@@ -66,7 +66,6 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
       ? search.searchesEnabled[myKey]
       : false;
 
-  console.log("top layer enabled", enabled)
 
   const thecolor = search.getLineColor(getMyIndex());
 
@@ -129,7 +128,11 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                   <FaSearch />
                 </Button>
 
-                <DisplayHaplotype showUncertainNodes={showUncertainNodes}/>
+                <DisplayHaplotype 
+                showUncertainNodes={showUncertainNodes} 
+                search={search}
+                singleSearchSpec={singleSearchSpec}
+                />
                 
                 {singleSearchSpec?.hs_value && (
                   <div className="text-sm">

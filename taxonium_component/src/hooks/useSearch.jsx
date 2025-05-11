@@ -18,6 +18,7 @@ const useSearch = ({
 }) => {
   const { singleSearch } = backend;
 
+  const [uncertainNodes, setUncertainNodes] = useState({})
   const [inflightSearches, setInflightSearches] = useState([]);
 
   const [searchControllers, setSearchControllers] = useState({});
@@ -238,23 +239,40 @@ const useSearch = ({
     boundsForQueries,
   ]);
 
+  const setEnableUncertainNodes = (keys, enabled) => {
+    console.log("keys", keys)
+    let newSearchesEnabled = {};
+      keys.forEach(item => {
+        newSearchesEnabled[item] = enabled;
+    });
+
+    console.log("newsearchennabled", newSearchesEnabled)
+    setTimeout(() => {
+      updateQuery({ enabled: JSON.stringify({...searchesEnabled, ...newSearchesEnabled})});
+    },50)
+  }
   const searchUncertain_nodes = (nodes,haplotype_index) => {
     let newsearchSpec = []
     let newSearchesEnabled = {};
 
+    let uncertain_nodes = []
     nodes.map((node, index) => {
+      // search searchspec for text
       const newSearch = getDefaultSearch(config);
       newSearch.text = node;
       newSearch.show = 'points';
       newSearch.index = haplotype_index
       newsearchSpec.push(newSearch);
+      uncertain_nodes.push(newSearch.key)
       newSearchesEnabled = { ...newSearchesEnabled, [newSearch.key]:true};
     })
+
     setSearchSpec([...searchSpec, ...newsearchSpec])
     setTimeout(() => {
       updateQuery({ enabled: JSON.stringify({...searchesEnabled, ...newSearchesEnabled})});
     },50)
 
+    return uncertain_nodes
     // setTimeout(() => {
     //   updateQuery({ enabled: JSON.stringify(newSearchesEnabled) });
     //   // setEnabled(newSearch.key, true);
@@ -396,7 +414,8 @@ const useSearch = ({
     searchLoadingStatus,
     setEnabledAll,
     sortedSearchOrder,
-    searchUncertain_nodes
+    searchUncertain_nodes,
+    setEnableUncertainNodes
   };
 };
 
