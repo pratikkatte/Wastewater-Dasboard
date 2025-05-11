@@ -1,0 +1,2 @@
+import{w as p,g as s}from"./index-ZKywDbWH.js";function u(t,a){for(var o=0;o<a.length;o++){const r=a[o];if(typeof r!="string"&&!Array.isArray(r)){for(const e in r)if(e!=="default"&&!(e in t)){const n=Object.getOwnPropertyDescriptor(r,e);n&&Object.defineProperty(t,e,n.get?n:{enumerable:!0,get:()=>r[e]})}}}return Object.freeze(Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}))}var i=p();const f=s(i),l=u({__proto__:null,default:f},[i]);export{l as R};
+//# sourceMappingURL=ReturnToImportFormDialog-DjNqe4JD.js.map
