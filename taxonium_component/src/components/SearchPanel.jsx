@@ -237,7 +237,6 @@ function SearchPanel({
       </div>
     );
   };
-
   return (
     <div
       className={classNames("flex flex-col px-4 divide-y text-sm", className)}
@@ -440,15 +439,19 @@ function SearchPanel({
             {/* <SearchDisplayToggle settings={settings} /> */}
         </h2>
         <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
-          {search.searchSpec.map((item) => (
-            <SearchTopLayerItem
+        {search.searchSpec.map((item) => {
+          if ('show' in item && item.show === 'points') {
+            return null
+          }else{
+            return (<SearchTopLayerItem
               key={item.key}
               singleSearchSpec={item}
               myKey={item.key}
               search={search}
               config={config}
-            />
-          ))}
+            />)
+          }
+          })}
           <Button
             className="mx-auto flex items-center font-medium leading-6 mt-2"
             onClick={search.addNewTopLevelSearch}

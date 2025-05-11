@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { FaCircle, FaRegCircle } from "react-icons/fa";
 
-const DisplayHaplotypes = () => {
+const DisplayHaplotypes = ({showUncertainNodes}) => {
 
     const [displayNodes, setDisplayNodes] = useState(false)
 
     const toggleDisplay = () => {
         setDisplayNodes(!displayNodes)
+        showUncertainNodes()
         console.log("clicked", displayNodes)
     }
 

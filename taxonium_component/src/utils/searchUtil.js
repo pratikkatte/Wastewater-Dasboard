@@ -1,7 +1,6 @@
 export function getDefaultSearch(config, key) {
   if (!key) {
     key = Math.random().toString(36).substring(2, 15);
-    console.log("generated key", key);
   }
   if (config && config.defaultSearch) {
     return config.defaultSearch;
@@ -15,8 +14,10 @@ export function getDefaultSearch(config, key) {
     position: 484,
     new_residue: "any",
     min_tips: 0,
-    hl_value: 'BA.2',
-    hs_value: '3.65',
-    uncertain_nodes: ['node1', 'node2', 'node3']
+    hl_value: '',
+    hs_value: '',
+    uncertain_nodes: []
+    // uncertain_nodes: ['34740.HMEL012959-PA', 'node2', 'node3']
   };
 }
+

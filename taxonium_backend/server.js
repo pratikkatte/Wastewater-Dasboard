@@ -729,41 +729,12 @@ async function selectNodes(uploadedFilenames, project_name) {
                 'groupname':group_name,
                 [group_name]: um,
                 "HS": haplotype_proportion, 
-                'HL': 'BA.2',
-                'UH': ['node1', 'node2', 'node3']
+                // 'HL': 'BA.2',
+                'HL':haplotype_lineage,
+                // 'UH': ['node1', 'node2', 'node3']
+                'UH': uncertain_haplotype,
               }
             });
-
-
-
-      
-
-      // const umDicts = parseCommentsInfo(comments);
-      // console.log("readGroup", readGroups)
-
-      // if (readGroups.length === 0) {
-      //   fileDict[randomChoice(fallbackNodes)] = {
-      //     filename: filename,
-      //     groupname: ""
-      //   };
-      // } else {
-
-      //   for (const readGroup of readGroups) {
-      //     let nodeName = (readGroup['DS'] || '').replace('Node:', '');
-      //     const groupName = readGroup['ID'] || '';
-      //     const unseenMutations = getUnseenMutationInfo(readGroup['UM'] || '');
-
-      //     const tempDict = unseenMutations.map((umKey) => ({
-      //       [umKey]: umDicts[umKey] || ''
-      //     }));
-
-      //     fileDict[nodeName] = {
-      //       filename: path.basename(filename),
-      //       groupname: groupName,
-      //       [groupName]: tempDict
-      //     };
-      //   }
-      // }
 
     }catch (error){
       console.log("error", error)

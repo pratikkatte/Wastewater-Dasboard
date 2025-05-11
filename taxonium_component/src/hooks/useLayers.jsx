@@ -474,7 +474,6 @@ const useLayers = ({
   };
 
   const { searchSpec, searchResults, searchesEnabled } = search;
-
   const search_layers = searchSpec.map((spec, i) => {
     const data = searchResults[spec.key]
       ? searchResults[spec.key].result.data
@@ -482,17 +481,20 @@ const useLayers = ({
 
     const lineColor = search.getLineColor(i);
 
+    const pointsLineColor = search.getLineColor(spec.index)
+
     return {
       layerType: "ScatterplotLayer",
 
       data: data,
       id: "main-search-scatter-" + spec.key,
       getPosition: (d) => [d[xType], d.y],
-      getLineColor: settings.displaySearchesAsPoints ? [0, 0, 0] : lineColor,
+      // getLineColor: settings.displaySearchesAsPoints ? [0, 0, 0] : pointsLineColor,
+      getLineColor: spec?.show === 'points'? pointsLineColor : lineColor,
       // getRadius: settings.displaySearchesAsPoints
       //   ? settings.searchPointSize
       //   : 5 + 2 * i,
-      getRadius: 5,
+      getRadius: spec?.show === 'points'? settings.searchPointSize : 5,
       radiusUnits: "pixels",
       lineWidthUnits: "pixels",
       stroked: true,
@@ -500,9 +502,10 @@ const useLayers = ({
       wireframe: true,
       getLineWidth: 1,
       filled: true,
-      getFillColor: settings.displaySearchesAsPoints
-        ? lineColor
-        : [255, 0, 0, 0],
+      // getFillColor: settings.displaySearchesAsPoints
+      //   ? lineColor
+      //   : [255, 0, 0, 0],
+      getFillColor: spec?.show === 'points'? pointsLineColor : [255,0,0,0],
       modelMatrix: modelMatrix,
       updateTriggers: {
         getPosition: [xType],
