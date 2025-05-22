@@ -32,6 +32,9 @@ const AlignmentsFeatureDetails = observer(function (props: {
   const display_id = model.display_id
   const all_group_name = model.all_group_name
   const uncertain_nodes = model.uncertain_nodes_names
+
+  const unseen_mutations = model.unseen_mutations
+  
   if (display_id.includes("sequence")) {
     omit.push('qual', 'template_length', 'Score', 'MQ', 'CIGAR', 'length_on_ref', 'seq_length', 'Type')
   }
@@ -39,6 +42,7 @@ const AlignmentsFeatureDetails = observer(function (props: {
   const SA = getTag('SA', feat) as string
 
   const UM = getTag('UM', feat) as string
+
   let RG = getTag('RG', feat) as string
 
   const RG_arrays = RG?.split(",")
@@ -73,7 +77,7 @@ const AlignmentsFeatureDetails = observer(function (props: {
       )
       }
 
-      <UnnaccountedMutations UM={UM} is_sequence={display_id.includes("sequence")}/>
+      <UnnaccountedMutations UM_ID={UM} unseen_mutations={unseen_mutations} is_sequence={display_id.includes("sequence")}/>
 
       {SA ? <SuppAlignments model={model} tag={SA} feature={feat} /> : null}
       {feat.flags !== undefined ? <Flags feature={feat} {...props} /> : null}

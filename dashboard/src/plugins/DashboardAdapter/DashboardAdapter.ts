@@ -193,10 +193,8 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           readName,
           filterReads
         } = filterBy || {}
-
         for (const record of records) {
           let ref: string | undefined
-          
           let unseen_mutations = {}
 
           if (!record.get('MD')) {
@@ -212,7 +210,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
             continue
           }
 
-          if (tagFilter) {
+          if (tagFilter && tagFilter.tag) {
             const v = record.get(tagFilter.tag)
             if (
               !(tagFilter.value === '*'
@@ -223,30 +221,17 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
             }
           }
 
-          if (filterReads){
-            const rg = record.get("RG")
-            const rg_filter = Object.keys(filterReads)[0]
-            const um_filter = filterReads[rg_filter] ? filterReads[rg_filter].map((item) => item.unseenKey) : []
+          const um_filter =
+                tagFilter?.value && filterReads[tagFilter.value]
+                  ? filterReads[tagFilter.value].map((item) => item.unseenKey)
+                  : [];
+          
 
-            unseen_mutations = filterReads[rg_filter] && filterReads[rg_filter].length > 0 
-            ? filterReads[rg_filter].reduce((acc, item) => {
-                acc[item.unseenKey] = item.mutation;
-                return acc;
-              }, {}) 
-            : {};
-
-            if (rg_filter) {
-              if (`${rg}`.split(',').includes(rg_filter)){
-                if(um_filter.length>0) {
-                  const um = record.get('UM') ? record.get('UM').split(",")  : ''
-                  if (!um || !um.some(u => um_filter.includes(u))) {
-                      continue
-                  }
-                }
-              }
-              else {
+          if(um_filter.length>0) {
+            const um = record.get('UM') ? record.get('UM').split(",")  : ''
+            
+            if (!um || !um.some(u => um_filter.includes(u))) {
                 continue
-              }
             }
           }
 

@@ -17,7 +17,7 @@ const session = {
     "bpPerPx": 0.07432544468767006,
     "displayedRegions": [
       {
-        "refName": "NC_045512.2",
+        "refName": "NC_045512v2",
         "start": 0,
         "end": 29903,
         "reversed": false,
