@@ -12,8 +12,8 @@ import DashboardPlugin from './plugins'
 import config from './config';
 import SplitPane from 'react-split-pane';
 import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
+import { createRoot, hydrateRoot } from 'react-dom/client'
 
-// import 'react-split-pane/lib/styles.css';
 import './App.css'
 
 
@@ -94,6 +94,19 @@ function App() {
       onChange: patch => {
         setPatches(previous => previous + JSON.stringify(patch) + '\n')
       },
+      configuration: {
+        rpc: {
+          defaultDriver: 'WebWorkerRpcDriver',
+        },
+      },
+      makeWorkerInstance: () => {
+        return new Worker(new URL('./rpcWorker', import.meta.url), {
+          type: 'module',
+        })
+      },
+      hydrateFn: hydrateRoot,
+      createRootFn: createRoot,
+
     })
     setViewState(state)
   }, []);

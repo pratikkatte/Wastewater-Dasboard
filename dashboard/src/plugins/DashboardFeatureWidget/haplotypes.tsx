@@ -12,7 +12,6 @@ import LaunchBreakpointSplitViewPanel from './LaunchBreakpointSplitViewPanel'
 export default function Haplotypes(props) {
 
   const {haplotype_names, RG } = props
-  console.log("haplotype_names", haplotype_names, RG)
   return (
     <BaseCard title="Other Haplotypes">
     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>

@@ -1,5 +1,5 @@
 
-const PRODUCTION = true
+const PRODUCTION = false
 
 let TAXONIUM_BASE = null
 

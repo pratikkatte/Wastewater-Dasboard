@@ -1,11 +1,20 @@
 import PluginManager from "@jbrowse/core/PluginManager";
 import configSchemaF from "./configSchema";
 import modelF from './model'
+import { BaseLinearDisplayComponent } from '@jbrowse/plugin-linear-genome-view'
+import DisplayType from '@jbrowse/core/pluggableElementTypes/DisplayType'
 
-export default (pluginManager: PluginManager) => {
-    const schema = configSchemaF(pluginManager)
-    return {
-      configSchema: schema,
-      stateModel: modelF(pluginManager, schema),
-    }
+export default function register(pluginManager: PluginManager) {
+    pluginManager.addDisplayType(() => {
+      const configSchema = configSchemaF(pluginManager)
+      return new DisplayType({
+        name: 'LinearDashboardDisplay',
+        configSchema,
+        stateModel: modelF(pluginManager, configSchema),
+        trackType: 'DashboardTrack',
+        viewType: 'LinearGenomeView',
+        ReactComponent: BaseLinearDisplayComponent
+      })
+    })
   }
+

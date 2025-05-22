@@ -8,7 +8,8 @@ import {
   import { BamRecord } from '@gmod/bam'
   
   // locals
-  import { getClip, getMismatches } from '../MismatchParser'
+  // import { getClip, getMismatches } from '../MismatchParser'
+import { MismatchParser } from '@jbrowse/plugin-alignments'
   import DashboardAdapter from './DashboardAdapter'
   
   export default class BamSlightlyLazyFeature implements Feature {
@@ -110,22 +111,7 @@ import {
       }
       return this.record.get(field)
     }
-  
-    _get_UM() {
-      const unseenid = this.record.get("UM")
-      let um = {};
-      if (unseenid){
-        const unseenidArray = unseenid.split(',');
-        unseenidArray.forEach(item => {
-          const value = this.unseen_mutations[item].split(":")
-          um[item] = value
-        });
-          // const um = `${unseenid} -> ${this.unseen_mutations[unseenid]}`
-          // console.log("jbrowse filterreads, bam", um, this.unseen_mutations)
-        return um
-      }
-      return um
-    }
+
 
     _get_refName() {
       return this.adapter.refIdToName(this.record.seq_id())
@@ -155,7 +141,7 @@ import {
     }
   
     _get_mismatches() {
-      return getMismatches(
+      return MismatchParser.getMismatches(
         this.get('CIGAR'),
         this.get('MD'),
         this.get('seq'),
@@ -166,6 +152,6 @@ import {
 
     _get_clipPos() {
       const cigar = this.get('CIGAR') || ''
-      return getClip(cigar, this.get('strand'))
+      return MismatchParser.getClip(cigar, this.get('strand'))
     }
   }
