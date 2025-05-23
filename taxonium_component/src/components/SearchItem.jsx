@@ -126,6 +126,7 @@ const SearchItem = ({ singleSearchSpec, setThisSearchSpec, config }) => {
         <DebounceInput
           className="inline-block w-40 border py-1 px-1 text-grey-darkest text-sm"
           value={singleSearchSpec.text}
+          debounceTimeout={1000} 
           onChange={(e) =>
             setThisSearchSpec({
               ...singleSearchSpec,
@@ -139,6 +140,7 @@ const SearchItem = ({ singleSearchSpec, setThisSearchSpec, config }) => {
           element="textarea"
           className="block w-56 h-32 border py-1 px-1 text-grey-darkest text-sm"
           value={singleSearchSpec.text}
+          debounceTimeout={1000} 
           onChange={(e) =>
             setThisSearchSpec({
               ...singleSearchSpec,
@@ -236,6 +238,7 @@ const SearchItem = ({ singleSearchSpec, setThisSearchSpec, config }) => {
             <DebounceInput
               type="number"
               value={singleSearchSpec.position}
+              debounceTimeout={1000} 
               onChange={(e) =>
                 setThisSearchSpec({
                   ...singleSearchSpec,
@@ -279,6 +282,7 @@ const SearchItem = ({ singleSearchSpec, setThisSearchSpec, config }) => {
             <DebounceInput
               type="number"
               value={singleSearchSpec.min_tips}
+              debounceTimeout={1000} 
               onChange={(e) =>
                 setThisSearchSpec({
                   ...singleSearchSpec,
@@ -391,6 +395,7 @@ const SearchItem = ({ singleSearchSpec, setThisSearchSpec, config }) => {
           <DebounceInput
             type="number"
             value={singleSearchSpec.number}
+            debounceTimeout={1000} 
             onChange={(e) =>
               setThisSearchSpec({
                 ...singleSearchSpec,
