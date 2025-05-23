@@ -12,7 +12,7 @@ import { FaSearch, FaShare, FaFilter } from "react-icons/fa";
 import { Select } from "./Basic";
 import ListOutputModal from "./ListOutputModal";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 import classNames from "classnames";
 
@@ -39,6 +39,39 @@ const fixAuthors = (authors) => {
   return authors.replace(/,([^\s])/g, ", $1");
 };
 
+
+
+function HaplotypesDropdown({ haplotypes, onSelect }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="my-2">
+      <button
+        className="font-semibold text-gray-600 bg-gray-100 rounded px-3 py-1 shadow hover:bg-gray-200 transition w-full flex justify-between items-center"
+        onClick={() => setOpen(o => !o)}
+        type="button"
+      >
+        Haplotypes
+        <span className="ml-2">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <ul className="flex flex-col gap-2 mt-2 ml-2">
+          {haplotypes.map((h, i) => (
+            <li
+              key={i}
+              className="px-4 py-2 text-blue-900 shadow-sm flex items-center break-all cursor-pointer hover:bg-yellow-100 transition"
+              onClick={() => onSelect(h)}
+            >
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+
 function SearchPanel({
   search,
   colorBy,
@@ -56,11 +89,82 @@ function SearchPanel({
   view,
   perNodeFunctions,
   toggleSidebar,
+  bamInformation
 }) {
   useEffect(() => {
     ReactTooltip.rebuild();
   });
 
+  const itemRefs = useRef({});
+
+  const [activeTab, setActiveTab] = useState("haplotypes");
+  const [unaccountedMutations, setUnaccountedMutations] = useState({})
+
+
+  //  const bamInformation = {
+  //   "England/CLIMB-CM7YEJ5Q/2023|OY742755.1|2023-09-23": {
+  //     filename: "my_vcf_haplotype_reads.bam",
+  //     group19: [
+  //       { unaccounted1: "25207C:0.038197" }
+  //     ],
+  //     groupname: "group19"
+  //   },
+  //   "England/PHEC-YYE4A1G/2023|OY289159.1|2023-06-02": {
+  //     filename: "my_vcf_haplotype_reads.bam",
+  //     group66: [
+  //       { unaccounted1: "25207C:0.038197" }
+  //     ],
+  //     groupname: "group66"
+  //   }
+  //   // ...more entries
+  // };
+
+  useEffect(() => {
+    if (!bamInformation || typeof bamInformation !== "object") return; // Ensure data exists and is an object
+  
+    const unaccounted_mutations = {};
+  
+    for (const [key, value] of Object.entries(bamInformation)) {
+      const haplotype = key;
+      const groupname = value?.groupname;
+  
+      // Safeguard: Ensure groupname and the group array exist and are an array
+      const group_ums = value?.[groupname];
+      if (!Array.isArray(group_ums)) continue; // Skip if not an array
+  
+      group_ums.forEach((obj) => {
+        if (!obj || typeof obj !== "object") return;
+        for (const [mutationKey, mutationValue] of Object.entries(obj)) {
+          if (!mutationValue || typeof mutationValue !== "string") continue;
+  
+        const info = mutationValue?.split(":");
+        const mutation = info[0] ?? "";
+        const residue = info[1] ?? "";
+        const AF = info[2] ?? "";
+        const depth = info[3] ?? "";
+
+  
+          if (!unaccounted_mutations[mutationKey]) {
+            unaccounted_mutations[mutationKey] = {
+              mutation,
+              residue,
+              AF,
+              depth,
+              haplotype: [haplotype],
+            };
+          } else {
+            const prev = unaccounted_mutations[mutationKey].haplotype;
+            if (!prev.includes(haplotype)) {
+              unaccounted_mutations[mutationKey].haplotype = [...prev, haplotype];
+            }
+          }
+        }
+      });
+    }
+  
+
+    setUnaccountedMutations(unaccounted_mutations)
+  }, [bamInformation]); 
 
   const covSpectrumQuery = useMemo(() => {
     if (selectedDetails.nodeDetails && selectedDetails.nodeDetails.node_id) {
@@ -75,6 +179,22 @@ function SearchPanel({
   const [listOutputModalOpen, setListOutputModalOpen] = useState(false);
 
   const [sortOrder, setSortOrder] = useState('asc')
+
+  const handleHaplotypeClick = (haplotypeKey) => {
+    setActiveTab("haplotypes");
+    setTimeout(() => {
+
+      const node = itemRefs.current[haplotypeKey];
+      console.log('node',itemRefs.current, node)
+      if (node) {
+        node.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Optional: Highlight it
+        node.classList.add("bg-yellow-100");
+        setTimeout(() => node.classList.remove("bg-yellow-100"), 1200);
+      }
+    }, 100); // Wait for tab render (tweak if necessary)
+  };
+  
 
   useEffect(() => {
     search.sortedSearchOrder(sortOrder)
@@ -431,25 +551,43 @@ function SearchPanel({
       </div>
 
       <div className="py-3 flex flex-col md:min-h-0">
-        <h2 className="font-bold text-gray-700 flex justify-between items-center mb-2">
-            <div className="flex items-center">
-              <FaSearch className="ml-1 mr-1.5 text-gray-500 h-4 w-4" />
-              Search
+            <div>
+            {/* Tab Header */}
+            <div className="flex justify-between items-center mb-2 border-b">
+              <div
+                className={`flex-1 cursor-pointer px-4 py-2 text-center font-bold 
+                  ${activeTab === "haplotypes" ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50" : "text-gray-700"}`}
+                onClick={() => setActiveTab("haplotypes")}
+              >
+                Detected Haplotypes
+              </div>
+              <div
+                className={`flex-1 cursor-pointer px-4 py-2 text-center font-bold 
+                  ${activeTab === "unaccounted" ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50" : "text-gray-700"}`}
+                onClick={() => setActiveTab("unaccounted")}
+              >
+                Unaccounted Alleles
+              </div>
             </div>
-            {/* <SearchDisplayToggle settings={settings} /> */}
-        </h2>
-        <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
+          </div>
+    
+        {activeTab === "haplotypes" ? (
+          <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
         {search.searchSpec.map((item) => {
           if ('show' in item && item.show === 'points') {
             return null
           }else{
-            return (<SearchTopLayerItem
+            return (<div
+              key={item.text}
+              ref={el => itemRefs.current[item.text] = el}>
+            <SearchTopLayerItem
               key={item.key}
               singleSearchSpec={item}
               myKey={item.key}
               search={search}
               config={config}
-            />)
+            />
+            </div>)
           }
           })}
           <Button
@@ -459,7 +597,34 @@ function SearchPanel({
             <RiAddCircleLine className="mr-1 h-4 w-4 text-gray-500" />
             <span>Add a new search</span>
           </Button>
+        </div>)
+        : (<div>
+          <div className="p-4 bg-white rounded-xl shadow">
+          {Object.entries(unaccountedMutations).map(([unaccountedKey, info]) => (
+            <div key={unaccountedKey} className="mb-4 border-b pb-2">
+              <div className="font-bold text-gray-800 mb-2">{unaccountedKey}</div>
+              <div>
+                <span className="font-semibold text-gray-600">Mutation: </span>
+                <span>{info.mutation}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-600">Residue: </span>
+                <span>{info.residue}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-600">Allele Frequency: </span>
+                <span>{info.AF}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-600">Depth: </span>
+                <span>{info.depth}</span>
+              </div>
+                <HaplotypesDropdown haplotypes={info.haplotype} onSelect={handleHaplotypeClick} /> 
+            </div>
+          ))}
+    </div>
         </div>
+      )}
       </div>
       {selectedDetails.nodeDetails && (
         <div className="py-3 px-4 md:px-0 mb-0 fixed bottom-0 left-0 right-0 bg-white md:static shadow-2xl md:shadow-none overflow-auto">

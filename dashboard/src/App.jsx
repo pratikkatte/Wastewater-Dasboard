@@ -204,6 +204,7 @@ useEffect(() => {
                       query={query}
                       updateQuery={updateQuery}
                       onClickNode={onClickNode}
+                      bamInformation={selectedFile}
                     />
                 </div>
 
