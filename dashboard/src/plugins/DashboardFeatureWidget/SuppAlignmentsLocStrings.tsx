@@ -1,7 +1,8 @@
 import React from 'react'
 import { Typography, Link } from '@mui/material'
 // locals
-import { getLengthOnRef } from '../MismatchParser'
+// import { getLengthOnRef } from '../MismatchParser'
+import {MismatchParser} from '@jbrowse/plugin-alignments'
 import { navToLoc } from './util'
 import { AlignmentFeatureWidgetModel } from './stateModelFactory'
 
@@ -21,7 +22,7 @@ export default function SuppAlignmentsLocStrings({
           .filter(SA => !!SA)
           .map((SA, index) => {
             const [saRef, saStart, saStrand, saCigar] = SA.split(',')
-            const saLength = getLengthOnRef(saCigar)
+            const saLength = MismatchParser.getLengthOnRef(saCigar)
             const extra = Math.floor(saLength / 5)
             const start = +saStart
             const end = +saStart + saLength

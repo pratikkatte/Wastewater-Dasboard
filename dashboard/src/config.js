@@ -1,14 +1,7 @@
 
-const PRODUCTION = false
+const TAXONIUM_BASE = import.meta.env.VITE_TAXONIUM_BASE;
 
-let TAXONIUM_BASE = null
-
-if(!PRODUCTION) {
-  TAXONIUM_BASE = 'http://localhost:8080/';
-}else {
-  TAXONIUM_BASE = window.location.origin + '/taxonium/'
-}
-
+console.log("TAXONIUM_BASE", TAXONIUM_BASE)
 const REF_FA = `${TAXONIUM_BASE}uploads/NC_045512v2.fa`
 const REF_FAI = `${TAXONIUM_BASE}uploads/NC_045512v2.fa.fai`
 
