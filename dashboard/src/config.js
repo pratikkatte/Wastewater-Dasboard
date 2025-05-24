@@ -1,5 +1,12 @@
 
-const TAXONIUM_BASE = import.meta.env.VITE_TAXONIUM_BASE;
+
+const isProd = import.meta.env.PROD; // true in production build
+
+let TAXONIUM_BASE = import.meta.env.VITE_TAXONIUM_BASE;
+
+if (isProd && TAXONIUM_BASE.startsWith('/')) {
+  TAXONIUM_BASE = window.location.origin + TAXONIUM_BASE;
+}
 
 console.log("TAXONIUM_BASE", TAXONIUM_BASE)
 const REF_FA = `${TAXONIUM_BASE}uploads/NC_045512v2.fa`
