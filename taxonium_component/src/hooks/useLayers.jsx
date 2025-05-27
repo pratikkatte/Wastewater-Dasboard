@@ -485,7 +485,6 @@ const useLayers = ({
 
     return {
       layerType: "ScatterplotLayer",
-
       data: data,
       id: "main-search-scatter-" + spec.key,
       getPosition: (d) => [d[xType], d.y],
@@ -494,7 +493,8 @@ const useLayers = ({
       // getRadius: settings.displaySearchesAsPoints
       //   ? settings.searchPointSize
       //   : 5 + 2 * i,
-      getRadius: spec?.show === 'points'? settings.searchPointSize : 5,
+      // getRadius: spec?.show === 'points'? 5: settings.searchPointSize,
+      getRadius: 5,
       radiusUnits: "pixels",
       lineWidthUnits: "pixels",
       stroked: true,
@@ -505,7 +505,7 @@ const useLayers = ({
       // getFillColor: settings.displaySearchesAsPoints
       //   ? lineColor
       //   : [255, 0, 0, 0],
-      getFillColor: spec?.show === 'points'? pointsLineColor : [255,0,0,0],
+      getFillColor: spec?.show === 'points'? [255,255,255,255]: lineColor,
       modelMatrix: modelMatrix,
       updateTriggers: {
         getPosition: [xType],
