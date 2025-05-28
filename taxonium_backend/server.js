@@ -715,15 +715,16 @@ const loadTaxonium = async (data_file) => {
     });
   }
 
-var global_taxonium_file_path = ''
-app.get("/load/:project", async (req, res) => {
+  let global_taxonium_file_path = ''; // Stores full resolved path of the loaded file
+  
+  app.get("/load/:project", async (req, res) => {
 
   const { project } = req.params;
   
   const taxonium_file_path = projects_info[project]['taxonium_file_path']
   const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
 
-  if(global_taxonium_file_path !== fullFilePath){
+  if(global_taxonium_file_path === fullFilePath){
     res.send({'result':'taxonium loaded'})  
   }
   else {
