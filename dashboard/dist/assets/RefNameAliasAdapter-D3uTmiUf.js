@@ -1,0 +1,2 @@
+import{a6 as n,ab as l}from"./index-BuyoQHVk.js";class c extends n.BaseAdapter{async getRefNameAliases(){const t=this.getConf("location");if(t.uri===""||t.uri==="/path/to/my/aliases.txt")return[];const a=await l.openLocation(t,this.pluginManager).readFile("utf8"),r=this.getConf("refNameColumn");return a.trim().split(/\n|\r\n|\r/).filter(e=>!!e&&!e.startsWith("#")).map(e=>{const s=e.split("	"),[i]=s.splice(r,1);return{refName:i,aliases:s.filter(o=>!!o.trim())}})}async freeResources(){}}export{c as default};
+//# sourceMappingURL=RefNameAliasAdapter-D3uTmiUf.js.map
