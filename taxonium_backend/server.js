@@ -24,6 +24,24 @@ const { program } = require("commander");
 
 const PRODUCTION = true
 
+const def_reference_config = {
+  "NC_038235.1":{
+    "taxonium_file_path": "/data/taxonium/RSVA_Study.jsonl",
+    "start": 0,
+    "end":15191
+  },
+  "NC_045512v2":{
+    "taxonium_file_path": "/data/taxonium/SARSv2.jsonl",
+    "start": 0,
+    "end":29903
+  },
+  "NC_045512.2": {
+    "taxonium_file_path": "/data/taxonium/SARS.2.jsonl",
+    "start": 0,
+    "end":29903
+  }
+
+}
 program
   .option("--ssl", "use ssl")
   .option("--port <port>", "port", 8000)
@@ -42,6 +60,9 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "taxonium"));
 
 let projectName='';
 
+
+
+
 // Ensure upload directory exists
 var uploadDir = '';
 
@@ -49,8 +70,11 @@ if (command_options.integrated) {
   // const uploadDir = '/var/www/WEPP/uploads';  
   uploadDir = '/workspace/results'
 } else {
-  uploadDir = '.';
+  uploadDir = './results';
 }
+
+const projects_info = JSON.parse(fs.readFileSync(`${uploadDir}/projects.json`, 'utf8'));
+
 const uploadPath = path.join(uploadDir, 'uploads');
 fs.mkdirSync(uploadPath, { recursive: true });
 
@@ -163,27 +187,32 @@ app.use(queue({ activeLimit: 500000, queuedLimit: 500000 }));
 const logStatusMessage = (status_obj) => {
   console.log("status", status_obj);
   if (process && process.send) {
+    console.log("here")
     process.send(status_obj);
   }
 };
 
-// This will handle /uploads/:filename
-app.get('/uploads/:filename', (req, res) => {
-  const { filename } = req.params;
-  var filePath = path.join(uploadDir, projectName);
-  
-  // Check if file exists
-  if (fs.existsSync(filePath)) {
-    // return res.sendFile(filePath);
-    res.sendFile(filename, { root: filePath }, function (err) {
-      if (err) {
-        console.error(err);
-        res.status(404).send('File not found');
-      }
-    });
-  } else {
-    res.status(404).json({ error: 'File not found' });
-  }
+
+app.get('/uploads/:projectname/:filename', (req, res) => {
+  const { projectname, filename } = req.params;
+  // Use path.resolve to build an absolute path
+  const fullFilePath = path.resolve(uploadDir, projectname, filename);
+
+  console.log("Trying to serve:", fullFilePath);
+
+  fs.access(fullFilePath, fs.constants.R_OK, (err) => {
+    if (err) {
+      console.error("File not found or unreadable:", fullFilePath);
+      res.status(404).send('File not found');
+    } else {
+      res.sendFile(fullFilePath, function (err) {
+        if (err) {
+          console.error("SendFile error:", err);
+          if (!res.headersSent) res.status(404).send('File not found');
+        }
+      });
+    }
+  });
 });
 
 
@@ -191,14 +220,23 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: 'No files uploaded' });
   }
-  projectName = 'uploads'
+  projectName = 'uploads'  
+  const reference_name = req.body.reference_file
+  const remaining_config = def_reference_config[reference_name]
   const uploadedFiles = req.files
   .filter(file => file.filename.endsWith('.bam'))  // keep only BAMs
   .map(file => `${file.filename}`);                     // map to filenames
   
+  const project_config = {'project_name':projectName,
+                          "reference_name": reference_name,
+                          ...remaining_config
+                        }
+console.log("project_config", project_config)
 
   const selectedNodes = await selectNodes(uploadedFiles, projectName);
-  res.json({ "response": selectedNodes,"status": "success"});
+  // res.json({ "response": selectedNodes,"status": "success"});
+  res.json({ "response": selectedNodes, "config": project_config,"status": "success"});
+
 });
 
 
@@ -245,10 +283,19 @@ app.post('/api/result/:folder', async function(req, res) {
     }
     
     const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
-  
+    
+    console.log("folder", folder)
+    
+    var specific_project = projects_info[folder]
+    console.log("project info", projects_info[folder])
 
   const results_config = await selectNodes(files, projectName)
-  res.json({ "response": results_config,"status": "success"});
+
+  const project_config = {'project_name':folder,
+                          ...specific_project
+                        }
+  console.log("project_config", project_config)
+  res.json({ "response": results_config, "config": project_config,"status": "success"});
   } catch (err) {
     console.error("Error processing request", err);
     res.status(500).json({ error: 'Internal server error', status: 'error' });
@@ -609,6 +656,87 @@ app.get("/tip_atts", async (req, res) => {
   );
 });
 
+const cleanupTaxoniumMemory = () => {
+  processedData = null;
+  cached_starting_values = null;
+
+  if (global.gc) global.gc();
+
+};
+
+const loadTaxonium = async (data_file) => {
+
+  cleanupTaxoniumMemory();
+  
+  const stream = fs.createReadStream(data_file);
+
+  let supplied_object = {
+      stream: stream,
+      status: "stream_supplied",
+      filename: data_file,
+    }
+
+    processedData = await importing.processJsonl(
+      supplied_object,
+      logStatusMessage,
+      ReadableWebToNodeStream.ReadableWebToNodeStream
+    );
+  
+    logStatusMessage({
+      status: "finalising",
+    });
+  
+    if (config.no_file) {
+      importing.generateConfig(config, processedData);
+    }
+  
+    processedData.genes = new Set(
+      processedData.mutations.map((mutation) => mutation.gene)
+    );
+    // as array
+    processedData.genes = Array.from(processedData.genes);
+    console.log("Loaded data");
+  
+    result = filtering.getNodes(
+      processedData.nodes,
+      processedData.y_positions,
+      processedData.overallMinY,
+      processedData.overallMaxY,
+      processedData.overallMinX,
+      processedData.overallMaxX,
+      "x_dist"
+    );
+  
+    cached_starting_values = result;
+    console.log("Saved cached starting vals");
+
+    logStatusMessage({
+      status: "loaded",
+    });
+  }
+
+var global_taxonium_file_path = ''
+app.get("/load/:project", async (req, res) => {
+
+  const { project } = req.params;
+  
+  const taxonium_file_path = projects_info[project]['taxonium_file_path']
+  const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
+
+  if(global_taxonium_file_path !== fullFilePath){
+    res.send({'result':'taxonium loaded'})  
+  }
+  else {
+    global_taxonium_file_path = taxonium_file_path
+
+  console.log("taxonium_file_path", fullFilePath)
+
+    await loadTaxonium(fullFilePath);
+    res.send({'result':'taxonium loaded'})
+
+  }
+
+})
 // match /nextstrain_json/12345
 app.get("/nextstrain_json/:root_id", async (req, res) => {
   const root_id = parseInt(req.params.root_id);
@@ -745,56 +873,56 @@ async function selectNodes(uploadedFilenames, project_name) {
 
 const loadData = async () => {
   await waitForTheImports();
-  let supplied_object;
-  if (command_options.data_file) {
-    local_file = command_options.data_file;
-    //  create a stream from the file
-    const stream = fs.createReadStream(local_file);
+  // let supplied_object;
+  // if (command_options.data_file) {
+  //   local_file = command_options.data_file;
+  //   //  create a stream from the file
+  //   const stream = fs.createReadStream(local_file);
 
-    supplied_object = {
-      stream: stream,
-      status: "stream_supplied",
-      filename: local_file,
-    };
-  } else {
-    url = command_options.data_url;
+  //   supplied_object = {
+  //     stream: stream,
+  //     status: "stream_supplied",
+  //     filename: local_file,
+  //   };
+  // } else {
+  //   url = command_options.data_url;
 
-    supplied_object = { status: "url_supplied", filename: url };
-  }
+  //   supplied_object = { status: "url_supplied", filename: url };
+  // }
 
-  processedData = await importing.processJsonl(
-    supplied_object,
-    logStatusMessage,
-    ReadableWebToNodeStream.ReadableWebToNodeStream
-  );
+  // processedData = await importing.processJsonl(
+  //   supplied_object,
+  //   logStatusMessage,
+  //   ReadableWebToNodeStream.ReadableWebToNodeStream
+  // );
 
-  logStatusMessage({
-    status: "finalising",
-  });
+  // logStatusMessage({
+  //   status: "finalising",
+  // });
 
-  if (config.no_file) {
-    importing.generateConfig(config, processedData);
-  }
+  // if (config.no_file) {
+  //   importing.generateConfig(config, processedData);
+  // }
 
-  processedData.genes = new Set(
-    processedData.mutations.map((mutation) => mutation.gene)
-  );
-  // as array
-  processedData.genes = Array.from(processedData.genes);
-  console.log("Loaded data");
+  // processedData.genes = new Set(
+  //   processedData.mutations.map((mutation) => mutation.gene)
+  // );
+  // // as array
+  // processedData.genes = Array.from(processedData.genes);
+  // console.log("Loaded data");
 
-  result = filtering.getNodes(
-    processedData.nodes,
-    processedData.y_positions,
-    processedData.overallMinY,
-    processedData.overallMaxY,
-    processedData.overallMinX,
-    processedData.overallMaxX,
-    "x_dist"
-  );
+  // result = filtering.getNodes(
+  //   processedData.nodes,
+  //   processedData.y_positions,
+  //   processedData.overallMinY,
+  //   processedData.overallMaxY,
+  //   processedData.overallMinX,
+  //   processedData.overallMaxX,
+  //   "x_dist"
+  // );
 
-  cached_starting_values = result;
-  console.log("Saved cached starting vals");
+  // cached_starting_values = result;
+  // console.log("Saved cached starting vals");
   // set a timeout to start listening
 
   setTimeout(() => {

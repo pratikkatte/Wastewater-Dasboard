@@ -58,7 +58,7 @@ export default (pluginManager: PluginManager, configSchema) => {
         /** whether to show the custom options button */
         unseenKeys: types.optional(types.map(unseenModel), {}),
         showEPColor: false,
-        filterBy: types.optional(FilterModel, {}),
+        // filterBy: types.optional(FilterModel, {}),
       }),
     )
     .volatile(() => ({
@@ -189,7 +189,7 @@ export default (pluginManager: PluginManager, configSchema) => {
             }
           },
           {
-            label: "unaccounted mutations",
+            label: "unaccounted alleles",
             icon: SortIcon,
             subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
               label: item.mutation.split(":")[0],

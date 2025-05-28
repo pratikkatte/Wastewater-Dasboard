@@ -2,22 +2,19 @@ import React, { useState, Suspense, useRef, useEffect, useCallback } from "react
 import TaxoniumBit from "./components/TaxoniumBit";
 import { getDefaultSearch } from "./utils/searchUtil.js";
 
-import tracks from './tracks.jsx';
-import assembly from './assembly.jsx';
-import defaultSession from './defaultSession.jsx'
+import makeTracks from './tracks.jsx';
+import makeAssembly from './assembly.jsx';
+import makeSession from './defaultSession.jsx'
 import addTrack  from './utils/TrackUtils.jsx'
 import { Header } from './utils/UIUtils.jsx'
 import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
-import config from './config';
 import SplitPane from 'react-split-pane';
 import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
 import { createRoot, hydrateRoot } from 'react-dom/client'
+import useDashboardConfig from './config.js'
 
 import './App.css'
-
-
-
 
 import {
   createViewState,
@@ -42,16 +39,16 @@ function App() {
     import("taxonium-component");
   }, []);
 
+
+  
   const [viewState, setViewState] = useState();
-  const [all_tracks, setTracks] = useState([])
-  const [showTrack, setShowTrack] = useState(null)
   const clickedNodeRef = useRef(null);
   const mark_nodeRef = useRef(null);
   const trackIDsRef = useRef([]);
-  const [createTract, setCreateTrack] = useState(null)
+  const [createTrack, setCreateTrack] = useState(null)
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
-  const [uploadProgress, setuploadProgress] = useState(0);
+  // const [selectedFile, setSelectedFile] = useState(true)
   const [paneSize, setPaneSize] = useState('98%');
 
   // const [query, updateQuery] = useState(default_query);
@@ -66,12 +63,22 @@ function App() {
   const query = backupQuery; // query
   const updateQuery = backupUpdateQuery;
 
-  const [refNames, setRefNames] = useState([]);
 
-  // const toggleJBrowse = () => {
-  //   setJBrowseOpen(!JBrowseOpen);
-  //   setPaneSize(prev => (JBrowseOpen ? '1%' : '30%'));
-  // };
+const defaultConfig = {"project_name":"uploads",
+                      "reference_name":"NC_045512v2",
+                      "taxonium_file_path": "taxonium.jsonl",
+                      "start": 0,
+                      "end":29903
+                    }
+  const [projectName, setProjectName] = useState(defaultConfig); 
+  
+  const config = useDashboardConfig(projectName);
+
+  useEffect(() => {
+    // Do something with config or projectConfig if needed
+    // (But DO NOT call useDashboardConfig here)
+    console.log("Config updated:", config);
+  }, [config]);
 
   const toggleJBrowse = useCallback((input_jbrowse) => {
     setJBrowseOpen(() => {
@@ -84,13 +91,12 @@ function App() {
   }, [JBrowseOpen]);
 
   useEffect(() => {
+    console.log("in createviewstate")
     const state = createViewState({
-      assembly,
-      tracks: tracks,
-      defaultSession,
-      plugins:[
-        DashboardPlugin
-        ],
+      assembly: makeAssembly(config),
+      tracks: [],
+      defaultSession: makeSession(config, []),
+      plugins: [DashboardPlugin],
       onChange: patch => {
         setPatches(previous => previous + JSON.stringify(patch) + '\n')
       },
@@ -109,32 +115,16 @@ function App() {
 
     })
     setViewState(state)
-  }, []);
-
-useEffect(() => {
-  if(createTract){
-      addTrack(clickedNodeRef, 
-        selectedFile, 
-        trackIDsRef, 
-        setTracks, 
-        setShowTrack, 
-        viewState, all_tracks);
-      }
-    setCreateTrack(false);
-  }, [createTract])
+  }, [config, projectName]);
 
   useEffect(() => {
-    if(showTrack)
-    {
-        // trackIDsRef.current.forEach((trackId) => {
-        // viewState.session.view.showTrack(trackId);
-        // })
-        viewState.session.view.showTrack(showTrack);
-
-        setShowTrack(null)
-        setCreateTrack(false);
+    if (createTrack && viewState && config && selectedFile) {
+      addTrack(clickedNodeRef, selectedFile, trackIDsRef, viewState, config);
+      setCreateTrack(false);
     }
-    }, [showTrack])
+  }, [createTrack, viewState, config, selectedFile]);
+  
+
 
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
@@ -185,7 +175,13 @@ useEffect(() => {
           <br />
             {!selectedFile ? 
               <div>
-                <FileUpload setSelectedFile={setSelectedFile} createDefaultSearch={createDefaultSearch} mark_nodeRef={mark_nodeRef} updateQuery={updateQuery}/>
+                <FileUpload setSelectedFile={setSelectedFile} 
+                createDefaultSearch={createDefaultSearch} 
+                mark_nodeRef={mark_nodeRef} 
+                updateQuery={updateQuery} 
+                config={config}
+                setProjectName={setProjectName}
+                />
               </div>
               
           :

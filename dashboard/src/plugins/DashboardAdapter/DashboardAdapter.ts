@@ -197,11 +197,11 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           let ref: string | undefined
           let unseen_mutations = {}
 
-          if (!record.get('MD')) {
+          if (!record.tags.MD) {
             ref = await this.seqFetch(
               originalRefName || refName,
-              record.get('start'),
-              record.get('end'),
+              record.start,
+              record.end,
             )
           }
 
@@ -211,7 +211,9 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           }
 
           if (tagFilter && tagFilter.tag) {
-            const v = record.get(tagFilter.tag)
+            // const v = record.get(tagFilter.tag)
+            const v = record.tags[tagFilter.tag]
+
             if (
               !(tagFilter.value === '*'
                 ? v !== undefined
@@ -228,7 +230,10 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           
 
           if(um_filter.length>0) {
-            const um = record.get('UM') ? record.get('UM').split(",")  : ''
+                        
+            var um = record.tags.UM ? record.tags.UM : ''
+            um = um.split(",")
+
             
             if (!um || !um.some(u => um_filter.includes(u))) {
                 continue
@@ -238,7 +243,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           if (readName && record.get('name') !== readName) {
             continue
           }
-          observer.next(new BamSlightlyLazyFeature(record, this, ref, unseen_mutations))
+          observer.next(new BamSlightlyLazyFeature(record, this, ref))
         }
         observer.complete()
       })

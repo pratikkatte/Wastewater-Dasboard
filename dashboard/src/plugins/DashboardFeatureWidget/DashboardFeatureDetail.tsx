@@ -17,9 +17,7 @@ import UncertainNodes from './uncertainnodes'
 import Flags from './Flags'
 import PairLink from './PairLink'
 import Formatter from './Formatter'
-import {
-    SimpleFeature,
-  } from '@jbrowse/core/util'
+
 
 const omit = ['clipPos', 'flags', "UM", "RG"]
 

@@ -6,8 +6,6 @@ import LinearDashboardDisplayF from './LinearDashboardDisplay'
 import DashboardTrackF from './DashboardTrack'
 import DashboardAdapterF from './DashboardAdapter'
 
-import WidgetType from '@jbrowse/core/pluggableElementTypes/WidgetType'
-
 
 import DashboardFeatureWidgetF from './DashboardFeatureWidget'
 

@@ -1,24 +1,23 @@
-import config from './config';
+export default function makeAssembly(config) {
 
-
-const assembly = {
-    name: 'NC_045512',
+  console.log("config", config)
+  return {
+    name: config.REF_NAME || 'NC_045512',
     aliases: ['hg38'],
     sequence: {
       type: 'ReferenceSequenceTrack',
-      trackId: 'GRCh38-ReferenceSequenceTrack',
+      trackId: config.REF_NAME
+        ? `${config.REF_NAME}-ReferenceSequenceTrack`
+        : 'GRCh38-ReferenceSequenceTrack',
       adapter: {
         type: 'IndexedFastaAdapter',
         fastaLocation: {
-          uri: `${config.REF_FA}`
+          uri: config.REF_FA,
         },
         faiLocation: {
-          uri: `${config.REF_FAI}`
-
+          uri: config.REF_FAI,
         },
       },
-    }
-  }
-
-  export default assembly
-  
+    },
+  };
+}
