@@ -142,8 +142,7 @@ function SearchPanel({
         const residue = info[1] ?? "";
         const AF = info[2] ?? "";
         const depth = info[3] ?? "";
-
-  
+        
           if (!unaccounted_mutations[mutationKey]) {
             unaccounted_mutations[mutationKey] = {
               mutation,
@@ -161,7 +160,6 @@ function SearchPanel({
         }
       });
     }
-  
 
     setUnaccountedMutations(unaccounted_mutations)
   }, [bamInformation]); 
@@ -572,7 +570,7 @@ function SearchPanel({
           </div>
     
         {activeTab === "haplotypes" ? (
-          <div className="space-y-2 max-h-64 md:overflow-y-auto -mr-4 pr-4">
+          <div className={`space-y-2 ${selectedDetails.nodeDetails ? 'max-h-64' : 'max-h-72'} md:overflow-y-auto -mr-4 pr-4`}>
         {search.searchSpec.map((item) => {
           if ('show' in item && item.show === 'points') {
             return null
@@ -598,13 +596,13 @@ function SearchPanel({
             <span>Add a new search</span>
           </Button>
         </div>)
-        : (<div>
-          <div className="p-4 bg-white rounded-xl shadow">
+        : (
+          <div className={`p-4 bg-white rounded-xl shadow overflow-y-auto ${selectedDetails.nodeDetails ? 'max-h-64' : 'max-h-72'}`}>
           {Object.entries(unaccountedMutations).map(([unaccountedKey, info]) => (
             <div key={unaccountedKey} className="mb-4 border-b pb-2">
-              <div className="font-bold text-gray-800 mb-2">{unaccountedKey}</div>
+              {/* <div className="font-bold text-gray-800 mb-2">{unaccountedKey}</div> */}
               <div>
-                <span className="font-semibold text-gray-600">Mutation: </span>
+                <span className="font-semibold text-gray-600">Allele: </span>
                 <span>{info.mutation}</span>
               </div>
               <div>
@@ -623,7 +621,6 @@ function SearchPanel({
             </div>
           ))}
     </div>
-        </div>
       )}
       </div>
       {selectedDetails.nodeDetails && (
