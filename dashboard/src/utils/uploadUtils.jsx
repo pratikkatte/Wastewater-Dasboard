@@ -1,15 +1,21 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import config from '../config';
 
 
+const referenceOptions = [
+  "NC_038235.1",
+  "NC_045512v2",
+  "NC_045512.2"
+];
 
-const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery}) => {
+const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery, config, setProjectName}) => {
   
+  const [selectedReference, setSelectedReference] = useState("NC_045512v2");
 
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [uploadProgress, setuploadProgress] = useState(0);
 
@@ -46,6 +52,8 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         const data = new FormData()
 
         uploadedFile.forEach(file => data.append('files', file)); // key must match 'files'
+        data.append('reference_file', selectedReference); 
+
 
        try {
           const p_config = {
@@ -54,7 +62,6 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             },
             onUploadProgress: (progressEvent) => {
               const { loaded, total } = progressEvent;
-              console.log("percent", Math.round((loaded / total) * 100))
               setuploadProgress(Math.round((loaded / total) * 100));
             },
           };
@@ -70,7 +77,10 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             
             setUploading(false)
             const selected_nodes = response.data.response
-            console.log("selected_nodes", selected_nodes)
+          
+            var project_config = response.data.config
+
+            setProjectName(project_config)
 
             handleFileProcessing(selected_nodes)
           }
@@ -95,24 +105,52 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
     };
 
     const handleResultsClick = async (idx) => {
-      try {
+      const tax_loaded = true;
 
-        const response = await axios.post(
-              `${config.RESULT}${results[idx]}`
-        )
-        console.log('response', response)
+  
+        
+        setLoading(true);
+        console.log("load url", `${config.LOAD_TAX}${results[idx]}`);
+        
+        try {
+          const response =  await axios.get(`${config.LOAD_TAX}${results[idx]}`);
+          if (response.status === 200) {
+            console.log("load tax", response);
+            setLoading(false);  
+          } else {
+            console.log("error", response);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.log("axios error", error);
+          setLoading(false);
+        }
 
-        if (response.status === 200) {
-          const selected_nodes = response.data.response
-          handleFileProcessing(selected_nodes)
+        if(tax_loaded){
+          try {
+            console.log("moving forward")
+            const response =  await axios.post(
+                  `${config.RESULT}${results[idx]}`
+            )
+            console.log('response', response)
+    
+            if (response.status === 200) {
+              const selected_nodes = response.data.response
+              var project_config = response.data.config
+    
+              console.log("config updating",project_config )
+              setProjectName(project_config)
+              handleFileProcessing(selected_nodes)
+            }
+            if (response.status == 400 ){
+              console.log(response)
+              alert(response.status)
+            }
+          } catch (error){
+            console.log("result error", error)
+          }  
         }
-        if (response.status == 400 ){
-          console.log(response)
-          alert(response.status)
-        }
-      } catch (error){
-        console.log("result error", error)
-      }
+        
     }
     
       const handleFileProcessing = (filenames_nodes) => {
@@ -142,7 +180,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
               backend: "",
               xType: "x_dist",
               zoomToSearch: zoom_to_indexes,
-              mutationTypesEnabled: JSON.stringify({ aa: true, nt: false }),
+              mutationTypesEnabled: JSON.stringify({ aa: true, nt: true }),
               treenomeEnabled: false,
           };
         updateQuery(query)
@@ -157,7 +195,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
                 This dashboard provides insights into the genomic data by using BAM files of the sequenced waste water samples, 
                 allowing for the monitoring and analysis of viral strains present in the community.
             </p>
-      
+
             <div className='flex' style={{ justifyContent: "center", alignItems: "center", margin: '30px auto'}}>
                 <input type="file" ref={(ref) => {
                   uploadInput = ref;
@@ -181,18 +219,29 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
               <div className="px-2 text-gray-500 text-sm">results</div>
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
+            <div className="flex flex-row space-x-4 mt-6">
             {results.map((result, index) => (
-              <button key={index} 
-              style={{ background: '#f20f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth:'10%', border: '1px solid gray', textAlign: 'center'}}
-              onClick={() => handleResultsClick(index)}>
+              <button
+                key={index}
+                style={{
+                  background: '#f20f0f0',
+                  padding: '20px',
+                  borderRadius: '5px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  minWidth: '120px',   // makes buttons a decent width
+                  border: '1px solid gray',
+                  textAlign: 'center'
+                }}
+                onClick={() => handleResultsClick(index)}
+                >
                 {result}
               </button>
             ))}
+            </div>
+            </div>
+          )}
           </div>
-        )}
-        </div>
-
-      );
-  };
+        );
+      };
 
   export default FileUpload

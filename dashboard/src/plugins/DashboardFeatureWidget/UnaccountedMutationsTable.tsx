@@ -1,12 +1,4 @@
-import React from 'react'
 import { BaseCard } from '@jbrowse/core/BaseFeatureWidget/BaseFeatureDetail'
-import { SimpleFeatureSerialized, getEnv, getSession } from '@jbrowse/core/util'
-import { ViewType } from '@jbrowse/core/pluggableElementTypes'
-
-// locals
-import { AlignmentFeatureWidgetModel } from './stateModelFactory'
-import SuppAlignmentsLocStrings from './SuppAlignmentsLocStrings'
-import LaunchBreakpointSplitViewPanel from './LaunchBreakpointSplitViewPanel'
 
 
 export default function UnaccountedMutations(props) {
@@ -19,7 +11,6 @@ export default function UnaccountedMutations(props) {
 
 
   type UnaccountedItem = { unseenKey: string; mutation: string };
-  console.log("um_ids", um_ids)
   const mapping = Object.fromEntries(
     (Object.values(unseen_mutations).flat() as UnaccountedItem[]).map(
       item => [item.unseenKey, item.mutation.split(":")]
@@ -27,14 +18,14 @@ export default function UnaccountedMutations(props) {
   );
 
   return (
-    <BaseCard title={is_sequence? "Possible Unaccounted Mutations": "Unaccounted Mutations"}>
+    <BaseCard title={is_sequence? "Possible Unaccounted Alleles": "Unaccounted Alleles"}>
     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
       
     {um_ids && um_ids.length > 0 ? (
       <table>
         <thead>
           <tr>
-            <th style={{ padding: '5px 10px 5px 10px', textAlign: 'center', fontWeight: 'bold' }}>Mutation</th>
+            <th style={{ padding: '5px 10px 5px 10px', textAlign: 'center', fontWeight: 'bold' }}>Allele</th>
             <th style={{ padding: '5px 10px 5px 10px', textAlign: 'center', fontWeight: 'bold' }}>Residue</th>
             <th style={{ padding: '5px 10px 5px 10px', textAlign: 'center', fontWeight: 'bold' }}>Allele Frequency</th>
             <th style={{ padding: '5px 10px 5px 10px', textAlign: 'center', fontWeight: 'bold' }}>Depth</th>
@@ -58,7 +49,7 @@ export default function UnaccountedMutations(props) {
       </table>
     ) : (
     <div>
-        No unaccounted mutations available
+        No unaccounted alleles available
     </div>
     )
   }

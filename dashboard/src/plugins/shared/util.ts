@@ -28,3 +28,15 @@ export function filterTagValue(readVal: unknown, filterVal?: string) {
     ? readVal === undefined
     : `${readVal}` !== `${filterVal}`
 }
+
+export function cacheGetter<T>(ctor: { prototype: T }, prop: keyof T): void {
+  const desc = Object.getOwnPropertyDescriptor(ctor.prototype, prop)!
+  const getter = desc.get!
+  Object.defineProperty(ctor.prototype, prop, {
+    get() {
+      const ret = getter.call(this)
+      Object.defineProperty(this, prop, { value: ret })
+      return ret
+    },
+  })
+}

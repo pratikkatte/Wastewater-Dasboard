@@ -1,6 +1,7 @@
-import config from '../config';
 
-const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowTrack, viewState, all_tracks) => {
+const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, viewState, config) => {
+    if (!viewState || !viewState.session || !viewState.session.view) return;
+
 
     // {'group1': {'filename': 'output_multi.bam', 'node_name': 'Germany/IMS-10209-CVDP-D48209F5-5BED-436E-BFC4-D2118C232BC4/2021'}, 
     // 'group2': {'filename': 'output_multi.bam', 'node_name': 'England/PHEC-Z306ZA27/2021'}}
@@ -9,6 +10,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
     // const key = Object.keys(selectedFile).find(key => selectedFile[key].node_name === node_name);
 
     const read_groupname = selectedFile[node_name]['groupname']
+
+    const uncertain_nodes = selectedFile[node_name]['UH']
 
     const unseenKey_dict = []
 
@@ -39,7 +42,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
         type: "DashboardTrack",
         trackId: trackId,
         name: "Reads mapping to "+clickedNodeRef.current.nodeDetails.name,
-        assemblyNames: ['NC_045512'],
+        assemblyNames: [config.REF_NAME],
         category: [],
         adapter: {
             type: "DashboardAdapter",
@@ -59,7 +62,8 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
                 groupname_tag: { 
                     [read_groupname]: unseenKey_dict
                 },
-                all_group_name : all_group_name
+                all_group_name : all_group_name,
+                uncertain_nodes: []
                 // groupname_tag: read_groupname
                 /*
                     groupname_tag: {
@@ -89,7 +93,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
         type: "DashboardTrack",
         trackId: haplotype_trackid,
         name: "sequence-"+clickedNodeRef.current.nodeDetails.name,
-        assemblyNames: ['NC_045512'],
+        assemblyNames: [config.REF_NAME],
         category: [],
         adapter: {
             type: "DashboardAdapter",
@@ -110,7 +114,7 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, setTracks, setShowT
                     [read_groupname]: unseenKey_dict
                 },
                 all_group_name : all_group_name,
-                uncertain_nodes: ['node1', 'node2', 'node3']
+                uncertain_nodes: uncertain_nodes
             }
         ]
     }

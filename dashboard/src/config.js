@@ -1,31 +1,30 @@
+import { useMemo } from "react";
 
+export default function useDashboardConfig(projectName) {
+  const isProd = import.meta.env.PROD; 
 
-const isProd = import.meta.env.PROD; // true in production build
+  let TAXONIUM_BASE = import.meta.env.VITE_TAXONIUM_BASE || "";
 
-let TAXONIUM_BASE = import.meta.env.VITE_TAXONIUM_BASE;
+  if (isProd && TAXONIUM_BASE.startsWith('/')) {
+    TAXONIUM_BASE = window.location.origin + TAXONIUM_BASE;
+  }
 
-if (isProd && TAXONIUM_BASE.startsWith('/')) {
-  TAXONIUM_BASE = window.location.origin + TAXONIUM_BASE;
+  var project_name = projectName['project_name']
+
+  return useMemo(() => {
+    return {
+      TAXONIUM_BASE,
+      REF_NAME: projectName['reference_name'],
+      PROJECT_NAME: project_name,
+      REF_FA: `${TAXONIUM_BASE}uploads/${project_name}/${projectName['reference_name']}.fa`,
+      REF_FAI: `${TAXONIUM_BASE}uploads/${project_name}/${projectName['reference_name']}.fa.fai`,
+      BAM: `${TAXONIUM_BASE}uploads/${project_name}/`,
+      PROJECTS: `${TAXONIUM_BASE}api/projects`,
+      RESULT: `${TAXONIUM_BASE}api/result/`,
+      UPLOAD: `${TAXONIUM_BASE}api/upload`,
+      START: projectName['start'],
+      END: projectName['end'],
+      LOAD_TAX: `${TAXONIUM_BASE}load/`
+    };
+  }, [TAXONIUM_BASE, projectName]);
 }
-
-console.log("TAXONIUM_BASE", TAXONIUM_BASE)
-const REF_FA = `${TAXONIUM_BASE}uploads/NC_045512v2.fa`
-const REF_FAI = `${TAXONIUM_BASE}uploads/NC_045512v2.fa.fai`
-
-const BAM = `${TAXONIUM_BASE}uploads/`
-
-const PROJECTS = `${TAXONIUM_BASE}api/projects`
-
-const RESULT = `${TAXONIUM_BASE}api/result/`
-
-const UPLOAD = `${TAXONIUM_BASE}api/upload`
-
-export default {
-  TAXONIUM_BASE,
-  REF_FA,
-  REF_FAI,
-  BAM,
-  PROJECTS,
-  RESULT,
-  UPLOAD
-};
