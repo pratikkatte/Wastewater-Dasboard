@@ -15,7 +15,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
 
   const [uploadProgress, setuploadProgress] = useState(0);
 
@@ -99,31 +99,34 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
               alert(error.response.statusText);
             }
           } else {
-            alert('Network error or CORS error');
+            alert('Could not upload file. Network error or CORS error');
           }
       }
     };
 
     const handleResultsClick = async (idx) => {
-      const tax_loaded = true;
+      let tax_loaded = false;
 
-  
-        
-        setLoading(true);
+        setLoading(idx);
         console.log("load url", `${config.LOAD_TAX}${results[idx]}`);
         
         try {
           const response =  await axios.get(`${config.LOAD_TAX}${results[idx]}`);
           if (response.status === 200) {
             console.log("load tax", response);
-            setLoading(false);  
+            tax_loaded = true
+            setLoading(null);  
           } else {
             console.log("error", response);
+            alert('Could not load the taxonium file.');
             setLoading(false);
+            const tax_loaded = false;
           }
         } catch (error) {
           console.log("axios error", error);
-          setLoading(false);
+          setLoading(null);
+          const tax_loaded = false;
+          alert('Could not load the taxonium file.');
         }
 
         if(tax_loaded){
@@ -221,22 +224,51 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             </div>
             <div className="flex flex-row space-x-4 mt-6">
             {results.map((result, index) => (
-              <button
-                key={index}
-                style={{
-                  background: '#f20f0f0',
-                  padding: '20px',
-                  borderRadius: '5px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  minWidth: '120px',   // makes buttons a decent width
-                  border: '1px solid gray',
-                  textAlign: 'center'
-                }}
-                onClick={() => handleResultsClick(index)}
-                >
-                {result}
-              </button>
-            ))}
+  <div key={index} style={{
+    display: 'flex',flexDirection: 'column',}}>
+    <button
+      style={{
+        background: '#f2f0f0', // fixed typo
+        padding: '10px',
+        display: 'flex',
+        // flexDirection: 'column',
+        borderRadius: '5px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        minWidth: '120px',
+        border: '1px solid gray',
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px'
+      }}
+      onClick={() => handleResultsClick(index)}
+    >
+      {result}
+      {loading === index && (
+        <span
+          className="spinner"
+          style={{
+            width: '15px',
+            display: 'flex',
+            height: '15px',
+            border: '2px solid #ccc',
+            borderTop: '3px solid #333',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginLeft: '10px',
+          }}
+        />
+      )}
+    </button>
+    {loading === index && (
+      <span style={{ marginTop: '4px',display: 'flex',
+        flexDirection: 'column', color: '#888', textAlign: 'center' }}>
+        Loading taxonium
+      </span>
+    )}
+  </div>
+))} 
             </div>
             </div>
           )}

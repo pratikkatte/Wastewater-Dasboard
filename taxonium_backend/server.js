@@ -24,6 +24,9 @@ const { program } = require("commander");
 
 const PRODUCTION = true
 
+let global_taxonium_file_path = ''; // Stores full resolved path of the loaded file
+
+
 const def_reference_config = {
   "NC_038235.1":{
     "taxonium_file_path": "/data/taxonium/RSVA_Study.jsonl",
@@ -715,7 +718,6 @@ const loadTaxonium = async (data_file) => {
     });
   }
 
-  let global_taxonium_file_path = ''; // Stores full resolved path of the loaded file
   
   app.get("/load/:project", async (req, res) => {
 
@@ -728,7 +730,7 @@ const loadTaxonium = async (data_file) => {
     res.send({'result':'taxonium loaded'})  
   }
   else {
-    global_taxonium_file_path = taxonium_file_path
+    global_taxonium_file_path = fullFilePath
 
   console.log("taxonium_file_path", fullFilePath)
 
