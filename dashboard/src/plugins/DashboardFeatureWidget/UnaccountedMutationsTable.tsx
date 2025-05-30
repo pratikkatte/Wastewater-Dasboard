@@ -40,7 +40,13 @@ export default function UnaccountedMutations(props) {
                 {(value as string[])[0]}
               </td>
               <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>
-                {(value as string[])[1]}
+                  {Number((value as string[])[1]).toFixed(3)}
+              </td>
+              <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>
+                    {Number((value as string[])[2]).toFixed(3)}
+              </td>
+              <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>
+              {(value as string[])[3] || ''}
               </td>
             </tr>
           )
@@ -49,7 +55,7 @@ export default function UnaccountedMutations(props) {
       </table>
     ) : (
     <div>
-        No unaccounted alleles available
+        No unaccounted alleles 
     </div>
     )
   }
