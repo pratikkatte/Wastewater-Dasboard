@@ -194,7 +194,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
       <div style={{maxWidth: '90%', margin: '0 auto'  }}>
 
         <div style={{ background: '#f0f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'}}>
-            <p style={{ textAlign: 'center', margin: '20px 0', fontSize: '16px', color: '#333', maxWidth:'90%',margin: '10px auto' }}>
+            <p style={{ textAlign: 'center', fontSize: '16px', color: '#333', maxWidth:'90%',margin: '10px auto' }}>
                 This dashboard provides insights into the genomic data by using BAM files of the sequenced waste water samples, 
                 allowing for the monitoring and analysis of viral strains present in the community.
             </p>
@@ -237,7 +237,6 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         minWidth: '120px',
         border: '1px solid gray',
         textAlign: 'center',
-        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '8px'
