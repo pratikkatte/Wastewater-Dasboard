@@ -17,7 +17,6 @@ export function getDefaultSearch(config, key) {
     hl_value: '',
     hs_value: '',
     uncertain_nodes: []
-    // uncertain_nodes: ['34740.HMEL012959-PA', 'node2', 'node3']
   };
 }
 

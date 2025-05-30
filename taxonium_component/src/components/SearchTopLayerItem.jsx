@@ -18,7 +18,6 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
   const [isOpen, setIsOpen] = useState(false);
   const [issearched, setIssearched] = useState(false);
 
-
   const num_results =
     this_result && this_result.result
       ? this_result.result.total_count
@@ -127,12 +126,13 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                 >
                   <FaSearch />
                 </Button>
-
-                <DisplayHaplotype 
-                showUncertainNodes={showUncertainNodes} 
-                search={search}
-                singleSearchSpec={singleSearchSpec}
+                {singleSearchSpec.uncertain_nodes && singleSearchSpec.uncertain_nodes.length > 0 && (
+                  <DisplayHaplotype 
+                  showUncertainNodes={showUncertainNodes} 
+                  search={search}
+                  singleSearchSpec={singleSearchSpec}
                 />
+                )}
                 
                 {singleSearchSpec?.hs_value && (
                   <div className="text-sm">
@@ -203,7 +203,7 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                 <p style={{ fontSize: '13px', color: '#777' }}>No uncertain nodes.</p>
               ) : (
                 singleSearchSpec.uncertain_nodes.map((node, index) => (
-                  <p key={index} style={{ margin: '2px 0', fontSize: '13px', color: '#555' }}>
+                  <p key={index} style={{ margin: '5px 0', fontSize: '13px', color: '#555' }}>
                     {node}
                   </p>
                 ))

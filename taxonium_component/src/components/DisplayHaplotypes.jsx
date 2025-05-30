@@ -1,6 +1,8 @@
 import React, { useCallback, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FaCircle, FaRegCircle } from "react-icons/fa";
+import { Button } from "../components/Basic";
+
 
 const DisplayHaplotypes = ({showUncertainNodes, search, singleSearchSpec}) => {
 
@@ -27,7 +29,19 @@ const DisplayHaplotypes = ({showUncertainNodes, search, singleSearchSpec}) => {
 
     return (
         <button onClick={toggleDisplay} style={{padding: '0 0px 0px 10px'}} aria-label="Toggle Display Mode">
-          {displayNodes ? <FaCircle /> : <FaRegCircle />}
+          {displayNodes ? <Button
+                  className="inline-block bg-gray-100 text-xs mx-auto h-5 rounded border-gray-300 border  text-gray-700 "
+                  title="hide uncertain nodes"
+                  >
+                    <FaCircle />
+                  </Button> : 
+                  <Button
+                  className="inline-block bg-gray-100 text-xs mx-auto h-5 rounded border-gray-300 border  text-gray-700 "
+                  title="show uncertain nodes"
+                  >
+                  <FaRegCircle />
+                  </Button>
+                  }
         </button>
       );
 }
