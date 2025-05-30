@@ -24,7 +24,10 @@ const { program } = require("commander");
 
 const PRODUCTION = true
 
-let global_taxonium_file_path = ''; // Stores full resolved path of the loaded file
+let globalTaxoniumMeta = {
+  path: null,
+  size: null
+};
 
 
 const def_reference_config = {
@@ -720,24 +723,39 @@ const loadTaxonium = async (data_file) => {
 
   
   app.get("/load/:project", async (req, res) => {
+  try {
+
 
   const { project } = req.params;
   
   const taxonium_file_path = projects_info[project]['taxonium_file_path']
   const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
 
-  if(global_taxonium_file_path === fullFilePath){
+  const stat = fs.statSync(fullFilePath);
+
+  const sameFile = (
+    globalTaxoniumMeta.path === taxonium_file_path &&
+    globalTaxoniumMeta.size === stat.size
+  );
+
+  if(sameFile){
     res.send({'result':'taxonium loaded'})  
-  }
-  else {
-    global_taxonium_file_path = fullFilePath
-
-  console.log("taxonium_file_path", fullFilePath)
-
+  } else {
+    globalTaxoniumMeta = {
+      path: taxonium_file_path,
+      size: stat.size
+    };
+  
+    console.log("Loading taxonium file:", fullFilePath);
     await loadTaxonium(fullFilePath);
-    res.send({'result':'taxonium loaded'})
-
+    res.send({'result':'taxonium loaded'})  
+    
   }
+  
+}catch (err) {
+  console.error("File load error:", err);
+  res.status(500).send({ error: 'Could not load taxonium file' });
+}
 
 })
 // match /nextstrain_json/12345
@@ -876,6 +894,18 @@ async function selectNodes(uploadedFilenames, project_name) {
 
 const loadData = async () => {
   await waitForTheImports();
+
+  // global_taxonium_file_path = command_options.data_file
+  const basename = path.basename(command_options.data_file);
+
+  const stats = fs.statSync(command_options.data_file)
+
+  globalTaxoniumMeta = {
+    path: basename,
+    size: stats.size
+  }; 
+
+  loadTaxonium(command_options.data_file);
   // let supplied_object;
   // if (command_options.data_file) {
   //   local_file = command_options.data_file;
