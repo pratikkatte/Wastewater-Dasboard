@@ -1,0 +1,2 @@
+import{o as n,R as o,u as r,a as l}from"./index-De5zAfF9.js";import{B as u}from"./BaseDisplayComponent-BjebKbJO.js";const d=n(function({model:t}){const s=r.getContainingView(t),e=Math.round(s.dynamicBlocks.totalWidthPx),a=t.height,c=l.useCallback(i=>{t.setRef(i)},[t,e,a]);return o.createElement("canvas",{"data-testid":"cloud-canvas",ref:c,style:{width:e,height:a,position:"absolute"},width:e*2,height:a*2})}),m=n(function({model:t}){return o.createElement(u,{model:t},o.createElement(d,{model:t}))});export{m as default};
+//# sourceMappingURL=ReactComponent-BX0Op_uJ.js.map
