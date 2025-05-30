@@ -1,0 +1,2 @@
+import{Z as s,u as c,R as t,$ as i}from"./rpcWorker-CcMd7PHn.js";async function g(e,a,n){await s(()=>!!e.stats&&!!e.regionCannotBeRenderedText);const{needsScalebar:r,stats:o}=e,{offsetPx:l}=c.getContainingView(e);return t.createElement(t.Fragment,null,t.createElement("g",null,await n(a)),r&&o?t.createElement("g",{transform:`translate(${Math.max(-l,0)})`},t.createElement(i,{model:e,orientation:"left"})):null)}export{g as renderSvg};
+//# sourceMappingURL=renderSvg-BXQaAU_X.js.map

@@ -1,2 +1,0 @@
-import{f,h as p}from"./index-DRB9nkgq.js";function s(t,a){for(var o=0;o<a.length;o++){const r=a[o];if(typeof r!="string"&&!Array.isArray(r)){for(const e in r)if(e!=="default"&&!(e in t)){const n=Object.getOwnPropertyDescriptor(r,e);n&&Object.defineProperty(t,e,n.get?n:{enumerable:!0,get:()=>r[e]})}}}return Object.freeze(Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}))}var i=f();const u=p(i),m=s({__proto__:null,default:u},[i]);export{m as R};
-//# sourceMappingURL=ReturnToImportFormDialog-tg2TX497.js.map

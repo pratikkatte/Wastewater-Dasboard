@@ -29,17 +29,12 @@ const formatNumberIfNumber = (possNum) => {
 };
 const fixName = (name) => {
   return name;
-  //return typeof name == "string"
-  //  ? name.replace("hCoV-19/", "hCoV-19/\n")
-  //  : name;
 };
 
 const fixAuthors = (authors) => {
   // make sure comma is always followed by space
   return authors.replace(/,([^\s])/g, ", $1");
 };
-
-
 
 function HaplotypesDropdown({ haplotypes, onSelect }) {
   const [open, setOpen] = useState(false);
@@ -597,7 +592,7 @@ function SearchPanel({
           </Button>
         </div>)
         : (
-          <div className={`p-4 bg-white rounded-xl shadow overflow-y-auto ${selectedDetails.nodeDetails ? 'max-h-64' : 'max-h-72'}`}>
+          <div className={`p-4 bg-white rounded-xl shadow overflow-y-auto ${selectedDetails.nodeDetails ? 'max-h-72' : 'max-h-72'}`}>
           {Object.entries(unaccountedMutations).map(([unaccountedKey, info]) => (
             <div key={unaccountedKey} className="mb-4 border-b pb-2">
               {/* <div className="font-bold text-gray-800 mb-2">{unaccountedKey}</div> */}
