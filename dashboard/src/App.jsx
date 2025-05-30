@@ -25,7 +25,6 @@ const default_query = {};
 
 default_query.backend = null;
 
-
 const createDefaultSearch = (mark_nodes, hap_lin, unc_nodes) => {
   
   return Object.keys(mark_nodes).map(node => {
@@ -78,6 +77,7 @@ const defaultConfig = {"project_name":"uploads",
     // Do something with config or projectConfig if needed
     // (But DO NOT call useDashboardConfig here)
     console.log("Config updated:", config);
+    trackIDsRef.current = []
   }, [config]);
 
   const toggleJBrowse = useCallback((input_jbrowse) => {
@@ -91,7 +91,6 @@ const defaultConfig = {"project_name":"uploads",
   }, [JBrowseOpen]);
 
   useEffect(() => {
-    console.log("in createviewstate")
     const state = createViewState({
       assembly: makeAssembly(config),
       tracks: [],
@@ -115,16 +114,32 @@ const defaultConfig = {"project_name":"uploads",
 
     })
     setViewState(state)
+    trackIDsRef.current = []
   }, [config, projectName]);
 
   useEffect(() => {
+    const annotationTrackId = "nextstrain-annotations"
+    if (!trackIDsRef.current.includes(annotationTrackId) && viewState) {
+      const geneTracks = makeTracks(config)
+      const annotationTrack = geneTracks.find(t => t.trackId === annotationTrackId)
+      
+      if (annotationTrack) {
+
+        viewState.session.addTrackConf(annotationTrack)
+        viewState.session.view.showTrack(annotationTrackId)
+        trackIDsRef.current.push(annotationTrackId)
+      }
+    }
+  }, [viewState])
+  
+
+  useEffect(() => {
+    
     if (createTrack && viewState && config && selectedFile) {
       addTrack(clickedNodeRef, selectedFile, trackIDsRef, viewState, config);
       setCreateTrack(false);
     }
   }, [createTrack, viewState, config, selectedFile]);
-  
-
 
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){

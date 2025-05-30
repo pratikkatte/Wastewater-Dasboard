@@ -1,7 +1,7 @@
 
 export default function makeSession(config, tracks) {
   console.log("default session", config, tracks)
-
+  
   return {
     id:"session-id",
     name:"this session",
