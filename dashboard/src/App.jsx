@@ -142,10 +142,10 @@ const defaultConfig = {"project_name":"uploads",
   }, [createTrack, viewState, config, selectedFile]);
 
     const onClickNode = useCallback((selectedNode) => {
-    if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name)){
+    if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name) && !createTrack){
             // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
-            selectedNode.clearNodeDetails()
+            // selectedNode.clearNodeDetails()
             // addTrack();
             setCreateTrack(true);
             // setJBrowseOpen(true);
@@ -153,7 +153,7 @@ const defaultConfig = {"project_name":"uploads",
 
           }
 
-    }, [JBrowseOpen]);
+    }, [mark_nodeRef]);
 
 
     useEffect(() => {
