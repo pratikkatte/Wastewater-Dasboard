@@ -31,9 +31,17 @@ usher_to_taxonium -i input.pb -o output.jsonl --name_internal_nodes -j config_pu
 docker build -t wepp-dashboard .
 
 # Runs the dashboard as a web server (e.g., http://localhost:80), mounting your `.jsonl` tree file and setting Node.js memory for large trees. If port 80 is unavailable, forward to another port (e.g., `-p 8080:80`).
-docker run -v output.jsonl -e NODE_MEMORY_LIMIT=6144 -e  /data/taxonium.jsonl -p 80:80 wepp-dashboard
+# Run the dashboard container
+docker run \
+  -v /absolute/path/to/your/folder/containing/taxonium:/data \
+  -e DATA_FILE=/data/your_file.jsonl \
+  -e NODE_MEMORY_LIMIT=6144 \
+  -p 80:80 \
+  wepp-dashboard
 ```
-⚠️ Make sure to replace output.jsonl with the actual path to your processed .jsonl file.
+⚠️ Replace the folder path with where your .jsonl or .jsonl.gz file is, and set DATA_FILE to its name (e.g., /data/myfile.jsonl).
+Dashboard runs at http://localhost.
+
 
 ## Run Locally (Without Docker)
 
