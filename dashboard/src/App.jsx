@@ -134,9 +134,11 @@ const defaultConfig = {"project_name":"uploads",
   
 
   useEffect(() => {
-    
-    if (createTrack && viewState && config && selectedFile) {
-      addTrack(clickedNodeRef, selectedFile, trackIDsRef, viewState, config);
+    if (createTrack && clickedNodeRef.current) {
+      if (viewState && config && selectedFile) {
+        addTrack(clickedNodeRef, selectedFile, trackIDsRef, viewState, config);
+        // clickedNodeRef.current.clearNodeDetails();
+      }
       setCreateTrack(false);
     }
   }, [createTrack, viewState, config, selectedFile]);

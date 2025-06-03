@@ -46,7 +46,7 @@ function HaplotypesDropdown({ haplotypes, onSelect }) {
         onClick={() => setOpen(o => !o)}
         type="button"
       >
-        Haplotypes
+        Possible Haplotypes
         <span className="ml-2">{open ? "▲" : "▼"}</span>
       </button>
       {open && (
@@ -171,7 +171,7 @@ function SearchPanel({
 
   const [listOutputModalOpen, setListOutputModalOpen] = useState(false);
 
-  const [sortOrder, setSortOrder] = useState('asc')
+  const [sortOrder, setSortOrder] = useState('desc')
 
   const handleHaplotypeClick = (haplotypeKey) => {
     setActiveTab("haplotypes");

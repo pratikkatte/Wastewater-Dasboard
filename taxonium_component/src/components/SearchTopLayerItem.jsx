@@ -194,7 +194,7 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
           }} 
             onClick={() => setIsOpen(!isOpen)}
           >
-            <strong style={{ fontSize: '14px', color: '#333' }}>Uncertain Nodes</strong>
+            <strong style={{ fontSize: '14px', color: '#333' }}>Uncertain Haplotypes</strong>
             {isOpen ? <FaArrowUp size={14} /> : <FaArrowDown size={14} />}
           </div>
           {isOpen && (
