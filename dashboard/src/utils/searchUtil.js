@@ -1,9 +1,6 @@
 export function getDefaultSearch(config, text, hs_value, hl_value, unc_nodes ) {
     const key = Math.random().toString(36).substring(2, 15);
-    // if (!key) {
-    //   key = Math.random().toString(36).substring(2, 15);
-    //   console.log("generated key", key);
-    // }
+
     if (config && config.defaultSearch) {
       return config.defaultSearch;
     }

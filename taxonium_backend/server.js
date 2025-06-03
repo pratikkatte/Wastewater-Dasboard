@@ -27,24 +27,7 @@ let globalTaxoniumMeta = {
   size: null
 };
 
-const def_reference_config = {
-  "NC_038235.1":{
-    "taxonium_file_path": "/data/taxonium/RSVA_Study.jsonl",
-    "start": 0,
-    "end":15191
-  },
-  "NC_045512v2":{
-    "taxonium_file_path": "/data/taxonium/SARSv2.jsonl",
-    "start": 0,
-    "end":29903
-  },
-  "NC_045512.2": {
-    "taxonium_file_path": "/data/taxonium/SARS.2.jsonl",
-    "start": 0,
-    "end":29903
-  }
 
-}
 program
   .option("--ssl", "use ssl")
   .option("--port <port>", "port", 8000)
@@ -93,7 +76,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const ALLOWED_EXTENSIONS = new Set(['bam', 'bai']);
+const ALLOWED_EXTENSIONS = new Set(['bam', 'bai', 'fa', 'fna', 'fasta', 'fai']);
 
 
 const upload = multer({
@@ -104,7 +87,7 @@ const upload = multer({
     if (ALLOWED_EXTENSIONS.has(extension)) {
       cb(null, true);
     } else {
-      cb(new Error(`Invalid file type: .${extension}. Only .bam and .bai allowed.`));
+      cb(new Error(`Invalid file type: .${extension}.`));
     }
   }
 });
@@ -115,20 +98,20 @@ const in_cache = new Set();
 
 const cache_helper = {
   retrieve_from_cache: (key) => {
-    console.log("retrieving ", key);
+    // console.log("retrieving ", key);
     if (!in_cache.has(key)) {
-      console.log("not found");
+      // console.log("not found");
       return undefined;
     } else {
       // get from tmpDir, parsing the JSON
-      console.log("found");
+      // console.log("found");
       const retrieved = JSON.parse(fs.readFileSync(path.join(tmpDir, key)));
 
       return retrieved;
     }
   },
   store_in_cache: (key, value) => {
-    console.log("caching ", key);
+    // console.log("caching ", key);
     // store in tmpDir, serializing the JSON
     fs.writeFileSync(path.join(tmpDir, key), JSON.stringify(value));
     in_cache.add(key);
@@ -221,42 +204,105 @@ app.get('/uploads/:projectname/:filename', (req, res) => {
 });
 
 
-app.post('/api/upload', (req, res, next) => {
-  upload.array('files', 50)(req, res, async function (err) {
-    if (err instanceof multer.MulterError) {
-      // Multer-specific error (e.g. file too large, wrong format)
-      return res.status(400).json({ error: `Upload error: ${err.message}` });
-    } else if (err) {
-      // Other unknown errors during upload
-      return next(err);
+function getReferenceFromFai(faiPath) {
+  try {
+    const content = fs.readFileSync(faiPath, 'utf8');
+    const firstLine = content.split('\n')[0].trim();
+
+    if (!firstLine) {
+      throw new Error('FAI file is empty or malformed');
     }
+
+    const [reference_name, lengthStr] = firstLine.split('\t');
+    const length = parseInt(lengthStr, 10);
+
+    if (!reference_name || isNaN(length)) {
+      throw new Error('Invalid FAI format: could not extract reference and length');
+    }
+
+    return { reference_name, length };
+  } catch (err) {
+    console.error("Error reading .fai file:", err);
+    return null;
+  }
+}
+
+
+app.post('/api/upload', upload.array('files', 50), async (req, res) => {
+
 
     try {
       if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: 'No files uploaded' });
+        return res.status(400).json({ error: 'No files uploaded' });
       }
 
       projectName = 'uploads';
-      const reference_name = req.body.reference_file;
-      const remaining_config = def_reference_config[reference_name];
 
-      if (!remaining_config) {
-        return res.status(400).json({ error: 'Invalid reference file name' });
+      const fastaFiles = req.files.filter(file => {
+        const name = file.filename.toLowerCase();
+        return /\.(fa|fna|fasta)$/i.test(name);
+      }).map(file => file.filename);
+      
+      const indexFiles = req.files.filter(file => {
+        const name = file.filename.toLowerCase();
+        return /\.(fa|fna|fasta)\.fai$/i.test(name);
+      }).map(file => file.filename);
+
+
+      // Check for presence
+      if (fastaFiles.length !== 1 || indexFiles.length !== 1) {
+        return res.status(400).json({
+          error: 'A single reference FASTA file and its index file (.fai) must be provided.'
+        });
       }
 
-      const uploadedFiles = req.files
-        .filter(file => file.filename.endsWith('.bam'))
-        .map(file => file.filename);
+      const faiInfo = getReferenceFromFai(`${uploadDir}/${projectName}/${indexFiles[0]}`);
+      if (!faiInfo) {
+        return res.status(400).json({ error: 'Failed to parse .fai file' });
+      }
+
+
+      const bamFiles = req.files
+      .filter(file => file.filename.toLowerCase().endsWith('.bam'))
+      .map(file => file.filename);
+    
+    const baiFiles = req.files
+      .filter(file => file.filename.toLowerCase().endsWith('.bai'))
+      .map(file => file.filename);
+    
+    // Step 1: Must have exactly 2 BAMs
+    if (bamFiles.length !== 2) {
+      return res.status(400).json({
+        error: `Exactly 2 BAM files must be provided. Received ${bamFiles.length}.`
+      });
+    }
+    
+    // Step 2: Must have a corresponding .bai file for each .bam
+    const missingIndexes = bamFiles.filter(bam => {
+      const expectedBai = bam + '.bai';
+      return !baiFiles.includes(expectedBai);
+    });
+    
+    if (missingIndexes.length > 0) {
+      return res.status(400).json({
+        error: `Missing .bai index file(s) for: ${missingIndexes.join(', ')}`
+      });
+    }
 
       const project_config = {
         project_name: projectName,
-        reference_name,
-        ...remaining_config
+        taxonium_file_path: globalTaxoniumMeta.path,
+        "reference_name": faiInfo.reference_name,
+        "start": 0,
+        "end": faiInfo.length,
+        "ref_file": fastaFiles[0]
       };
 
       console.log("project_config", project_config);
+      console.log("bamFiles", bamFiles)
+      const selectedNodes = await selectNodes(bamFiles, projectName);
 
-      const selectedNodes = await selectNodes(uploadedFiles, projectName);
+      await loadTaxonium(command_options.data_file)
 
       res.json({
         response: selectedNodes,
@@ -265,10 +311,10 @@ app.post('/api/upload', (req, res, next) => {
       });
     } catch (e) {
       console.error("Upload processing error:", e);
-      next(e); // Pass error to global error handler
+      res.status(500).json({ error: 'Internal server error', status: 'error' });
+      // next(e); // Pass error to global error handler
     }
   });
-});
 
 
 const getFilesRecursively = (directory, result = {}) => {
@@ -315,7 +361,7 @@ app.post('/api/result/:folder', async function(req, res) {
     
     const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
     
-    console.log("folder", folder)
+    console.log("folder", folder, files)
     
     var specific_project = projects_info[folder]
     console.log("project info", projects_info[folder])
@@ -339,7 +385,7 @@ app.get("/", function (req, res) {
 
 app.get("/search", function (req, res) {
   const start_time = Date.now();
-  console.log("/search");
+  // console.log("/search");
   const json = req.query.json;
   const spec = JSON.parse(JSON.parse(json));
   console.log(spec);
@@ -369,14 +415,14 @@ app.get("/search", function (req, res) {
 
   const result = filtering.singleSearch(forSingleSearch);
   validateSIDandSend(result, req.query.sid, res);
-  console.log(
-    "Found " +
-      result.data.length +
-      " results in " +
-      (Date.now() - start_time) +
-      "ms"
-  );
-  console.log("Result type was " + result.type);
+  // console.log(
+  //   "Found " +
+  //     result.data.length +
+  //     " results in " +
+  //     (Date.now() - start_time) +
+  //     "ms"
+  // );
+  // console.log("Result type was " + result.type);
 });
 
 let path_for_config = command_options.config_json;
@@ -419,6 +465,7 @@ if (path_for_config && fs.existsSync(path_for_config)) {
 }
 
 app.get("/config", function (req, res) {
+  
   config.num_nodes = processedData.nodes.length;
   config.initial_x =
     (processedData.overallMinX + processedData.overallMaxX) / 2;
@@ -697,6 +744,7 @@ const cleanupTaxoniumMemory = () => {
 
 const loadTaxonium = async (data_file) => {
 
+  
   cleanupTaxoniumMemory();
   
   const stream = fs.createReadStream(data_file);
@@ -746,7 +794,7 @@ const loadTaxonium = async (data_file) => {
     });
   }
 
-  
+
   app.get("/load/:project", async (req, res) => {
   try {
 
@@ -923,14 +971,14 @@ const loadData = async () => {
   }; 
 
   await loadTaxonium(command_options.data_file);
-  
+
   // set a timeout to start listening
   setTimeout(() => {
     console.log("Starting to listen");
     startListening();
-    logStatusMessage({
-      status: "loaded",
-    });
+    // logStatusMessage({
+    //   status: "loaded",
+    // });
   }, 10);
 };
 

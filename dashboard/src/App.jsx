@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import TaxoniumBit from "./components/TaxoniumBit";
 import { getDefaultSearch } from "./utils/searchUtil.js";
 
@@ -47,10 +47,8 @@ function App() {
   const [createTrack, setCreateTrack] = useState(null)
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
-  // const [selectedFile, setSelectedFile] = useState(true)
   const [paneSize, setPaneSize] = useState('98%');
 
-  // const [query, updateQuery] = useState(default_query);
   
   const [patches, setPatches] = useState();
   
@@ -61,7 +59,6 @@ function App() {
   
   const query = backupQuery; // query
   const updateQuery = backupUpdateQuery;
-
 
 const defaultConfig = {"project_name":"uploads",
                       "reference_name":"NC_045512v2",
@@ -84,8 +81,7 @@ const defaultConfig = {"project_name":"uploads",
     setJBrowseOpen(() => {
       // const newState = !prev;
       const newState = input_jbrowse
-      // setLeftPaneSize(newState ? '70%' : '90%'); // expand left when hidden
-      setPaneSize(newState ? '60%' : '98%');
+      setPaneSize(newState ? '50%' : '98%');
       return newState;
     });
   }, [JBrowseOpen]);
@@ -137,7 +133,6 @@ const defaultConfig = {"project_name":"uploads",
     if (createTrack && clickedNodeRef.current) {
       if (viewState && config && selectedFile) {
         addTrack(clickedNodeRef, selectedFile, trackIDsRef, viewState, config);
-        // clickedNodeRef.current.clearNodeDetails();
       }
       setCreateTrack(false);
     }
@@ -145,18 +140,12 @@ const defaultConfig = {"project_name":"uploads",
 
     const onClickNode = useCallback((selectedNode) => {
     if ( selectedNode && mark_nodeRef.current.includes(selectedNode.nodeDetails.name) && !createTrack){
-            // addTrack(showTrack.trackID, showTrack.bam_location, showTrack.bami_location)
             clickedNodeRef.current = selectedNode
-            // selectedNode.clearNodeDetails()
-            // addTrack();
             setCreateTrack(true);
-            // setJBrowseOpen(true);
             toggleJBrowse(true)
-
           }
 
     }, [mark_nodeRef]);
-
 
     useEffect(() => {
       const handlePopState = () => {
@@ -234,7 +223,6 @@ const defaultConfig = {"project_name":"uploads",
             {JBrowseOpen ? <MdArrowForward/> : <MdArrowBack/>}
           </button>
           {JBrowseOpen && (
-       
             <JBrowseLinearGenomeView viewState={viewState}/>
           )}
           </div>

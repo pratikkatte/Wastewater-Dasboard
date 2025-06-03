@@ -2,15 +2,10 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 
-const referenceOptions = [
-  "NC_038235.1",
-  "NC_045512v2",
-  "NC_045512.2"
-];
+
 
 const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery, config, setProjectName}) => {
   
-  const [selectedReference, setSelectedReference] = useState("NC_045512v2");
 
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -34,9 +29,8 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
       console.error("Error fetching results", error);
     });
     }
-  }, [results])
+  }, [])
 
-  let uploadInput = React.createRef();
     const handleFileChange = (event) => {
       setUploadedFile(Array.from(event.target.files))
       };
@@ -52,8 +46,6 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         const data = new FormData()
 
         uploadedFile.forEach(file => data.append('files', file)); // key must match 'files'
-        data.append('reference_file', selectedReference); 
-
 
        try {
           const p_config = {
@@ -77,12 +69,10 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             
             setUploading(false)
             const selected_nodes = response.data.response
-          
             var project_config = response.data.config
-
             setProjectName(project_config)
-
             handleFileProcessing(selected_nodes)
+
           }
           if (response.status == 400 ){
             console.log(response)
@@ -93,10 +83,10 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
           console.log("error", error);
         
           if (error.response) {
-            if (error.response.status == 400) {
-              alert(error.response.data.status);
+            if (error.response.status === 400) {
+              alert(error.response.data.error);
             } else {
-              alert(error.response.statusText);
+              alert(error.response.status);
             }
           } else {
             alert('Could not upload file. Network error or CORS error');
@@ -158,8 +148,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
     
       const handleFileProcessing = (filenames_nodes) => {
 
-        const keysToExclude = ['HP_SEQ']; // replace 'key1', 'key2' with actual keys
-        // Filter out the keys to exclude
+        const keysToExclude = ['HP_SEQ']; 
         const nodes = Object.keys(filenames_nodes).filter(key => !keysToExclude.includes(key));
         
         mark_nodeRef.current = nodes;
@@ -200,9 +189,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             </p>
 
             <div className='flex' style={{ justifyContent: "center", alignItems: "center", margin: '30px auto'}}>
-                <input type="file" ref={(ref) => {
-                  uploadInput = ref;
-                }} 
+                <input type="file" 
                 onChange={handleFileChange} style={{ padding: '10px', margin: '5px', border: '1px solid #ccc', borderRadius: '5px' }} multiple />
                 <button 
                   disabled={uploading}
