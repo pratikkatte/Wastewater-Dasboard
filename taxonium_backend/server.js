@@ -22,13 +22,10 @@ var exporting;
 
 const { program } = require("commander");
 
-const PRODUCTION = true
-
 let globalTaxoniumMeta = {
   path: null,
   size: null
 };
-
 
 const def_reference_config = {
   "NC_038235.1":{
@@ -65,9 +62,6 @@ const command_options = program.opts();
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "taxonium"));
 
 let projectName='';
-
-
-
 
 // Ensure upload directory exists
 var uploadDir = '';
@@ -146,7 +140,7 @@ if (
   command_options.data_url === undefined &&
   command_options.data_file === undefined
 ) {
-  console.log("--data_url or --data_file must be supplied");
+  console.log("--data_file must be supplied");
   process.exit(1);
 }
 
@@ -188,7 +182,12 @@ app.use(cors({}));
 
 app.use(compression());
 
-app.use(queue({ activeLimit: 500000, queuedLimit: 500000 }));
+app.use(queue({ activeLimit: 200, queuedLimit: 1000 }));
+
+app.use((err, req, res, next) => {
+  console.error("Global Error:", err.stack);
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+});
 
 const logStatusMessage = (status_obj) => {
   console.log("status", status_obj);
@@ -222,27 +221,53 @@ app.get('/uploads/:projectname/:filename', (req, res) => {
 });
 
 
-app.post('/api/upload', upload.array('files', 50), async (req, res) => {
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ message: 'No files uploaded' });
-  }
-  projectName = 'uploads'  
-  const reference_name = req.body.reference_file
-  const remaining_config = def_reference_config[reference_name]
-  const uploadedFiles = req.files
-  .filter(file => file.filename.endsWith('.bam'))  // keep only BAMs
-  .map(file => `${file.filename}`);                     // map to filenames
-  
-  const project_config = {'project_name':projectName,
-                          "reference_name": reference_name,
-                          ...remaining_config
-                        }
-console.log("project_config", project_config)
+app.post('/api/upload', (req, res, next) => {
+  upload.array('files', 50)(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      // Multer-specific error (e.g. file too large, wrong format)
+      return res.status(400).json({ error: `Upload error: ${err.message}` });
+    } else if (err) {
+      // Other unknown errors during upload
+      return next(err);
+    }
 
-  const selectedNodes = await selectNodes(uploadedFiles, projectName);
-  // res.json({ "response": selectedNodes,"status": "success"});
-  res.json({ "response": selectedNodes, "config": project_config,"status": "success"});
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: 'No files uploaded' });
+      }
 
+      projectName = 'uploads';
+      const reference_name = req.body.reference_file;
+      const remaining_config = def_reference_config[reference_name];
+
+      if (!remaining_config) {
+        return res.status(400).json({ error: 'Invalid reference file name' });
+      }
+
+      const uploadedFiles = req.files
+        .filter(file => file.filename.endsWith('.bam'))
+        .map(file => file.filename);
+
+      const project_config = {
+        project_name: projectName,
+        reference_name,
+        ...remaining_config
+      };
+
+      console.log("project_config", project_config);
+
+      const selectedNodes = await selectNodes(uploadedFiles, projectName);
+
+      res.json({
+        response: selectedNodes,
+        config: project_config,
+        status: "success"
+      });
+    } catch (e) {
+      console.error("Upload processing error:", e);
+      next(e); // Pass error to global error handler
+    }
+  });
 });
 
 
@@ -479,10 +504,10 @@ function startListening() {
       ),
     };
     https.createServer(options, app).listen(command_options.port, "0.0.0.0");
-    console.log("SSL on port " + command_options.port);
+    // console.log("SSL on port " + command_options.port);
   } else {
     app.listen(command_options.port, "0.0.0.0");
-    console.log("Non SSL on port " + command_options.port);
+    // console.log("Non SSL on port " + command_options.port);
   }
 }
 
@@ -752,7 +777,7 @@ const loadTaxonium = async (data_file) => {
     
   }
   
-}catch (err) {
+} catch (err) {
   console.error("File load error:", err);
   res.status(500).send({ error: 'Could not load taxonium file' });
 }
@@ -798,13 +823,11 @@ function randomChoice(array) {
 }
 
 async function selectNodes(uploadedFilenames, project_name) {
-  const fallbackNodes = []
 
   const fileDict = {};
   for (const filename of uploadedFilenames) {
     try {
       const file_path = path.join(uploadDir, `${project_name}/${filename}`);
-      console.log("file_path", file_path)
       const bamFile = new BamFile({
         bamPath: file_path,
         // optional: bamFile can use index file too if needed, but not needed for header parsing
@@ -835,7 +858,6 @@ async function selectNodes(uploadedFilenames, project_name) {
         parsed_comments[um_id] = value
       })
 
-
       if(is_hp_seq){
         continue
       }
@@ -863,8 +885,6 @@ async function selectNodes(uploadedFilenames, project_name) {
                     return { [u]: parsed_comments[u] };
                   });
                 } else if(d.tag === 'HS'){
-                  //haplotype_proportion = read_group['HS'].replace('Z:','')
-                  
                   haplotype_proportion = d.value.replace('Z:', '')
                 } else if (d.tag == 'HL'){
                   haplotype_lineage = d.value.replace('Z:', '')
@@ -878,9 +898,7 @@ async function selectNodes(uploadedFilenames, project_name) {
                 'groupname':group_name,
                 [group_name]: um,
                 "HS": haplotype_proportion, 
-                // 'HL': 'BA.2',
                 'HL':haplotype_lineage,
-                // 'UH': ['node1', 'node2', 'node3']
                 'UH': uncertain_haplotype,
               }
             });
@@ -895,7 +913,6 @@ async function selectNodes(uploadedFilenames, project_name) {
 const loadData = async () => {
   await waitForTheImports();
 
-  // global_taxonium_file_path = command_options.data_file
   const basename = path.basename(command_options.data_file);
 
   const stats = fs.statSync(command_options.data_file)
@@ -905,59 +922,9 @@ const loadData = async () => {
     size: stats.size
   }; 
 
-  loadTaxonium(command_options.data_file);
-  // let supplied_object;
-  // if (command_options.data_file) {
-  //   local_file = command_options.data_file;
-  //   //  create a stream from the file
-  //   const stream = fs.createReadStream(local_file);
-
-  //   supplied_object = {
-  //     stream: stream,
-  //     status: "stream_supplied",
-  //     filename: local_file,
-  //   };
-  // } else {
-  //   url = command_options.data_url;
-
-  //   supplied_object = { status: "url_supplied", filename: url };
-  // }
-
-  // processedData = await importing.processJsonl(
-  //   supplied_object,
-  //   logStatusMessage,
-  //   ReadableWebToNodeStream.ReadableWebToNodeStream
-  // );
-
-  // logStatusMessage({
-  //   status: "finalising",
-  // });
-
-  // if (config.no_file) {
-  //   importing.generateConfig(config, processedData);
-  // }
-
-  // processedData.genes = new Set(
-  //   processedData.mutations.map((mutation) => mutation.gene)
-  // );
-  // // as array
-  // processedData.genes = Array.from(processedData.genes);
-  // console.log("Loaded data");
-
-  // result = filtering.getNodes(
-  //   processedData.nodes,
-  //   processedData.y_positions,
-  //   processedData.overallMinY,
-  //   processedData.overallMaxY,
-  //   processedData.overallMinX,
-  //   processedData.overallMaxX,
-  //   "x_dist"
-  // );
-
-  // cached_starting_values = result;
-  // console.log("Saved cached starting vals");
+  await loadTaxonium(command_options.data_file);
+  
   // set a timeout to start listening
-
   setTimeout(() => {
     console.log("Starting to listen");
     startListening();
@@ -966,4 +933,5 @@ const loadData = async () => {
     });
   }, 10);
 };
+
 loadData();
