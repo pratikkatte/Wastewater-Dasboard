@@ -736,6 +736,8 @@ const cleanupTaxoniumMemory = () => {
   processedData = null;
   cached_starting_values = null;
 
+  in_cache.clear();
+
   if (global.gc) global.gc();
 
 };
@@ -795,8 +797,7 @@ const loadTaxonium = async (data_file) => {
 
   app.get("/load/:project", async (req, res) => {
   try {
-
-
+    
   const { project } = req.params;
   
   const taxonium_file_path = projects_info[project]['taxonium_file_path']

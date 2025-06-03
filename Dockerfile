@@ -49,4 +49,4 @@ EXPOSE 80
 
 # Start both backend and NGINX
 # CMD node server.js --port 8080 --data_file $DATA_FILE & nginx -g "daemon off;"
-CMD ["sh", "-c", "node server.js --max-old-space-size=$NODE_MEMORY_LIMIT --port 8080 --data_file $DATA_FILE & nginx -g 'daemon off;'"]
+CMD ["sh", "-c", "node --max-old-space-size=$NODE_MEMORY_LIMIT server.js --port 8080 --data_file $DATA_FILE & nginx -g 'daemon off;'"]
