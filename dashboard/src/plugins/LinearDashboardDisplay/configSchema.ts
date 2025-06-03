@@ -39,8 +39,6 @@ export default (pluginManager: PluginManager) => {
         defaultValue: {}
       },
       groupname_tag: {
-        // type: 'string',
-        // defaultValue: "",
         type: 'frozen',
         mode: RootModel,
         description: "read groups",

@@ -302,8 +302,6 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
       console.log("bamFiles", bamFiles)
       const selectedNodes = await selectNodes(bamFiles, projectName);
 
-      await loadTaxonium(command_options.data_file)
-
       res.json({
         response: selectedNodes,
         config: project_config,
