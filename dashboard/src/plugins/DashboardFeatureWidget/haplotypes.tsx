@@ -13,7 +13,7 @@ export default function Haplotypes(props) {
 
   const {haplotype_names, RG } = props
   return (
-    <BaseCard title="Other Haplotypes">
+    <BaseCard title="Other PossibleHaplotypes">
     <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
     <ul style={{ listStyleType: 'none', padding: '0' }}>
       {RG && RG.length>0 ? (RG.map((haplotype) => (
