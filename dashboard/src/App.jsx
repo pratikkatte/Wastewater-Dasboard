@@ -115,7 +115,7 @@ const defaultConfig = {"project_name":"uploads",
 
   useEffect(() => {
     const annotationTrackId = "nextstrain-annotations"
-    if (!trackIDsRef.current.includes(annotationTrackId) && viewState) {
+    if (!trackIDsRef.current.includes(annotationTrackId) && viewState && config.REF_NAME?.includes("NC_045512")) {
       const geneTracks = makeTracks(config)
       const annotationTrack = geneTracks.find(t => t.trackId === annotationTrackId)
       
