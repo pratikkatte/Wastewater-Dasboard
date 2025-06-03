@@ -101,7 +101,7 @@ function Taxonium({
     if(selectedDetails.nodeDetails != null && onClickNode){
       onClickNode(selectedDetails)
     }
- }, [selectedDetails])
+ }, [selectedDetails.nodeDetails, onClickNode])
 
   const config = useConfig(
     backend,
