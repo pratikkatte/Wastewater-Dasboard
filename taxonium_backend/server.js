@@ -56,7 +56,22 @@ if (command_options.integrated) {
   uploadDir = './results';
 }
 
-const projects_info = JSON.parse(fs.readFileSync(`${uploadDir}/projects.json`, 'utf8'));
+// const projects_info = JSON.parse(fs.readFileSync(`${uploadDir}/projects.json`, 'utf8'));
+
+let projects_info = {};
+
+try {
+  const filePath = path.join(uploadDir, 'projects.json');
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath, 'utf8');
+    projects_info = JSON.parse(data);
+  } else {
+    console.warn(`projects.json not found at: ${filePath}`);
+  }
+} catch (err) {
+  console.error(`Error reading or parsing projects.json: ${err.message}`);
+  projects_info = {}; // fallback to empty object
+}
 
 const uploadPath = path.join(uploadDir, 'uploads');
 fs.mkdirSync(uploadPath, { recursive: true });
@@ -341,8 +356,12 @@ const getFilesRecursively = (directory, result = {}) => {
 app.post('/api/projects', function(req, res) {
 
   const dir_path = `${uploadDir}/`
-  const bamFiles = getFilesRecursively(dir_path);
-  res.send({"results": Object.keys(bamFiles)})
+  const project_keys = Object.keys(getFilesRecursively(dir_path));
+  const projects_info_keys = Object.keys(projects_info);
+  
+  const intersection = project_keys.filter(key => projects_info_keys.includes(key));
+
+  res.send({"results": intersection})
 
 });
 
@@ -744,7 +763,6 @@ const cleanupTaxoniumMemory = () => {
 
 const loadTaxonium = async (data_file) => {
 
-  
   cleanupTaxoniumMemory();
   
   const stream = fs.createReadStream(data_file);
