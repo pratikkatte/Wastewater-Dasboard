@@ -28,7 +28,7 @@ const DisplayHaplotypes = ({showUncertainNodes, search, singleSearchSpec}) => {
     }, [displayNodes, search.searchesEnabled, searchKeys])
 
     return (
-        <button onClick={toggleDisplay} style={{padding: '0 0px 0px 10px'}} aria-label="Toggle Display Mode">
+        <span onClick={toggleDisplay} style={{padding: '0 0px 0px 10px'}} aria-label="Toggle Display Mode">
           {displayNodes ? <Button
                   className="inline-block bg-gray-100 text-xs mx-auto h-5 rounded border-gray-300 border  text-gray-700 "
                   title="hide uncertain nodes"
@@ -42,7 +42,7 @@ const DisplayHaplotypes = ({showUncertainNodes, search, singleSearchSpec}) => {
                   <FaRegCircle />
                   </Button>
                   }
-        </button>
+        </span>
       );
 }
 export default DisplayHaplotypes;
