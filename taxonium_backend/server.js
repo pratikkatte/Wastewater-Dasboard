@@ -12,6 +12,7 @@ var axios = require("axios");
 var pako = require("pako");
 const multer = require('multer');
 const { BamFile } = require('@gmod/bam');
+const fsp = require('fs').promises;
 
 const URL = require("url").URL;
 const ReadableWebToNodeStream = require("readable-web-to-node-stream");
@@ -178,9 +179,15 @@ let options;
 
 app.use(cors({}));
 
-app.use(compression());
+app.use('/uploads', express.static(uploadDir, {
+  maxAge: '1d',           // Aggressive caching
+  etag: true,             // ETag headers for cache validation
+  lastModified: true,     // Last-modified headers
+  index: false,           // Don't serve directory indexes
+  dotfiles: 'deny'        // Security
+}));
 
-app.use(queue({ activeLimit: 200, queuedLimit: 1000 }));
+// app.use(queue({ activeLimit: 200, queuedLimit: 1000 }));
 
 app.use((err, req, res, next) => {
   console.error("Global Error:", err.stack);
@@ -195,28 +202,52 @@ const logStatusMessage = (status_obj) => {
   }
 };
 
+// app.get('/uploads/:projectname/:filename', async (req, res) => {
+//   const { projectname, filename } = req.params;
+//   const fullFilePath = path.resolve(uploadDir, projectname, filename);
 
-app.get('/uploads/:projectname/:filename', (req, res) => {
-  const { projectname, filename } = req.params;
-  // Use path.resolve to build an absolute path
-  const fullFilePath = path.resolve(uploadDir, projectname, filename);
+//   try {
+//     await fsp.access(fullFilePath, fs.constants.R_OK);
 
-  console.log("Trying to serve:", fullFilePath);
+//     const stream = fs.createReadStream(fullFilePath);
 
-  fs.access(fullFilePath, fs.constants.R_OK, (err) => {
-    if (err) {
-      console.error("File not found or unreadable:", fullFilePath);
-      res.status(404).send('File not found');
-    } else {
-      res.sendFile(fullFilePath, function (err) {
-        if (err) {
-          console.error("SendFile error:", err);
-          if (!res.headersSent) res.status(404).send('File not found');
-        }
-      });
-    }
-  });
-});
+//     res.setHeader('Content-Type', 'application/octet-stream');
+//     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+//     stream.pipe(res);
+
+//     stream.on('error', (err) => {
+//       console.error("Stream error:", err);
+//       res.status(500).send('Error streaming file');
+//     });
+//   } catch (err) {
+//     console.error("File not found or unreadable:", fullFilePath, err);
+//     res.status(404).send('File not found');
+//   }
+// });
+
+
+// app.get('/uploads/:projectname/:filename', (req, res) => {
+//   const { projectname, filename } = req.params;
+//   // Use path.resolve to build an absolute path
+//   const fullFilePath = path.resolve(uploadDir, projectname, filename);
+
+//   console.log("Trying to serve:", fullFilePath);
+
+//   fs.access(fullFilePath, fs.constants.R_OK, (err) => {
+//     if (err) {
+//       console.error("File not found or unreadable:", fullFilePath);
+//       res.status(404).send('File not found');
+//     } else {
+//       res.sendFile(fullFilePath, function (err) {
+//         if (err) {
+//           console.error("SendFile error:", err);
+//           if (!res.headersSent) res.status(404).send('File not found');
+//         }
+//       });
+//     }
+//   });
+// });
 
 
 function getReferenceFromFai(faiPath) {
@@ -685,6 +716,9 @@ async function getGenBankAuthors(genbank_accession) {
 }
 
 app.get("/node_details/", async (req, res) => {
+try {
+
+  console.log("node_details", req.query)
   const start_time = Date.now();
   const query_id = req.query.id;
   const node = processedData.nodes[query_id];
@@ -738,6 +772,10 @@ app.get("/node_details/", async (req, res) => {
   console.log(
     "Request took " + (Date.now() - start_time) + "ms, and output " + node
   );
+
+}catch(e){
+  console.log("Error", e)
+}
 });
 
 app.get("/tip_atts", async (req, res) => {

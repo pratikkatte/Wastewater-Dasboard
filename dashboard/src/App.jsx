@@ -11,8 +11,8 @@ import FileUpload from './utils/uploadUtils.jsx'
 import DashboardPlugin from './plugins'
 import SplitPane from 'react-split-pane';
 import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
-import { createRoot, hydrateRoot } from 'react-dom/client'
 import useDashboardConfig from './config.js'
+// import {createRoot, hydrateRoot } from 'react-dom/client'
 
 import './App.css'
 
@@ -95,19 +95,18 @@ const defaultConfig = {"project_name":"uploads",
       onChange: patch => {
         setPatches(previous => previous + JSON.stringify(patch) + '\n')
       },
-      configuration: {
-        rpc: {
-          defaultDriver: 'WebWorkerRpcDriver',
-        },
-      },
-      makeWorkerInstance: () => {
-        return new Worker(new URL('./rpcWorker', import.meta.url), {
-          type: 'module',
-        })
-      },
-      hydrateFn: hydrateRoot,
-      createRootFn: createRoot,
-
+      // configuration: {
+      //   rpc: {
+      //     defaultDriver: 'WebWorkerRpcDriver',
+      //   },
+      // },
+      // makeWorkerInstance: () => {
+      //   return new Worker(new URL('./rpcWorker', import.meta.url), {
+      //     type: 'module',
+      //   })
+      // },
+      // hydrateFn: hydrateRoot,
+      // createRootFn: createRoot,
     })
     setViewState(state)
     trackIDsRef.current = []
@@ -156,6 +155,10 @@ const defaultConfig = {"project_name":"uploads",
           if (!confirmLeave) {
             // 👇 Push a new dummy state again to intercept future back presses
             window.history.pushState(null, '', window.location.href);
+          } else {
+             // Allow back navigation
+            window.removeEventListener('popstate', handlePopState);
+            window.history.back(); // proceed with browser history
           }
         }
       };

@@ -4,11 +4,13 @@ import {
   BaseOptions,
 } from '@jbrowse/core/data_adapters/BaseAdapter'
 import { Region } from '@jbrowse/core/util/types'
+import QuickLRU from '@jbrowse/core/util/QuickLRU'
 import { bytesForRegions, updateStatus, Feature } from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { toArray } from 'rxjs/operators'
 import { firstValueFrom } from 'rxjs'
+import { checkStopToken } from '@jbrowse/core/util/stopToken'
 
 // locals
 import BamSlightlyLazyFeature from './BamSlightlyLazyFeature'
@@ -23,6 +25,16 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
   private samHeader?: Header
 
   private setupP?: Promise<Header>
+
+
+  // used for avoiding re-creation new BamSlightlyLazyFeatures, keeping
+  // mismatches in cache. at an average of 100kb-300kb, keeping even just 500
+  // of these in memory is memory intensive but can reduce recomputation on
+  // these objects
+  private ultraLongFeatureCache = new QuickLRU({
+    maxSize: 500,
+  })
+  
   private configureP?: Promise<{
     bam: BamFile
     sequenceAdapter?: BaseFeatureDataAdapter
@@ -44,7 +56,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
       // chunkSizeLimit and fetchSizeLimit are more troublesome than
       // helpful, and have given overly large values on the ultra long
       // nanopore reads even with 500MB limits, so disabled with infinity
-      yieldThreadTime: Infinity,
+      yieldThreadTime: Number.POSITIVE_INFINITY,
     })
 
     const adapterConfig = this.getConf('sequenceAdapter')
@@ -172,18 +184,19 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
   ) {
 
     const { refName, start, end, originalRefName } = region
-    const { signal, filterBy, statusCallback = () => {} } = opts || {}
+    const { stopToken, filterBy, statusCallback = () => {} } = opts || {}
     
     return ObservableCreate<Feature>(async observer => {
 
       const { bam } = await this.configure()
       await this.setup(opts)
+      checkStopToken(stopToken)
       const records = await updateStatus(
         'Downloading alignments',
         statusCallback,
         () => bam.getRecordsForRange(refName, start, end, opts),
       )
-
+      checkStopToken(stopToken)
       await updateStatus('Processing alignments', statusCallback, async () => {
 
         const {
@@ -243,11 +256,21 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           if (readName && record.get('name') !== readName) {
             continue
           }
-          observer.next(new BamSlightlyLazyFeature(record, this, ref))
+
+
+          const ret = this.ultraLongFeatureCache.get(`${record.id}`)
+          if (!ret) {
+            const elt = new BamSlightlyLazyFeature(record, this, ref)
+            this.ultraLongFeatureCache.set(`${record.id}`, elt)
+            observer.next(elt)
+          } else {
+            observer.next(ret)
+          }
+          // observer.next(new BamSlightlyLazyFeature(record, this, ref))
         }
         observer.complete()
       })
-    }, signal)
+    })
   }
 
   async getMultiRegionFeatureDensityStats(
