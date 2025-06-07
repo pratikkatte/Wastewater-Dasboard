@@ -26,7 +26,6 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
 
   private setupP?: Promise<Header>
 
-
   // used for avoiding re-creation new BamSlightlyLazyFeatures, keeping
   // mismatches in cache. at an average of 100kb-300kb, keeping even just 500
   // of these in memory is memory intensive but can reduce recomputation on
@@ -83,7 +82,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
 
   async getHeader(opts?: BaseOptions) {
     const { bam } = await this.configure()
-    return bam.getHeaderText(opts)
+    return bam.getHeaderText()
   }
 
   private async setupPre(opts?: BaseOptions) {
@@ -93,7 +92,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
       'Downloading index',
       statusCallback,
       async () => {
-        const samHeader = await bam.getHeader(opts)
+        const samHeader = await bam.getHeader()
 
         // use the @SQ lines in the header to figure out the
         // mapping between ref ref ID numbers and names
@@ -194,7 +193,7 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
       const records = await updateStatus(
         'Downloading alignments',
         statusCallback,
-        () => bam.getRecordsForRange(refName, start, end, opts),
+        () => bam.getRecordsForRange(refName, start, end),
       )
       checkStopToken(stopToken)
       await updateStatus('Processing alignments', statusCallback, async () => {

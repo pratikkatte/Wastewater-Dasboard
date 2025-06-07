@@ -179,13 +179,13 @@ let options;
 
 app.use(cors({}));
 
-app.use('/uploads', express.static(uploadDir, {
-  maxAge: '1d',           // Aggressive caching
-  etag: true,             // ETag headers for cache validation
-  lastModified: true,     // Last-modified headers
-  index: false,           // Don't serve directory indexes
-  dotfiles: 'deny'        // Security
-}));
+// app.use('/uploads', express.static(uploadDir, {
+//   maxAge: '1d',           // Aggressive caching
+//   etag: true,             // ETag headers for cache validation
+//   lastModified: true,     // Last-modified headers
+//   index: false,           // Don't serve directory indexes
+//   dotfiles: 'deny'        // Security
+// }));
 
 // app.use(queue({ activeLimit: 200, queuedLimit: 1000 }));
 
@@ -226,28 +226,69 @@ const logStatusMessage = (status_obj) => {
 //   }
 // });
 
+const send = require('send'); // Add this import at the top
 
-// app.get('/uploads/:projectname/:filename', (req, res) => {
-//   const { projectname, filename } = req.params;
-//   // Use path.resolve to build an absolute path
-//   const fullFilePath = path.resolve(uploadDir, projectname, filename);
+app.get('/uploads/:projectname/:filename/', (req, res) => {
+  const { projectname, filename} = req.params;
 
-//   console.log("Trying to serve:", fullFilePath);
+  const relativePath = path.join(projectname, filename);
+  console.log("Trying to serve:", relativePath, "from root:", uploadDir);
 
-//   fs.access(fullFilePath, fs.constants.R_OK, (err) => {
-//     if (err) {
-//       console.error("File not found or unreadable:", fullFilePath);
-//       res.status(404).send('File not found');
-//     } else {
-//       res.sendFile(fullFilePath, function (err) {
-//         if (err) {
-//           console.error("SendFile error:", err);
-//           if (!res.headersSent) res.status(404).send('File not found');
-//         }
-//       });
-//     }
-//   });
-// });
+  // Add CORS headers for JBrowse compatibility
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Range');
+  res.setHeader('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
+
+  send(req, relativePath, { 
+    root: uploadDir,        // Base directory
+    dotfiles: 'deny',       // Security: block .env, .git files
+    index: false,           // Don't serve directory indexes
+    hidden: false           // Block hidden files
+  })
+  .on('error', (err) => {
+    console.error("Send module error:", err.message, "Status:", err.status);
+    
+    // Handle different error types
+    if (err.status === 404) {
+      console.error("File not found:", relativePath);
+      res.status(404).send('File not found');
+    } else if (err.status === 403) {
+      console.error("Access denied:", relativePath);
+      res.status(403).send('Access denied');
+    } else if (err.status === 416) {
+      console.error("Range not satisfiable:", relativePath);
+      res.status(416).send('Range not satisfiable');
+    } else {
+      console.error("Server error:", err);
+      if (!res.headersSent) {
+        res.status(500).send('Internal server error');
+      }
+    }
+  })
+  .on('directory', () => {
+    // Prevent directory listing
+    console.error("Directory access attempt:", relativePath);
+    res.status(403).send('Directory access denied');
+  })
+  .on('file', (filePath) => {
+    // Optional: Log successful file serving
+    console.log("Successfully serving file:", filePath);
+  })
+  .on('stream', () => {
+    // Optional: Log when streaming starts
+    console.log("Started streaming:", relativePath);
+  })
+  .pipe(res);
+});
+
+// Optional: Add OPTIONS handler for CORS preflight
+app.options('/uploads/:projectname/:filename/:groupid?', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Range');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  res.status(204).send();
+});
 
 
 function getReferenceFromFai(faiPath) {

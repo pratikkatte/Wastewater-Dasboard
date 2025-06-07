@@ -1,5 +1,4 @@
 
-import AdapterClass from './DashboardAdapter'
 import PluginManager from "@jbrowse/core/PluginManager";
 import AdapterType from '@jbrowse/core/pluggableElementTypes/AdapterType'
 
@@ -10,7 +9,8 @@ export default function register(pluginManager: PluginManager) {
         () =>
           new AdapterType({
             name: 'DashboardAdapter',
-            AdapterClass,
+            // AdapterClass,
+            getAdapterClass: () => import('./DashboardAdapter').then(r => r.default),
             configSchema: configSchema,
           }),
       )

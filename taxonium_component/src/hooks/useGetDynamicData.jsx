@@ -5,7 +5,7 @@ const CHECK_AGAIN_TIME = 100;
 function addNodeLookup(data) {
     const output = {
       ...data,
-      nodeLookup: Object.fromEntries(data.nodes.map((n) => [n.node_id, n])),
+      nodeLookup: Object.fromEntries(data.nodes?.map((n) => [n.node_id, n])),
     };
     return output;
 }
