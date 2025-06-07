@@ -17,8 +17,8 @@ export default defineConfig({
     '@gmod/bam',
     // Add other JBrowse dependencies that might be causing issues
   ],
-  // optimizeDeps: {
-  //   exclude: [],
-  //   entries: []
-  // }
+  optimizeDeps: {
+    exclude: [],
+    entries: []
+  }
 });

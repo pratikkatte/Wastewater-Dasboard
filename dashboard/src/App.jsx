@@ -12,7 +12,7 @@ import DashboardPlugin from './plugins'
 import SplitPane from 'react-split-pane';
 import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
 import useDashboardConfig from './config.js'
-// import {createRoot, hydrateRoot } from 'react-dom/client'
+import {createRoot, hydrateRoot } from 'react-dom/client'
 
 import './App.css'
 
@@ -50,7 +50,7 @@ function App() {
   const [paneSize, setPaneSize] = useState('98%');
 
   
-  const [patches, setPatches] = useState();
+  const [patches, setPatches] = useState(null);
   
   const [backupQuery, setBackupQuery] = useState(default_query);
   const backupUpdateQuery = useCallback((newQuery) => {
@@ -75,6 +75,7 @@ const defaultConfig = {"project_name":"uploads",
     // (But DO NOT call useDashboardConfig here)
     console.log("Config updated:", config);
     trackIDsRef.current = []
+    setPatches(null)
   }, [config]);
 
   const toggleJBrowse = useCallback((input_jbrowse) => {
@@ -95,18 +96,18 @@ const defaultConfig = {"project_name":"uploads",
       onChange: patch => {
         setPatches(previous => previous + JSON.stringify(patch) + '\n')
       },
-      // configuration: {
-      //   rpc: {
-      //     defaultDriver: 'WebWorkerRpcDriver',
-      //   },
-      // },
-      // makeWorkerInstance: () => {
-      //   return new Worker(new URL('./rpcWorker', import.meta.url), {
-      //     type: 'module',
-      //   })
-      // },
-      // hydrateFn: hydrateRoot,
-      // createRootFn: createRoot,
+      configuration: {
+        rpc: {
+          defaultDriver: 'WebWorkerRpcDriver',
+        },
+      },
+      makeWorkerInstance: () => {
+        return new Worker(new URL('./rpcWorker', import.meta.url), {
+          type: 'module',
+        })
+      },
+      hydrateFn: hydrateRoot,
+      createRootFn: createRoot,
     })
     setViewState(state)
     trackIDsRef.current = []
