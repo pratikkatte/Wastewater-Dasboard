@@ -182,6 +182,8 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
     },
   ) {
 
+    const MAX_FEATURES = 40000
+
     const { refName, start, end, originalRefName } = region
     const { stopToken, filterBy, statusCallback = () => {} } = opts || {}
     
@@ -205,7 +207,13 @@ export default class BamAdapter extends BaseFeatureDataAdapter {
           readName,
           filterReads
         } = filterBy || {}
-        for (const record of records) {
+
+        const stride = Math.ceil(records.length / MAX_FEATURES)
+
+        for (let i = 0; i < records.length; i += stride) {
+          if (stride > 1 && i % stride !== 0) continue // skip
+
+          const record = records[i]
           let ref: string | undefined
           let unseen_mutations = {}
 
