@@ -171,39 +171,39 @@ export default (pluginManager: PluginManager, configSchema) => {
       const {
         trackMenuItems: superTrackMenuItems,
       } = self
-
-
-
-      
+      const is_sequence = self.configuration.toJSON().displayId.includes("sequence") ? true : false
       return {
-      trackMenuItems() {
-        return [
-          
-          {
-            label: 'color by EPP',
-            icon: VisibilityIcon,
-            type: 'checkbox',
-            checked: self.showEPColor,
-            onClick: () => {
-              self.toggleEPDisplay()
-            }
-          },
-          {
-            label: "unaccounted alleles",
-            icon: SortIcon,
-            subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
-              label: item.mutation.split(":")[0],
-              type:'checkbox',
-              checked: item.show,
-              onClick: () => {
-                self.toggleUnaccountedMutationsDisplay(key)
-              }
-            }))
-          },
-          ...superTrackMenuItems()
-        ]
-    }
-  }
+        trackMenuItems() {
+          return [
+            ...(!is_sequence
+              ? [
+                  {
+                    label: 'color by EPP',
+                    icon: VisibilityIcon,
+                    type: 'checkbox',
+                    checked: self.showEPColor,
+                    onClick: () => {
+                      self.toggleEPDisplay()
+                    },
+                  },
+                  {
+                    label: "unaccounted alleles",
+                    icon: SortIcon,
+                    subMenu: Array.from(self.unseenKeys.entries()).map(([key, item]) => ({
+                      label: item.mutation.split(":")[0],
+                      type: 'checkbox',
+                      checked: item.show,
+                      onClick: () => {
+                        self.toggleUnaccountedMutationsDisplay(key)
+                      },
+                    })),
+                  },
+                ]
+              : []),
+            ...superTrackMenuItems(),
+          ]
+        },
+      }
 })
    
 }

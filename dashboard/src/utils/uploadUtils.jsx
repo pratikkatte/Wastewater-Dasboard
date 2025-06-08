@@ -15,6 +15,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
   const [uploadProgress, setuploadProgress] = useState(0);
 
   const [results, setResults] = useState(null);
+  const [taxonium_file, setTaxoniumFile] = useState(null);
 
 
   useEffect(()=> {
@@ -24,6 +25,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         .then((response) => {
       console.log("result", response.data.results)
       setResults(response.data.results);
+      setTaxoniumFile(response.data.taxonium_file);
     })
     .catch((error) => {
       console.error("Error fetching results", error);
@@ -184,8 +186,10 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
 
         <div style={{ background: '#f0f0f0', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'}}>
             <p style={{ textAlign: 'center', fontSize: '16px', color: '#333', maxWidth:'90%',margin: '10px auto' }}>
-                This dashboard provides insights into the genomic data by using BAM files of the sequenced waste water samples, 
-                allowing for the monitoring and analysis of viral strains present in the community.
+            This dashboard provides insights into wastewater sequencing data by enabling interactive estimation of haplotype and lineage proportions, detection of unaccounted (novel) alleles, and read-level analysis.
+            </p>
+            <p style={{ textAlign: 'center', fontSize: 'small', color: '#333', maxWidth:'90%',margin: '10px auto' }}>
+            <strong>Note:</strong> Please upload your BAM and reference files with their index files for complete analysis or click on one of the results to explore.
             </p>
 
             <div className='flex' style={{ justifyContent: "center", alignItems: "center", margin: '30px auto'}}>
@@ -198,9 +202,13 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
                 {uploading && (
             <p>{uploadProgress}%</p>
 
-        )}
+        )} 
                 <br/>
             </div>
+            <div style={{ textAlign: 'center', fontSize: 'small' }}>
+                <span>Loaded Taxonium file: <strong>{taxonium_file}</strong></span>
+            </div>
+            
         </div>   
         {results && results.length>0 && (
           <div className="flex flex-col space-y-3 pt-6">

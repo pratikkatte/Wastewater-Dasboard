@@ -179,52 +179,17 @@ let options;
 
 app.use(cors({}));
 
-// app.use('/uploads', express.static(uploadDir, {
-//   maxAge: '1d',           // Aggressive caching
-//   etag: true,             // ETag headers for cache validation
-//   lastModified: true,     // Last-modified headers
-//   index: false,           // Don't serve directory indexes
-//   dotfiles: 'deny'        // Security
-// }));
-
-// app.use(queue({ activeLimit: 200, queuedLimit: 1000 }));
-
 app.use((err, req, res, next) => {
   console.error("Global Error:", err.stack);
   res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
 const logStatusMessage = (status_obj) => {
-  console.log("status", status_obj);
   if (process && process.send) {
-    console.log("here")
     process.send(status_obj);
   }
 };
 
-// app.get('/uploads/:projectname/:filename', async (req, res) => {
-//   const { projectname, filename } = req.params;
-//   const fullFilePath = path.resolve(uploadDir, projectname, filename);
-
-//   try {
-//     await fsp.access(fullFilePath, fs.constants.R_OK);
-
-//     const stream = fs.createReadStream(fullFilePath);
-
-//     res.setHeader('Content-Type', 'application/octet-stream');
-//     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-//     stream.pipe(res);
-
-//     stream.on('error', (err) => {
-//       console.error("Stream error:", err);
-//       res.status(500).send('Error streaming file');
-//     });
-//   } catch (err) {
-//     console.error("File not found or unreadable:", fullFilePath, err);
-//     res.status(404).send('File not found');
-//   }
-// });
 
 const send = require('send'); // Add this import at the top
 
@@ -433,7 +398,7 @@ app.post('/api/projects', function(req, res) {
   
   const intersection = project_keys.filter(key => projects_info_keys.includes(key));
 
-  res.send({"results": intersection})
+  res.send({"results": intersection,'taxonium_file': globalTaxoniumMeta.path, "status": "success", "error": null})
 
 });
 
