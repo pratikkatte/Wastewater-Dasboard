@@ -18,7 +18,7 @@ def main():
     reference_start = 0
     reference_end = ref_data[1]
 
-    path = '/workspace/results/projects.json'
+    path = './results/projects.json'
 
     if os.path.exists(path):
         with open(path) as f:
