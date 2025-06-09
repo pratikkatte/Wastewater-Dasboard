@@ -28,7 +28,6 @@ let globalTaxoniumMeta = {
   size: null
 };
 
-
 program
   .option("--ssl", "use ssl")
   .option("--port <port>", "port", 8000)
@@ -38,7 +37,6 @@ program
     "--data_file <data file>",
     "local data file, as alternative to data url"
   ).
-  option("--integrated", "integrated in the WEPP workflow")
 
 program.parse();
 
@@ -50,12 +48,9 @@ let projectName='';
 // Ensure upload directory exists
 var uploadDir = '';
 
-if (command_options.integrated) {
-  // const uploadDir = '/var/www/WEPP/uploads';  
-  uploadDir = '/workspace/results'
-} else {
-  uploadDir = './results';
-}
+uploadDir = './results'
+
+
 
 // const projects_info = JSON.parse(fs.readFileSync(`${uploadDir}/projects.json`, 'utf8'));
 
