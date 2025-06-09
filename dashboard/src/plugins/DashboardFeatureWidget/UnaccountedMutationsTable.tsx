@@ -105,6 +105,7 @@ export default function UnaccountedMutations(props: UnaccountedMutationsProps) {
               ) : (
                 um_ids.map((item) => {
                   const value = mapping[item]
+                  if (!value) return null;
                   return (
                     <tr key={item} style={{ backgroundColor: '#f9f9f9', borderBottom: '1px solid #ddd' }}>
                       <td style={{ padding: '8px', textAlign: 'center', color: '#555' }}>

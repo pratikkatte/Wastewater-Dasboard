@@ -6,7 +6,7 @@ export default function UncertainNodes(props) {
     const {uncertain_nodes_names } = props
 
     return (
-        <BaseCard title="Uncertain Nodes">
+        <BaseCard title="Uncertain Haplotypes">
             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                 <ul style={{ listStyleType: 'none', padding: '0' }}>
                     {uncertain_nodes_names && uncertain_nodes_names.length>0 ? (uncertain_nodes_names.map((node, index) => (

@@ -61,18 +61,34 @@ if (command_options.integrated) {
 
 let projects_info = {};
 
-try {
-  const filePath = path.join(uploadDir, 'projects.json');
-  if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath, 'utf8');
-    projects_info = JSON.parse(data);
-  } else {
-    console.warn(`projects.json not found at: ${filePath}`);
+const filePath = path.join(uploadDir, 'projects.json');
+
+function loadProjectsInfo() {
+  try {
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      projects_info = JSON.parse(data);
+      console.log("projects_info updated:", projects_info);
+    } else {
+      console.warn(`projects.json not found at: ${filePath}`);
+      projects_info = {};
+    }
+  } catch (err) {
+    console.error(`Error reading or parsing projects.json: ${err.message}`);
+    projects_info = {};
   }
-} catch (err) {
-  console.error(`Error reading or parsing projects.json: ${err.message}`);
-  projects_info = {}; // fallback to empty object
 }
+
+// Initial load
+loadProjectsInfo();
+
+// Watch for changes
+fs.watchFile(filePath, { interval: 1000 }, (curr, prev) => {
+  if (curr.mtime !== prev.mtime) {
+    console.log('projects.json has changed. Reloading...');
+    loadProjectsInfo();
+  }
+});
 
 const uploadPath = path.join(uploadDir, 'uploads');
 fs.mkdirSync(uploadPath, { recursive: true });
