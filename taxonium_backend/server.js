@@ -48,8 +48,8 @@ let projectName='';
 // Ensure upload directory exists
 var uploadDir = '';
 
-uploadDir = './results'
-
+uploadDir = './results';
+fs.mkdirSync(uploadDir, { recursive: true });
 
 
 // const projects_info = JSON.parse(fs.readFileSync(`${uploadDir}/projects.json`, 'utf8'));
@@ -57,6 +57,10 @@ uploadDir = './results'
 let projects_info = {};
 
 const filePath = path.join(uploadDir, 'projects.json');
+if (!fs.existsSync(filePath)) {
+  fs.writeFileSync(filePath, '{}');
+}
+
 
 function loadProjectsInfo() {
   try {
@@ -84,6 +88,8 @@ fs.watchFile(filePath, { interval: 1000 }, (curr, prev) => {
     loadProjectsInfo();
   }
 });
+
+console.log("projects_info", projects_info);
 
 const uploadPath = path.join(uploadDir, 'uploads');
 fs.mkdirSync(uploadPath, { recursive: true });
@@ -204,57 +210,46 @@ const logStatusMessage = (status_obj) => {
 
 const send = require('send'); // Add this import at the top
 
-app.get('/uploads/:projectname/:filename/', (req, res) => {
-  const { projectname, filename} = req.params;
-
-  const relativePath = path.join(projectname, filename);
+app.get('/uploads/*', (req, res) => {
+  const relativePath = req.params[0]; // everything after '/uploads/'
   console.log("Trying to serve:", relativePath, "from root:", uploadDir);
 
-  // Add CORS headers for JBrowse compatibility
+  // CORS headers for JBrowse/BAM streaming
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Range');
   res.setHeader('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
 
-  send(req, relativePath, { 
-    root: uploadDir,        // Base directory
-    dotfiles: 'deny',       // Security: block .env, .git files
-    index: false,           // Don't serve directory indexes
-    hidden: false           // Block hidden files
+  send(req, relativePath, {
+    root: uploadDir,
+    dotfiles: 'deny',
+    index: false,
+    hidden: false,
   })
-  .on('error', (err) => {
-    console.error("Send module error:", err.message, "Status:", err.status);
-    
-    // Handle different error types
-    if (err.status === 404) {
-      console.error("File not found:", relativePath);
-      res.status(404).send('File not found');
-    } else if (err.status === 403) {
-      console.error("Access denied:", relativePath);
-      res.status(403).send('Access denied');
-    } else if (err.status === 416) {
-      console.error("Range not satisfiable:", relativePath);
-      res.status(416).send('Range not satisfiable');
-    } else {
-      console.error("Server error:", err);
-      if (!res.headersSent) {
-        res.status(500).send('Internal server error');
+    .on('error', (err) => {
+      console.error("Send error:", err.message);
+      if (err.status === 404) {
+        res.status(404).send('File not found');
+      } else if (err.status === 403) {
+        res.status(403).send('Access denied');
+      } else if (err.status === 416) {
+        res.status(416).send('Range not satisfiable');
+      } else {
+        if (!res.headersSent) {
+          res.status(500).send('Internal server error');
+        }
       }
-    }
-  })
-  .on('directory', () => {
-    // Prevent directory listing
-    console.error("Directory access attempt:", relativePath);
-    res.status(403).send('Directory access denied');
-  })
-  .on('file', (filePath) => {
-    // Optional: Log successful file serving
-    console.log("Successfully serving file:", filePath);
-  })
-  .on('stream', () => {
-    // Optional: Log when streaming starts
-    console.log("Started streaming:", relativePath);
-  })
-  .pipe(res);
+    })
+    .on('directory', () => {
+      console.error("Attempt to access directory:", relativePath);
+      res.status(403).send('Directory access denied');
+    })
+    .on('file', (filePath) => {
+      console.log("Serving file:", filePath);
+    })
+    .on('stream', () => {
+      console.log("Streaming:", relativePath);
+    })
+    .pipe(res);
 });
 
 // Optional: Add OPTIONS handler for CORS preflight
@@ -363,6 +358,7 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
 
       console.log("project_config", project_config);
       console.log("bamFiles", bamFiles)
+      
       const selectedNodes = await selectNodes(bamFiles, projectName);
 
       res.json({
@@ -378,60 +374,86 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
   });
 
 
-const getFilesRecursively = (directory, result = {}) => {
+const getFoldersWithBams = (directory, result = []) => {
   const files = fs.readdirSync(directory);
-  files.forEach((file) => {
 
+  files.forEach((file) => {
     const fullPath = path.join(directory, file);
-    var folderName = ''
 
     if (fs.statSync(fullPath).isDirectory()) {
-      // Ignore if the folder name is 'uploads'
-      if (file !== 'uploads') {
-        getFilesRecursively(fullPath, result);
+      const bamsPath = path.join(fullPath, 'bams');
+      if (fs.existsSync(bamsPath) && fs.statSync(bamsPath).isDirectory()) {
+        result.push(file); // or bamsPath if you want the 'bams/' subdir
       }
-    } else {
-      if (path.extname(file) === '.bam') {
-        folderName = path.basename(directory);
-        result[folderName] = result[folderName] || [];
-        result[folderName].push(file);
-      }
+
+      // Recurse into subdirectory
+      getFoldersWithBams(fullPath, result);
     }
   });
+
   return result;
 };
+
 
 app.post('/api/projects', function(req, res) {
 
   const dir_path = `${uploadDir}/`
-  const project_keys = Object.keys(getFilesRecursively(dir_path));
+  const project_keys = getFoldersWithBams(dir_path);
   const projects_info_keys = Object.keys(projects_info);
-  
+
   const intersection = project_keys.filter(key => projects_info_keys.includes(key));
 
   res.send({"results": intersection,'taxonium_file': globalTaxoniumMeta.path, "status": "success", "error": null})
 
 });
 
+async function getAllBamFiles(startingFolder) {
+  const bamFiles = [];
+
+  async function recurse(currentPath, relativeBase) {
+    const entries = await fsp.readdir(currentPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const entryPath = path.join(currentPath, entry.name);
+      const relPath = path.join(relativeBase, entry.name);
+
+      if (entry.isDirectory()) {
+        await recurse(entryPath, relPath);
+      } else if (entry.isFile() && entry.name.endsWith('.bam')) {
+        bamFiles.push(relPath);
+      }
+    }
+  }
+
+  try {
+    await recurse(startingFolder, '.'); // relativeBase starts as "."
+    return bamFiles;
+  } catch (err) {
+    console.error('Error traversing directory:', err);
+    return [];
+  }
+}
+
 app.post('/api/result/:folder', async function(req, res) {
   const { folder } = req.params;
   projectName = folder
 
   const fullpath = `${uploadDir}/${folder}`
+  console.log("fullpath", fullpath)
   try {
     // Check if the directory exists
     if (!fs.existsSync(fullpath)) {
       return res.status(404).json({ error: 'Directory not found', status: 'error' });
     }
     
-    const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
-    
-    console.log("folder", folder, files)
+    // const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
+    const bamFiles = await getAllBamFiles(path.join(uploadDir, folder));
+    console.log("folder", folder, bamFiles)
     
     var specific_project = projects_info[folder]
     console.log("project info", projects_info[folder])
 
-  const results_config = await selectNodes(files, projectName)
+  const results_config = await selectNodes(bamFiles, projectName)
 
   const project_config = {'project_name':folder,
                           ...specific_project
@@ -942,12 +964,13 @@ function randomChoice(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-async function selectNodes(uploadedFilenames, project_name) {
+async function selectNodes(uploadedFilenames, project_name = null) {
 
   const fileDict = {};
   for (const filename of uploadedFilenames) {
     try {
-      const file_path = path.join(uploadDir, `${project_name}/${filename}`);
+      // const file_path = path.join(uploadDir,`${project_name}/bams/${filename}`);
+      const file_path = path.join(uploadDir, project_name,filename)
       const bamFile = new BamFile({
         bamPath: file_path,
         // optional: bamFile can use index file too if needed, but not needed for header parsing

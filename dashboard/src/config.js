@@ -18,7 +18,7 @@ export default function useDashboardConfig(projectName) {
       PROJECT_NAME: project_name,
       REF_FA: `${TAXONIUM_BASE}uploads/${project_name}/${projectName['ref_file']}`,
       REF_FAI: `${TAXONIUM_BASE}uploads/${project_name}/${projectName['ref_file']}.fai`,
-      BAM: `${TAXONIUM_BASE}uploads/${project_name}/`,
+      BAM: `${TAXONIUM_BASE}uploads/${project_name}/bams/`,
       PROJECTS: `${TAXONIUM_BASE}api/projects`,
       RESULT: `${TAXONIUM_BASE}api/result/`,
       UPLOAD: `${TAXONIUM_BASE}api/upload`,
