@@ -328,12 +328,12 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
       .filter(file => file.filename.toLowerCase().endsWith('.bai'))
       .map(file => file.filename);
     
-    // Step 1: Must have exactly 2 BAMs
-    if (bamFiles.length !== 2) {
-      return res.status(400).json({
-        error: `Exactly 2 BAM files must be provided. Received ${bamFiles.length}.`
-      });
-    }
+    // // Step 1: Must have exactly 2 BAMs
+    // if (bamFiles.length !== 2) {
+    //   return res.status(400).json({
+    //     error: `Exactly 2 BAM files must be provided. Received ${bamFiles.length}.`
+    //   });
+    // }
     
     // Step 2: Must have a corresponding .bai file for each .bam
     const missingIndexes = bamFiles.filter(bam => {
