@@ -360,6 +360,7 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
       console.log("bamFiles", bamFiles)
       
       const selectedNodes = await selectNodes(bamFiles, projectName);
+    
 
       res.json({
         response: selectedNodes,
@@ -374,25 +375,26 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
   });
 
 
-const getFoldersWithBams = (directory, result = []) => {
-  const files = fs.readdirSync(directory);
+  const getFoldersWithBams = (directory, result = []) => {
+    const files = fs.readdirSync(directory);
+  
+    files.forEach((file) => {
+      const fullPath = path.join(directory, file);
+  
+      // Skip any folder named 'uploads'
+      if (file === 'uploads') return;
+  
+      if (fs.statSync(fullPath).isDirectory()) {
+        result.push(file);
 
-  files.forEach((file) => {
-    const fullPath = path.join(directory, file);
-
-    if (fs.statSync(fullPath).isDirectory()) {
-      const bamsPath = path.join(fullPath, 'bams');
-      if (fs.existsSync(bamsPath) && fs.statSync(bamsPath).isDirectory()) {
-        result.push(file); // or bamsPath if you want the 'bams/' subdir
+        // Recurse into subdirectory
+        // getFoldersWithBams(fullPath, result);
       }
-
-      // Recurse into subdirectory
-      getFoldersWithBams(fullPath, result);
-    }
-  });
-
-  return result;
-};
+    });
+  
+    return result;
+  };
+  
 
 
 app.post('/api/projects', function(req, res) {
@@ -400,9 +402,9 @@ app.post('/api/projects', function(req, res) {
   const dir_path = `${uploadDir}/`
   const project_keys = getFoldersWithBams(dir_path);
   const projects_info_keys = Object.keys(projects_info);
+  console.log("projects_info_keys", projects_info_keys, project_keys)
 
   const intersection = project_keys.filter(key => projects_info_keys.includes(key));
-
   res.send({"results": intersection,'taxonium_file': globalTaxoniumMeta.path, "status": "success", "error": null})
 
 });
@@ -454,7 +456,6 @@ app.post('/api/result/:folder', async function(req, res) {
     console.log("project info", projects_info[folder])
 
   const results_config = await selectNodes(bamFiles, projectName)
-
   const project_config = {'project_name':folder,
                           ...specific_project
                         }
@@ -891,40 +892,42 @@ const loadTaxonium = async (data_file) => {
 
 
   app.get("/load/:project", async (req, res) => {
-  try {
-    
-  const { project } = req.params;
-  
-  const taxonium_file_path = projects_info[project]['taxonium_file_path']
-  const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
+    try {
+      const { project } = req.params;
+      const taxonium_file_path = projects_info[project]['taxonium_file_path'];
+      const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
 
-  const stat = fs.statSync(fullFilePath);
+      const stat = await fs.promises.stat(fullFilePath);
 
-  const sameFile = (
-    globalTaxoniumMeta.path === taxonium_file_path &&
-    globalTaxoniumMeta.size === stat.size
-  );
+      const sameFile = (
+        globalTaxoniumMeta.path === taxonium_file_path &&
+        globalTaxoniumMeta.size === stat.size
+      );
+      if (sameFile) {
+        res.send({'result': 'taxonium loaded'});
+      } else {
 
-  if(sameFile){
-    res.send({'result':'taxonium loaded'})  
-  } else {
-    globalTaxoniumMeta = {
-      path: taxonium_file_path,
-      size: stat.size
-    };
-  
-    console.log("Loading taxonium file:", fullFilePath);
-    await loadTaxonium(fullFilePath);
-    res.send({'result':'taxonium loaded'})  
-    
-  }
-  
-} catch (err) {
-  console.error("File load error:", err);
-  res.status(500).send({ error: 'Could not load taxonium file' });
-}
+        console.log("Loading taxonium file:", fullFilePath);
 
-})
+        const fileExt = getFullExtension(fullFilePath);
+        if (![".jsonl", ".jsonl.gz"].includes(fileExt)) {
+          throw new Error(`Invalid file extension: ${fileExt}. Expected .jsonl or .jsonl.gz.`);
+        }
+        await loadTaxonium(fullFilePath);
+
+        globalTaxoniumMeta = {
+          path: taxonium_file_path,
+          size: stat.size
+        };
+
+        res.send({'result': 'taxonium loaded'});
+      }
+    } catch (error) {
+      console.error("Error loading taxonium file:", error);
+      res.status(500).send({'error': 'Failed to load taxonium file'});
+    }
+  });
+
 // match /nextstrain_json/12345
 app.get("/nextstrain_json/:root_id", async (req, res) => {
   const root_id = parseInt(req.params.root_id);
@@ -971,6 +974,7 @@ async function selectNodes(uploadedFilenames, project_name = null) {
     try {
       // const file_path = path.join(uploadDir,`${project_name}/bams/${filename}`);
       const file_path = path.join(uploadDir, project_name,filename)
+      console.log("file_path", file_path) 
       const bamFile = new BamFile({
         bamPath: file_path,
         // optional: bamFile can use index file too if needed, but not needed for header parsing
@@ -1053,6 +1057,13 @@ async function selectNodes(uploadedFilenames, project_name = null) {
   return fileDict;
 }
 
+function getFullExtension(filename) {
+  if (filename.endsWith('.jsonl.gz')) return '.jsonl.gz';
+  if (filename.endsWith('.jsonl')) return '.jsonl';
+  // fallback to default
+  return path.extname(filename);
+}
+
 const loadData = async () => {
   await waitForTheImports();
 
@@ -1060,12 +1071,18 @@ const loadData = async () => {
 
   const stats = fs.statSync(command_options.data_file)
 
+
+  const fileExt = getFullExtension('data.jsonl.gz'); // returns '.jsonl.gz'
+  if (![".jsonl", ".jsonl.gz"].includes(fileExt)) {
+    throw new Error(`Invalid file extension: ${fileExt}. Expected .jsonl or .jsonl.gz.`);
+  }
+
+  await loadTaxonium(command_options.data_file);
+
   globalTaxoniumMeta = {
     path: basename,
     size: stats.size
   }; 
-
-  await loadTaxonium(command_options.data_file);
 
   // set a timeout to start listening
   setTimeout(() => {
