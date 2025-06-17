@@ -202,6 +202,7 @@ app.use((err, req, res, next) => {
 });
 
 const logStatusMessage = (status_obj) => {
+  console.log("status", status_obj);
   if (process && process.send) {
     process.send(status_obj);
   }
@@ -890,6 +891,11 @@ const loadTaxonium = async (data_file) => {
     });
   }
 
+  async function getFileSizeInMB(filePath) {
+    const stat = await fs.promises.stat(filePath);
+    const sizeInMB = Math.floor(stat.size / (1024 * 1024));
+    return sizeInMB;
+  }
 
   app.get("/load/:project", async (req, res) => {
     try {
@@ -897,11 +903,12 @@ const loadTaxonium = async (data_file) => {
       const taxonium_file_path = projects_info[project]['taxonium_file_path'];
       const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
 
-      const stat = await fs.promises.stat(fullFilePath);
+      const stat_size = await getFileSizeInMB(fullFilePath)
+      // const stat = await fs.promises.stat(fullFilePath);
 
       const sameFile = (
         globalTaxoniumMeta.path === taxonium_file_path &&
-        globalTaxoniumMeta.size === stat.size
+        globalTaxoniumMeta.size === stat_size
       );
       if (sameFile) {
         res.send({'result': 'taxonium loaded'});
@@ -917,7 +924,7 @@ const loadTaxonium = async (data_file) => {
 
         globalTaxoniumMeta = {
           path: taxonium_file_path,
-          size: stat.size
+          size: stat_size
         };
 
         res.send({'result': 'taxonium loaded'});
@@ -1069,8 +1076,8 @@ const loadData = async () => {
 
   const basename = path.basename(command_options.data_file);
 
-  const stats = fs.statSync(command_options.data_file)
-
+  // const stats = fs.statSync(command_options.data_file)
+  const stat_size = await getFileSizeInMB(command_options.data_file)
 
   const fileExt = getFullExtension('data.jsonl.gz'); // returns '.jsonl.gz'
   if (![".jsonl", ".jsonl.gz"].includes(fileExt)) {
@@ -1081,8 +1088,10 @@ const loadData = async () => {
 
   globalTaxoniumMeta = {
     path: basename,
-    size: stats.size
+    size: stat_size
   }; 
+  console.log("globalTaxoniumMeta", globalTaxoniumMeta)
+
 
   // set a timeout to start listening
   setTimeout(() => {
