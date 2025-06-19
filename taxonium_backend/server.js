@@ -89,7 +89,6 @@ fs.watchFile(filePath, { interval: 1000 }, (curr, prev) => {
   }
 });
 
-console.log("projects_info", projects_info);
 
 const uploadPath = path.join(uploadDir, 'uploads');
 fs.mkdirSync(uploadPath, { recursive: true });
@@ -357,8 +356,7 @@ app.post('/api/upload', upload.array('files', 50), async (req, res) => {
         "ref_file": fastaFiles[0]
       };
 
-      console.log("project_config", project_config);
-      console.log("bamFiles", bamFiles)
+
       
       const selectedNodes = await selectNodes(bamFiles, projectName);
     
@@ -403,7 +401,6 @@ app.post('/api/projects', function(req, res) {
   const dir_path = `${uploadDir}/`
   const project_keys = getFoldersWithBams(dir_path);
   const projects_info_keys = Object.keys(projects_info);
-  console.log("projects_info_keys", projects_info_keys, project_keys)
 
   const intersection = project_keys.filter(key => projects_info_keys.includes(key));
   res.send({"results": intersection,'taxonium_file': globalTaxoniumMeta.path, "status": "success", "error": null})
@@ -442,7 +439,6 @@ app.post('/api/result/:folder', async function(req, res) {
   projectName = folder
 
   const fullpath = `${uploadDir}/${folder}`
-  console.log("fullpath", fullpath)
   try {
     // Check if the directory exists
     if (!fs.existsSync(fullpath)) {
@@ -451,10 +447,8 @@ app.post('/api/result/:folder', async function(req, res) {
     
     // const files = fs.readdirSync(fullpath).filter(file => file.endsWith('.bam'));
     const bamFiles = await getAllBamFiles(path.join(uploadDir, folder));
-    console.log("folder", folder, bamFiles)
     
     var specific_project = projects_info[folder]
-    console.log("project info", projects_info[folder])
 
   const results_config = await selectNodes(bamFiles, projectName)
   const project_config = {'project_name':folder,
@@ -901,14 +895,16 @@ const loadTaxonium = async (data_file) => {
     try {
       const { project } = req.params;
       const taxonium_file_path = projects_info[project]['taxonium_file_path'];
+      const taxonium_size = projects_info[project]['taxonium_size'];
+      
       const fullFilePath = path.resolve(uploadDir, project, taxonium_file_path);
 
-      const stat_size = await getFileSizeInMB(fullFilePath)
+      // const stat_size = await getFileSizeInMB(fullFilePath)
       // const stat = await fs.promises.stat(fullFilePath);
 
       const sameFile = (
         globalTaxoniumMeta.path === taxonium_file_path &&
-        globalTaxoniumMeta.size === stat_size
+        globalTaxoniumMeta.size === taxonium_size
       );
       if (sameFile) {
         res.send({'result': 'taxonium loaded'});
@@ -924,7 +920,7 @@ const loadTaxonium = async (data_file) => {
 
         globalTaxoniumMeta = {
           path: taxonium_file_path,
-          size: stat_size
+          size: taxonium_size
         };
 
         res.send({'result': 'taxonium loaded'});

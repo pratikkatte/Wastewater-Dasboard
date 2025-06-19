@@ -96,7 +96,8 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
       }
     };
 
-    const handleResultsClick = async (idx) => {
+    const handleResultsClick = async (ev, idx) => {
+      ev.preventDefault();
       let tax_loaded = false;
 
         setLoading(idx);
@@ -112,12 +113,12 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             console.log("error", response);
             alert('Could not load the taxonium file.');
             setLoading(false);
-            const tax_loaded = false;
+            tax_loaded = false;
           }
         } catch (error) {
           console.log("axios error", error);
           setLoading(null);
-          const tax_loaded = false;
+          tax_loaded = false;
           alert('Could not load the taxonium file.');
         }
 
@@ -235,7 +236,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
         justifyContent: 'center',
         gap: '8px'
       }}
-      onClick={() => handleResultsClick(index)}
+      onClick={(ev) => handleResultsClick(ev, index)}
     >
       {result}
       {loading === index && (
