@@ -32,6 +32,7 @@ def main():
         'start': reference_start,
         "end": reference_end,
         'ref_file': os.path.basename(ref),
+        'taxonium_size': int(os.path.getsize(taxonium_file_path) / (1024 * 1024))
     }
 
     with open(path, 'w') as f:
