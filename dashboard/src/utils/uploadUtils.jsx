@@ -217,10 +217,9 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
               <div className="px-2 text-gray-500 text-sm">results</div>
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
-            <div className="flex flex-row space-x-4 mt-6">
+            <div className="flex flex-wrap gap-4 mt-6">
             {results.map((result, index) => (
-  <div key={index} style={{
-    display: 'flex',flexDirection: 'column',}}>
+  <div key={index} className="flex flex-col">
     <button
       style={{
         background: '#f2f0f0', // fixed typo
