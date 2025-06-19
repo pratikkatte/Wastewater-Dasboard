@@ -1,2 +1,0 @@
-import{x as o,u as i,R as t}from"./index-CTn4VqQ6.js";import{Y as m}from"./YScaleBars-NDuIrZBl.js";import"./util-D8AyiNeF.js";async function g(e,a,n){await o(()=>!!e.stats&&!!e.regionCannotBeRenderedText);const{offsetPx:r}=i.getContainingView(e);return t.createElement(t.Fragment,null,t.createElement("g",null,await n(a)),t.createElement("g",{transform:`translate(${Math.max(-r,0)})`},t.createElement(m,{model:e,orientation:"left",exportSVG:!0})))}export{g as renderSvg};
-//# sourceMappingURL=renderSvg-BeynShT8.js.map
