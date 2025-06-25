@@ -887,7 +887,7 @@ const loadTaxonium = async (data_file) => {
 
   async function getFileSizeInMB(filePath) {
     const stat = await fs.promises.stat(filePath);
-    const sizeInMB = Math.floor(stat.size / (1024 * 1024));
+    const sizeInMB = Math.ceil(stat.size / (1024 * 1024));
     return sizeInMB;
   }
 
