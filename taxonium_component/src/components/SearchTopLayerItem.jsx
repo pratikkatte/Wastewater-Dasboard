@@ -11,13 +11,14 @@ import Modal from "react-modal";
 import { useEffect } from "react";
 
 
-function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
+function SearchTopLayerItem({ singleSearchSpec, myKey, search, config, uncertainNodes }) {
   const myLoadingStatus = search.searchLoadingStatus[myKey];
   const [permaLinkModalOpen, setPermaLinkModalOpen] = useState(false);
   const this_result = search.searchResults[myKey];
   const [isOpen, setIsOpen] = useState(false);
   const [issearched, setIssearched] = useState(false);
 
+  console.log("uncertainNodes", uncertainNodes)
   const num_results =
     this_result && this_result.result
       ? this_result.result.total_count
@@ -51,12 +52,9 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
   );
 
   const showUncertainNodes = useCallback(()=>{
-
-          const index = getMyIndex()
-          console.log("index", index)
-
-          var keys = search.searchUncertain_nodes(singleSearchSpec.uncertain_nodes, index);
-          return keys
+    const index = getMyIndex()
+    var keys = search.searchUncertain_nodes(uncertainNodes, index);
+    return keys
 
   },[search.searchSpec, singleSearchSpec, search.searchesEnabled])
 
@@ -126,11 +124,11 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
                 >
                   <FaSearch />
                 </Button>
-                {singleSearchSpec.uncertain_nodes && singleSearchSpec.uncertain_nodes.length > 0 && (
+                {uncertainNodes && uncertainNodes.length > 0 && (
                   <DisplayHaplotype 
                   showUncertainNodes={showUncertainNodes} 
                   search={search}
-                  singleSearchSpec={singleSearchSpec}
+                  // singleSearchSpec={singleSearchSpec}
                 />
                 )}
                 
@@ -175,7 +173,7 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
           </div>
 
         </div>
-        {singleSearchSpec.uncertain_nodes && singleSearchSpec.uncertain_nodes.length > 0 && (
+        {uncertainNodes && uncertainNodes.length > 0 && (
         <div style={{
       border: '1px solid #e0e0e0',
       borderRadius: '4px',
@@ -199,10 +197,10 @@ function SearchTopLayerItem({ singleSearchSpec, myKey, search, config }) {
           </div>
           {isOpen && (
             <div style={{ marginTop: '8px', paddingLeft: '5px' }}>
-              {singleSearchSpec.uncertain_nodes.length === 0 ? (
+              {uncertainNodes.length === 0 ? (
                 <p style={{ fontSize: '13px', color: '#777' }}>No uncertain nodes.</p>
               ) : (
-                singleSearchSpec.uncertain_nodes.map((node, index) => (
+                uncertainNodes.map((node, index) => (
                   <p key={index} style={{ margin: '5px 0', fontSize: '13px', color: '#555' }}>
                     {node}
                   </p>

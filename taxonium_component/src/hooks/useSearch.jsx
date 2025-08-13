@@ -240,7 +240,6 @@ const useSearch = ({
   ]);
 
   const setEnableUncertainNodes = (keys, enabled) => {
-    console.log("keys", keys)
     let newSearchesEnabled = {};
       keys.forEach(item => {
         newSearchesEnabled[item] = enabled;

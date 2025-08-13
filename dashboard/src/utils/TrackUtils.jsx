@@ -62,7 +62,6 @@ const addTrack = (clickedNodeRef, selectedFile, trackIDsRef, viewState, config) 
         ]
     };
 
-
     const haplotype_sequences = selectedFile['HP_SEQ']['filename']
 
     const hap_location = `${config.BAM}${haplotype_sequences}`;

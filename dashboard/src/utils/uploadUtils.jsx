@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 
 
-const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery, config, setProjectName}) => {
+const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQuery, config, setProjectName, setUncertainNodes}) => {
   
 
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -167,7 +167,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             haplotype_lineage[nodes[i]] = filenames_nodes[nodes[i]]['HL']
             uncertain_nodes[nodes[i]] = filenames_nodes[nodes[i]]['UH']
         }
-        const default_search = createDefaultSearch(haplotype_prop, haplotype_lineage, uncertain_nodes);
+        const default_search = createDefaultSearch(haplotype_prop, haplotype_lineage);
 
         const query = {
               srch: JSON.stringify(default_search),
@@ -180,6 +180,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
           };
         updateQuery(query)
         setSelectedFile(filenames_nodes);
+        setUncertainNodes(uncertain_nodes);
     }
     
     return (
@@ -204,7 +205,7 @@ const FileUpload = ({setSelectedFile, createDefaultSearch, mark_nodeRef, updateQ
             <p>{uploadProgress}%</p>
 
         )} 
-                <br/>
+            <br/>
             </div>
             <div style={{ textAlign: 'center', fontSize: 'small' }}>
                 <span>Loaded Taxonium file: <strong>{taxonium_file}</strong></span>

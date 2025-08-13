@@ -37,7 +37,8 @@ function Taxonium({
   setOverlayContent,
   setTitle,
   onClickNode,
-  bamInformation
+  bamInformation,
+  uncertainNodes
 }) {
 
   const [backupQuery, setBackupQuery] = useState(query ? query: default_query);
@@ -205,6 +206,8 @@ function Taxonium({
                 perNodeFunctions={perNodeFunctions}
                 toggleSidebar={toggleSidebar}
                 bamInformation={bamInformation}
+                uncertainNodes={uncertainNodes}
+
               />
             )}
       </div>

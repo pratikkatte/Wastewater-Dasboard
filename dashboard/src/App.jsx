@@ -13,6 +13,7 @@ import SplitPane from 'react-split-pane';
 import { MdArrowBack, MdArrowForward, MdArrowUpward } from "react-icons/md";
 import useDashboardConfig from './config.js'
 import {createRoot, hydrateRoot } from 'react-dom/client'
+import useConfirmOnBack from './utils/useConfirmOnBack.ts'
 
 import './App.css'
 
@@ -25,10 +26,10 @@ const default_query = {};
 
 default_query.backend = null;
 
-const createDefaultSearch = (mark_nodes, hap_lin, unc_nodes) => {
+const createDefaultSearch = (mark_nodes, hap_lin) => {
   
   return Object.keys(mark_nodes).map(node => {
-    return getDefaultSearch(null, node, mark_nodes[node], hap_lin[node], unc_nodes[node]);
+    return getDefaultSearch(null, node, mark_nodes[node], hap_lin[node]);
   })
 }
 
@@ -48,6 +49,7 @@ function App() {
   const [JBrowseOpen, setJBrowseOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
   const [paneSize, setPaneSize] = useState('98%');
+  const [uncertainNodes, setUncertainNodes] = useState(null);
 
   
   const [patches, setPatches] = useState(null);
@@ -147,35 +149,58 @@ const defaultConfig = {"project_name":"uploads",
 
     }, [mark_nodeRef]);
 
-    useEffect(() => {
-      const handlePopState = () => {
-        if (selectedFile) {
-          const confirmLeave = window.confirm(
-            "Do you want to leave and lose this session?"
-          );
-          if (!confirmLeave) {
-            // 👇 Push a new dummy state again to intercept future back presses
-            window.history.pushState(null, '', window.location.href);
-          } else {
-             // Allow back navigation
-            window.removeEventListener('popstate', handlePopState);
-            window.history.back(); // proceed with browser history
-          }
-        }
-      };
+    useConfirmOnBack({
+      enabled: !!selectedFile, // only trap when a session/file is loaded
+      message: 'Do you want to leave and lose this session?',
+      onConfirm: () => {
     
-      // Initial trap
-      window.history.pushState(null, '', window.location.href);
-      window.addEventListener('popstate', handlePopState);
-    
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-      };
-    }, [selectedFile]);    
+        // Vanilla:
+        setSelectedFile(false);
+        // setUncertainNodes(null);
+        // setBackupQuery(default_query);
+        setProjectName(defaultConfig);
+        // setPatches(null);
+        // setViewState(null);
+        // clickedNodeRef.current = null;
+        // mark_nodeRef.current = null;
+        trackIDsRef.current = [];
+        setCreateTrack(null);
+        setJBrowseOpen(false);
+        setPaneSize('98%');
+        window.location.href = '/';
+        
+      },
+    });
 
-    if (!viewState) {
-      return null
-  }
+  //   useEffect(() => {
+  //     const handlePopState = () => {
+  //       if (selectedFile) {
+  //         const confirmLeave = window.confirm(
+  //           "Do you want to leave and lose this session?"
+  //         );
+  //         if (!confirmLeave) {
+  //           // 👇 Push a new dummy state again to intercept future back presses
+  //           window.history.pushState(null, '', window.location.href);
+  //         } else {
+  //            // Allow back navigation
+  //           window.removeEventListener('popstate', handlePopState);
+  //           window.history.back(); // proceed with browser history
+  //         }
+  //       }
+  //     };
+    
+  //     // Initial trap
+  //     window.history.pushState(null, '', window.location.href);
+  //     window.addEventListener('popstate', handlePopState);
+    
+  //     return () => {
+  //       window.removeEventListener('popstate', handlePopState);
+  //     };
+  //   }, [selectedFile]);    
+
+  //   if (!viewState) {
+  //     return null
+  // }
 
   return (
     <>
@@ -185,15 +210,16 @@ const defaultConfig = {"project_name":"uploads",
           <br />
             {!selectedFile ? 
               <div>
-                <FileUpload setSelectedFile={setSelectedFile} 
+                <FileUpload 
+                setSelectedFile={setSelectedFile} 
                 createDefaultSearch={createDefaultSearch} 
                 mark_nodeRef={mark_nodeRef} 
                 updateQuery={updateQuery} 
                 config={config}
                 setProjectName={setProjectName}
+                setUncertainNodes={setUncertainNodes}
                 />
               </div>
-              
           :
                 <SplitPane
                   split="vertical"
@@ -211,6 +237,7 @@ const defaultConfig = {"project_name":"uploads",
                       updateQuery={updateQuery}
                       onClickNode={onClickNode}
                       bamInformation={selectedFile}
+                      uncertainNodes={uncertainNodes}
                     />
                 </div>
 

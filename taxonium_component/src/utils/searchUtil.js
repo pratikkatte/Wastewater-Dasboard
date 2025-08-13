@@ -15,8 +15,7 @@ export function getDefaultSearch(config, key) {
     new_residue: "any",
     min_tips: 0,
     hl_value: '',
-    hs_value: '',
-    uncertain_nodes: []
+    hs_value: ''
   };
 }
 

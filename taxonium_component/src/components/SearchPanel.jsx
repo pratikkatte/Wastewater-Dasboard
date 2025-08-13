@@ -84,7 +84,8 @@ function SearchPanel({
   view,
   perNodeFunctions,
   toggleSidebar,
-  bamInformation
+  bamInformation,
+  uncertainNodes
 }) {
   useEffect(() => {
     ReactTooltip.rebuild();
@@ -579,6 +580,7 @@ function SearchPanel({
               myKey={item.key}
               search={search}
               config={config}
+              uncertainNodes={item.text && uncertainNodes[item.text] ? uncertainNodes[item.text] : []}
             />
             </div>)
           }

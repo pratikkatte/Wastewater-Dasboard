@@ -1,4 +1,4 @@
-export function getDefaultSearch(config, text, hs_value, hl_value, unc_nodes ) {
+export function getDefaultSearch(config, text, hs_value, hl_value ) {
     const key = Math.random().toString(36).substring(2, 15);
 
     if (config && config.defaultSearch) {
@@ -13,11 +13,8 @@ export function getDefaultSearch(config, text, hs_value, hl_value, unc_nodes ) {
       position: 484,
       new_residue: "any",
       min_tips: 0,
-      uncertain_nodes: unc_nodes,
       hl_value: String(hl_value),
-      ...(hs_value ? { hs_value: (parseFloat(hs_value) * 100).toFixed(3) } : {})
-
-      
+      ...(hs_value ? { hs_value: (parseFloat(hs_value) * 100).toFixed(3) } : {})      
     };
   }
   
